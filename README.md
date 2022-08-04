@@ -2,3 +2,5 @@
 
 
 - [Article about HTTP Server on C](https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa)
+
+- [Checklist for evaluation](https://github.com/mharriso/school21-checklists/blob/master/ng_5_webserv.pdf)
