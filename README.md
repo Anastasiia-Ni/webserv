@@ -7,3 +7,4 @@
 
 - [RTFM HTTP Message](https://www.rfc-editor.org/rfc/rfc2616.html#section-4)
 - [methods](https://developer.mozilla.org/en-US/docs/Web/HTTP)
+- [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html)
