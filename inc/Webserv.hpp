@@ -4,11 +4,24 @@
 #include <iostream>
 #include <fcntl.h>
 
-/* we need define them accoding to the subject */
+/* STL Containers */
+# include <map>
+# include <set>
+# include <vector>
+# include <algorithm>
+# include <iterator>
+# include <list>
 
-#define FD_SET
-#define FD_CLR
-#define FD_ISSET
-#define FD_ZERO
+/* System */
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <sys/stat.h>
+# include <sys/time.h>
+
+/* Network */
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <sys/select.h>
+# include <arpa/inet.h>
 
 #endif
