@@ -17,11 +17,15 @@
 # include <sys/wait.h>
 # include <sys/stat.h>
 # include <sys/time.h>
+# include <unistd.h>
 
 /* Network */
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <sys/select.h>
 # include <arpa/inet.h>
+
+# include "ConfigParser.hpp"
+# include "ConfigFile.hpp"
 
 #endif

@@ -1,0 +1,36 @@
+server {
+    server_name
+    listen
+
+    index home.html
+    root ./server_dir
+
+    location / {
+        allow_methods PUT
+        autoindex
+    }
+    location / {
+        allow_methods POST
+
+    }
+    location / {
+        allow_methods DELETE
+
+    }
+}
+
+server {
+    server_name
+    listen
+
+    index home.html
+    root 
+}
+
+server {
+    server_name
+    listen
+
+    index home.html
+    root 
+}
