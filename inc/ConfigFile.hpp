@@ -15,6 +15,7 @@ class ConfigFile {
 
 		int getTypePath(std::string const path);
 		int checkFile(std::string const path);
+		std::string	readFile(std::string path);
 
 		std::string getPath();
 		int getSize();

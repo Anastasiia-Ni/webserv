@@ -2,6 +2,8 @@
 # define WEBSERV_HPP
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <fcntl.h>
 
 /* STL Containers */

@@ -33,12 +33,22 @@ int ConfigFile::getTypePath(std::string const path)
 /* checks is the file exists and accessable */
 int  ConfigFile::checkFile(std::string const path)
 {
-	if (access(path.c_str(), 0) != -1)
-		return (0);
-	else
-		return (-1); //throw FileError
+	return (access(path.c_str(), 0));	
 }
-// access()
+
+/* reading from file to string */
+std::string	ConfigFile::readFile(std::string path)
+{
+	if (path.empty() || path.length() == 0)
+		return (NULL);
+	std::ifstream config_file(path.c_str());
+	if (!config_file || !config_file.is_open())
+		return (NULL);
+
+    std::stringstream stream_binding;
+    stream_binding << config_file.rdbuf();
+    return (stream_binding.str());
+}
 
 std::string ConfigFile::getPath()
 {

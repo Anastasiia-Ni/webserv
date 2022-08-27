@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 			ConfigParser	cluster;
 
 			/* configuration file as argument or default path */
-			config = (argc == 1 ? "config.txt" : argv[1]);
+			config = (argc == 1 ? "default.conf" : argv[1]);
 			cluster.createCluster(config);
 			cluster.print();
 
@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
 		}
 		catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;
+			return (1);
 		}
     }
     else {
