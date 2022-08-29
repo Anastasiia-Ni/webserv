@@ -29,5 +29,6 @@
 
 # include "ConfigParser.hpp"
 # include "ConfigFile.hpp"
+# include "ServerConfig.hpp"
 
 #endif

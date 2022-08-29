@@ -8,7 +8,7 @@ ConfigFile::~ConfigFile() { }
 
 
 /* define is path is file(1), folder(2) or something else(3) */
-int ConfigFile::getTypePath(std::string const path) 
+int ConfigFile::getTypePath(std::string const path)
 {
 	struct stat	buffer;
 	int			result;
@@ -25,15 +25,15 @@ int ConfigFile::getTypePath(std::string const path)
 			return (2);
 		else
 			return (3);
-    }
+	}
 	else
 		return (-1);
 }
 
 /* checks is the file exists and accessable */
-int  ConfigFile::checkFile(std::string const path)
+int	ConfigFile::checkFile(std::string const path)
 {
-	return (access(path.c_str(), 0));	
+	return (access(path.c_str(), 0));
 }
 
 /* reading from file to string */
@@ -45,9 +45,9 @@ std::string	ConfigFile::readFile(std::string path)
 	if (!config_file || !config_file.is_open())
 		return (NULL);
 
-    std::stringstream stream_binding;
-    stream_binding << config_file.rdbuf();
-    return (stream_binding.str());
+	std::stringstream stream_binding;
+	stream_binding << config_file.rdbuf();
+	return (stream_binding.str());
 }
 
 std::string ConfigFile::getPath()

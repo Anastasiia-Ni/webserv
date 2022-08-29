@@ -1,19 +1,18 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include "../inc/Webserv.hpp"
+#include "Webserv.hpp"
 
 #define WHITESPACE "\t\n\v\f\r "
 
 class ConfigParser {
 	private:
+		//std::vector<ServerConfig> servers;
+		std::vector<std::string>	_server_config;
+		size_t						_nb_server;
 
 	public:
-		public:
-    	//std::vector<ServerConfig> servers;
-		std::vector<std::string> server_config;
-		unsigned int number_server;
-		
+
 		ConfigParser();
 		~ConfigParser();
 
@@ -24,6 +23,7 @@ class ConfigParser {
 		void removeWhiteSpace(std::string &content);
 		size_t findStartServer(size_t start, std::string &content);
 		size_t findEndServer(size_t start, std::string &content);
+		void createServer(std::string &config);
 
 		int print();
 
@@ -44,15 +44,5 @@ class ConfigParser {
 				virtual ~ErrorException() throw() {}
 		};
 };
-
-// class ServerConfig
-// {
-// 	private:
-// 		port;
-// 		client_max_body_size;
-// 		root;
-// 		autoindex;
-
-// };
 
 #endif
