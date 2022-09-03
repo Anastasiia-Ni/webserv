@@ -5,9 +5,11 @@
 
 #define WHITESPACE "\t\n\v\f\r "
 
+class ServerConfig;
+
 class ConfigParser {
 	private:
-		//std::vector<ServerConfig> servers;
+		std::vector<ServerConfig>	_servers;
 		std::vector<std::string>	_server_config;
 		size_t						_nb_server;
 
@@ -23,7 +25,13 @@ class ConfigParser {
 		void removeWhiteSpace(std::string &content);
 		size_t findStartServer(size_t start, std::string &content);
 		size_t findEndServer(size_t start, std::string &content);
-		void createServer(std::string &config);
+		void createServer(std::string &config, ServerConfig &server);
+
+		int isValidAdress(std::string parametr);
+		int isValidPort(std::string parametr);
+		int isValidMethods(std::string parametr);
+		int	stringCompare(std::string str1, std::string str2, size_t pos);
+		int parseLocation(std::vector<std::string> &parametrs, size_t &pos);
 
 		int print();
 

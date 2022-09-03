@@ -1,6 +1,6 @@
 NAME = webserv
 
-SRCS = main.cpp src/ConfigFile.cpp src/ConfigParser.cpp
+SRCS = main.cpp src/ConfigFile.cpp src/ConfigParser.cpp src/ServerConfig.cpp
 
 HEADERS	= inc/Webserv.hpp
 
@@ -17,7 +17,7 @@ BLACK = "\033[1m\033[37m"
 
 all: $(NAME)
 
-$(NAME) : $(OBJS) $(HEADERS)
+$(NAME) : $(OBJS) 
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled 🌐 $(RESET)
 
@@ -30,4 +30,7 @@ fclean: clean
 
 re: 	fclean all
 
-.PHONY: all clean fclean re
+fmt:
+	clang-format -i $(SRCS) $(HEADERS)
+
+.PHONY: all clean fclean re fmt

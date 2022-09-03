@@ -3,6 +3,8 @@
 
 #include "../inc/Webserv.hpp"
 
+static std::string	serverParametrs[] = {"server_name", "listen", "root", "index", "allow_methods", "client_body_buffer_size"};
+
 class ServerConfig
 {
 	private:
@@ -18,6 +20,8 @@ class ServerConfig
 	public:
 		ServerConfig();
 		~ServerConfig();
+		ServerConfig(const ServerConfig &other);
+		ServerConfig &operator=(const ServerConfig & rhs);
 
 		void setServerName(std::string server_name);
 		void setRoot(std::string root);
