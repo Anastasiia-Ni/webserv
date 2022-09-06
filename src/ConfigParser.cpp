@@ -7,10 +7,27 @@ ConfigParser::ConfigParser()
 
 ConfigParser::~ConfigParser() { }
 
+
+
 int ConfigParser::print()
 {
-	std::cout<< "------------- Config -------------" << std::endl;
-
+	std::cout << "------------- Config -------------" << std::endl;
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		std::cout << "Server #" << i + 1 << std::endl;
+		std::cout << "Server name: " << _servers[i].getServerName() << std::endl;
+		std::cout << "Host: " << _servers[i].getHost() << std::endl;
+		std::cout << "Port: " << _servers[i].getPort() << std::endl;
+		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
+		std::cout << "Error pages: " << std::endl;
+		std::map<short, std::string>::iterator it = _servers[i]._error_pages.begin();
+		while (it != _servers[i]._error_pages.end())
+		{
+			std::cout << it->first << " - " << it->second << std::endl;
+			++it;
+		}
+		std::cout << "-----------------------------" << std::endl;
+	}
 	return (0);
 }
 
@@ -173,31 +190,58 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 
-	std::cout << "SERVER" << std::endl; // delete
 	for (size_t i = 0; i < parametrs.size(); i++)
 	{
-		if (parametrs[i] == "location")
+		if (parametrs[i] == "listen" && (i + 1) < parametrs.size())
 		{
-			std::string	nameLocation;
-			// check directive
-			i++;
-			if (parametrs[i] == "{" || parametrs[i] == "}")
-				throw  ErrorException("Wrong character in server scope{}");
-			nameLocation = parametrs[i];
-			i++;		
-			if (!parseLocation(parametrs, i))
-				throw  ErrorException("Wrong character in server scope{}");
-			//server.setLocation(nameLocation);
-			if (i < parametrs.size() && parametrs[i] == "}")
-				continue ;
+			server.setHost(parametrs[++i]);
 		}
-		
-		std::cout << parametrs[i] << std::endl; // delete
+	// 	if (parametrs[i] == "location")
+	// 	{
+	// 		std::string	nameLocation;
+	// 		// check directive
+	// 		i++;
+	// 		if (parametrs[i] == "{" || parametrs[i] == "}")
+	// 			throw  ErrorException("Wrong character in server scope{}");
+	// 		nameLocation = parametrs[i];
+	// 		i++;
+	// 		if (!parseLocation(parametrs, i))
+	// 			throw  ErrorException("Wrong character in server scope{}");
+	// 		//server.setLocation(nameLocation);
+	// 		if (i < parametrs.size() && parametrs[i] == "}")
+	// 			continue ;
+	// 	}
+		if (parametrs[i] == "port" && (i + 1) < parametrs.size())
+		{
+			server.setPort(parametrs[++i]);
+		}
+		if (parametrs[i] == "error_page" && (i + 1) < parametrs.size())
+		{
+			std::vector<std::string> codes;
+			while (++i < parametrs.size())
+			{
+				codes.push_back(parametrs[i]);
+				if (parametrs[i].find(';') != std::string::npos)
+					break;
+				if (i + 1 >= parametrs.size())
+					throw ErrorException("Wrong character out of server scope{}"); //check the case
+			}
+			server.setErrorPages(codes);
+		}
+		if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size())
+		{
+			server.setClientMaxBodySize(parametrs[++i]);
+		}
+		if (parametrs[i] == "server_name" && (i + 1) < parametrs.size())
+		{
+			server.setServerName(parametrs[++i]);
+		}
+	// 	std::cout << parametrs[i] << std::endl; // delete
 	}
 
 	// идем по каждому слову
 	// если location
-	
+
 	(void) server;
 	//проверить обязательные параметры, если ок создаем и заполняем. может проверить раньше??
 
@@ -213,13 +257,13 @@ int ConfigParser::parseLocation(std::vector<std::string> &parametrs, size_t &pos
 int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 {
 	size_t	i;
-	
+
 	i = 0;
 	while (pos < str1.length() && i < str2.length() && str1[pos] == str2[i])
 	{
 		pos++;
 		i++;
-	}	
+	}
 	if (i == str2.length() && pos <= str1.length() && (str1.length() == pos || isspace(str1[pos])))
 		return (0);
 	return (1);
