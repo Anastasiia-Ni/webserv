@@ -7,8 +7,7 @@ ConfigParser::ConfigParser()
 
 ConfigParser::~ConfigParser() { }
 
-
-
+/* printing parametrs of servers from config file */
 int ConfigParser::print()
 {
 	std::cout << "------------- Config -------------" << std::endl;
@@ -19,18 +18,26 @@ int ConfigParser::print()
 		std::cout << "Host: " << _servers[i].getHost() << std::endl;
 		std::cout << "Port: " << _servers[i].getPort() << std::endl;
 		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
-		std::cout << "Error pages: " << std::endl;
+		std::cout << "Error pages: " << _servers[i]._error_pages.size() << std::endl;
 		std::map<short, std::string>::iterator it = _servers[i]._error_pages.begin();
 		while (it != _servers[i]._error_pages.end())
 		{
-			std::cout << it->first << " - " << it->second << std::endl;
+			std::cout << (*it).first << " - " << it->second << std::endl;
 			++it;
 		}
+		std::cout << "Locations: " << _servers[i]._locations.size() << std::endl;
+		// std::map<std::string, Location>::iterator itl = _servers[i]._locations.begin();
+		// while (itl != _servers[i]._locations.end())
+		// {
+		// 	std::cout << "name location " << (*itl).first << " - " << itl->second._root << std::endl;
+		// 	++itl;
+		// }
 		std::cout << "-----------------------------" << std::endl;
 	}
 	return (0);
 }
 
+/* checking and read config file, split servers to strings and creating vector of servers */
 int ConfigParser::createCluster(const std::string &config_file)
 {
 	std::string		content;
@@ -52,8 +59,17 @@ int ConfigParser::createCluster(const std::string &config_file)
 	{
 		ServerConfig server;
 		createServer(this->_server_config[i], server);
+		validServer(server);
 		this->_servers.push_back(server);
+
+		std::cout << "size error - " << server._error_pages.size() << std::endl; //delete
+		std::map<short, std::string>::iterator it = server._error_pages.begin(); //delete
+		for (; it != server._error_pages.end(); it++)			//delete
+			std::cout << it->first << " - " << it->second << std::endl;	//delete
+
+
 	}
+	// checkServers(); // for repeat and mandatory parametrs
 	return (0);
 }
 
@@ -116,7 +132,7 @@ void ConfigParser::splitServers(std::string &content)
 		this->_nb_server++;
 		start = end + 1;
 	}
-	std::cout << "size: " << _nb_server << std::endl; //delete
+	//std::cout << "size: " << _nb_server << std::endl; //delete
 }
 
 /* finding a server begin and return the index of { start of server */
@@ -164,6 +180,7 @@ size_t ConfigParser::findEndServer (size_t start, std::string &content)
 	return (start);
 }
 
+/* spliting line by separator */
 std::vector<std::string> splitParametrs(std::string line, std::string sep)
 {
 	std::vector<std::string>	str;
@@ -184,33 +201,36 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 	return (str);
 }
 
+/* creating Server from string and fill the value */
 void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
 	std::vector<std::string>parametrs;
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
-
 	for (size_t i = 0; i < parametrs.size(); i++)
 	{
 		if (parametrs[i] == "listen" && (i + 1) < parametrs.size())
 		{
 			server.setHost(parametrs[++i]);
 		}
-	// 	if (parametrs[i] == "location")
-	// 	{
-	// 		std::string	nameLocation;
-	// 		// check directive
-	// 		i++;
-	// 		if (parametrs[i] == "{" || parametrs[i] == "}")
-	// 			throw  ErrorException("Wrong character in server scope{}");
-	// 		nameLocation = parametrs[i];
-	// 		i++;
-	// 		if (!parseLocation(parametrs, i))
-	// 			throw  ErrorException("Wrong character in server scope{}");
-	// 		//server.setLocation(nameLocation);
-	// 		if (i < parametrs.size() && parametrs[i] == "}")
-	// 			continue ;
-	// 	}
+		if (parametrs[i] == "location" && (i + 1) < parametrs.size())
+		{
+			std::string	path;
+			i++;
+			if (parametrs[i] == "{" || parametrs[i] == "}")
+				throw  ErrorException("Wrong character in server scope{}");
+			path = parametrs[i];
+			std::vector<std::string> codes;
+			if (parametrs[++i] != "{")
+				throw  ErrorException("Wrong character in server scope{}");
+			while (i < parametrs.size() && parametrs[i] != "}")
+				codes.push_back(parametrs[i++]);
+			server.setLocation(path, codes);
+			if (i < parametrs.size() && parametrs[i] == "}")
+				i++;
+			else
+				throw  ErrorException("Wrong character in server scope{}");
+		}
 		if (parametrs[i] == "port" && (i + 1) < parametrs.size())
 		{
 			server.setPort(parametrs[++i]);
@@ -238,14 +258,6 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		}
 	// 	std::cout << parametrs[i] << std::endl; // delete
 	}
-
-	// идем по каждому слову
-	// если location
-
-	(void) server;
-	//проверить обязательные параметры, если ок создаем и заполняем. может проверить раньше??
-
-	// проверяем и заполняем дополнительные
 }
 
 int ConfigParser::parseLocation(std::vector<std::string> &parametrs, size_t &pos)
@@ -254,6 +266,7 @@ int ConfigParser::parseLocation(std::vector<std::string> &parametrs, size_t &pos
 	return (parametrs[pos] == "}");
 }
 
+/* comparing strings from position */
 int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 {
 	size_t	i;
@@ -269,46 +282,10 @@ int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 	return (1);
 }
 
-int ConfigParser::isValidAdress(std::string parametr)
+int ConfigParser::validServer(const ServerConfig &server)
 {
-	(void)parametr;
-	// size_t index;
-	// std::string ip;
-	// std::string port;
-
-	// index = parametr.find(":");
-	// if (parametr.find(":") != std::string::npos)
-	// {
-	// 	ip = parametr.substr(0, index);
-	// 	port = parametr.substr(index + 1);
-	// }
-	// else
-	// {
-	// 	// ip =
-	// 	port = parametr.substr();
-	// }
-	return (0);
+	if (server.isValidHost() && server.isValidErrorPages() && server.isValidLocations())
+		return (1);
+	else
+		throw ErrorException("Failed server validation");
 }
-
-int ConfigParser::isValidPort(std::string parametr)
-{
-	size_t	port;
-
-	for (size_t i = 0; i < parametr.length(); i++)
-	{
-		if (parametr[i] < '0' || parametr[i] > '9')
-			throw ErrorException("Wrong syntax: port");
-	}
-	port = atoi(parametr.c_str());
-	if (!port || port > 65636)
-		throw ErrorException("Wrong syntax: port");
-	return (0);
-}
-
-int ConfigParser::isValidMethods(std::string parametr)
-{
-	(void)parametr;
-	return (0);
-}
-// int isValidLocation(std::string location)
-// int isValidRoot(std::string root)

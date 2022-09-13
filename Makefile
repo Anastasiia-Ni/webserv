@@ -1,6 +1,6 @@
 NAME = webserv
 
-SRCS = main.cpp src/ConfigFile.cpp src/ConfigParser.cpp src/ServerConfig.cpp
+SRCS = main.cpp src/ConfigFile.cpp src/ConfigParser.cpp src/ServerConfig.cpp src/Location.cpp
 
 HEADERS	= inc/Webserv.hpp
 

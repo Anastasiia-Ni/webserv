@@ -31,5 +31,6 @@
 # include "ConfigParser.hpp"
 # include "ConfigFile.hpp"
 # include "ServerConfig.hpp"
+# include "Location.hpp"
 
 #endif

@@ -50,6 +50,7 @@ std::string	ConfigFile::readFile(std::string path)
 	return (stream_binding.str());
 }
 
+/* Get functions */
 std::string ConfigFile::getPath()
 {
 	return (this->_path);

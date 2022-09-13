@@ -1,7 +1,7 @@
-#ifndef CONFIGFile_HPP
-#define CONFIGFile_HPP
+#ifndef CONFIGFILE_HPP
+#define CONFIGFILE_HPP
 
-#include "../inc/Webserv.hpp"
+#include "Webserv.hpp"
 
 class ConfigFile {
     private:
@@ -14,7 +14,7 @@ class ConfigFile {
 		~ConfigFile();
 
 		int getTypePath(std::string const path);
-		int checkFile(std::string const path);
+		static int checkFile(std::string const path);
 		std::string	readFile(std::string path);
 
 		std::string getPath();
