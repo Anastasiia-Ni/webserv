@@ -18,20 +18,21 @@ int ConfigParser::print()
 		std::cout << "Host: " << _servers[i].getHost() << std::endl;
 		std::cout << "Port: " << _servers[i].getPort() << std::endl;
 		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
-		std::cout << "Error pages: " << _servers[i]._error_pages.size() << std::endl;
-		std::map<short, std::string>::iterator it = _servers[i]._error_pages.begin();
-		while (it != _servers[i]._error_pages.end())
+		std::cout << "Error pages: " << _servers[i].getErrorPages().size() << std::endl;
+		std::map<short, std::string>::const_iterator it = _servers[i].getErrorPages().begin();
+		while (it != _servers[i].getErrorPages().end())
 		{
 			std::cout << (*it).first << " - " << it->second << std::endl;
 			++it;
 		}
 		std::cout << "Locations: " << _servers[i]._locations.size() << std::endl;
-		// std::map<std::string, Location>::iterator itl = _servers[i]._locations.begin();
-		// while (itl != _servers[i]._locations.end())
-		// {
-		// 	std::cout << "name location " << (*itl).first << " - " << itl->second._root << std::endl;
-		// 	++itl;
-		// }
+		std::map<std::string, Location>::iterator itl = _servers[i]._locations.begin();
+		while (itl != _servers[i]._locations.end())
+		{
+			std::cout << "name location " << (*itl).first << " - " << itl->second.getRoot() << std::endl;
+			std::cout << "methods" << itl->second.getPrintMethods() << std::endl;
+			++itl;
+		}
 		std::cout << "-----------------------------" << std::endl;
 	}
 	return (0);
@@ -61,15 +62,14 @@ int ConfigParser::createCluster(const std::string &config_file)
 		createServer(this->_server_config[i], server);
 		validServer(server);
 		this->_servers.push_back(server);
-
-		std::cout << "size error - " << server._error_pages.size() << std::endl; //delete
-		std::map<short, std::string>::iterator it = server._error_pages.begin(); //delete
-		for (; it != server._error_pages.end(); it++)			//delete
-			std::cout << it->first << " - " << it->second << std::endl;	//delete
-
-
+		// std::cout << "size error - " << _servers[i].getErrorPages().size() << std::endl; //delete
+		// std::cout << "size locations - " << server.getLocations().size() << std::endl; //delete
+		// std::map<short, std::string>::const_iterator it = server.getErrorPages().begin(); //delete
+		// for (; it != server.getErrorPages().end(); it++)			//delete
+		// 	std::cout << it->first << " - " << it->second << std::endl;	//delete
 	}
-	// checkServers(); // for repeat and mandatory parametrs
+	if (this->_nb_server > 1)
+		checkServers();
 	return (0);
 }
 
@@ -132,6 +132,10 @@ void ConfigParser::splitServers(std::string &content)
 		this->_nb_server++;
 		start = end + 1;
 	}
+	// for (size_t i = 0; i < _server_config.size(); i++) // delete
+	// {
+	// 	std::cout << _server_config[i] << std::endl;
+	// }
 	//std::cout << "size: " << _nb_server << std::endl; //delete
 }
 
@@ -209,12 +213,14 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 	for (size_t i = 0; i < parametrs.size(); i++)
 	{
+		//std::cout << parametrs[i] << std::endl; //delete
 		if (parametrs[i] == "listen" && (i + 1) < parametrs.size())
 		{
 			server.setHost(parametrs[++i]);
 		}
 		if (parametrs[i] == "location" && (i + 1) < parametrs.size())
 		{
+			//std::cout << " --- " << parametrs[i] << "----" << std::endl; // delete
 			std::string	path;
 			i++;
 			if (parametrs[i] == "{" || parametrs[i] == "}")
@@ -223,12 +229,13 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			std::vector<std::string> codes;
 			if (parametrs[++i] != "{")
 				throw  ErrorException("Wrong character in server scope{}");
+			i++;
 			while (i < parametrs.size() && parametrs[i] != "}")
 				codes.push_back(parametrs[i++]);
 			server.setLocation(path, codes);
-			if (i < parametrs.size() && parametrs[i] == "}")
-				i++;
-			else
+			// for (size_t i = 0; i < codes.size(); i++) //delete
+			// 	std::cout << codes[i] << std::endl;	//delete
+			if (i < parametrs.size() && parametrs[i] != "}")
 				throw  ErrorException("Wrong character in server scope{}");
 		}
 		if (parametrs[i] == "port" && (i + 1) < parametrs.size())
@@ -256,6 +263,10 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		{
 			server.setServerName(parametrs[++i]);
 		}
+		// if (parametrs[i] == "cgi_pass" && (i + 1) < parametrs.size())
+		// {
+		// 	server.setSgiPass(parametrs[++i]);
+		// }
 	// 	std::cout << parametrs[i] << std::endl; // delete
 	}
 }
@@ -288,4 +299,20 @@ int ConfigParser::validServer(const ServerConfig &server)
 		return (1);
 	else
 		throw ErrorException("Failed server validation");
+}
+
+/* checking repeat and mandatory parametrs*/
+void ConfigParser::checkServers()
+{
+	std::vector<ServerConfig>::iterator it1;
+	std::vector<ServerConfig>::iterator it2;
+
+	for (it1 = this->_servers.begin(); it1 != this->_servers.end() - 1; it1++)
+	{
+		for (it2 = it1 + 1; it2 != this->_servers.end(); it2++)
+		{
+			if (it1->getPort() == it2->getPort() && it1->getHost() == it2->getHost() && it1->getServerName() == it2->getServerName())
+				throw ErrorException("Failed server validation");
+		}
+	}
 }

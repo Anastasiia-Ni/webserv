@@ -23,8 +23,11 @@ ServerConfig::ServerConfig(const ServerConfig &other)
 		//this->_root = other._root;
 		this->_port = other._port;
 		this->_port = other._port;
+		//this->_sgi_path = other._sgi_path;
 		this->_client_max_body_size = other._client_max_body_size;
 		//this->_autoindex = other._autoindex;
+		this->_error_pages = other._error_pages;
+		this->_locations = other._locations;
 	}
 	return ;
 }
@@ -38,8 +41,11 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 		//this->_root = rhs._root;
 		this->_port = rhs._port;
 		this->_port = rhs._port;
+		//this->_sgi_path = rhs._sgi_path;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		//this->_autoindex = rhs._autoindex;
+		this->_error_pages = rhs._error_pages;
+		this->_locations = rhs._locations;
 	}
 	return (*this);
 }
@@ -51,14 +57,16 @@ void ServerConfig::setServerName(std::string server_name)
 {
 	checkToken(server_name);
 	this->_server_name = server_name;
-	std::cout << "Name: " << this->_server_name << std::endl; // delete
+	//std::cout << "Name: " << this->_server_name << std::endl; // delete
 }
 
 void ServerConfig::setHost(std::string parametr)
 {
 	checkToken(parametr);
+	if (parametr == "localhost")
+		parametr = "127.0.0.1";
 	this->_host = inet_addr(parametr.data()); // проверить
-	std::cout << "Host: " << this->_host << std::endl; // delete
+	//std::cout << "Host: " << this->_host << std::endl; // delete
 }
 
 // void ServerConfig::setRoot(std::string root)
@@ -96,6 +104,12 @@ void ServerConfig::setClientMaxBodySize(std::string parametr)
 	this->_client_max_body_size = body_size;
 
 }
+
+// void ServerConfig::setSgiPass(std::string parametr)
+// {
+// 	checkToken(parametr);
+// 	this->_sgi_path = parametr;
+// }
 
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr) //может ли быть только страница?
 {
@@ -135,10 +149,10 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 					checkToken(parametr[i]);
 					methods.push_back(parametr[i]);
 					break ;
-				}					
-				else	
+				}
+				else
 					methods.push_back(parametr[i]);
-			}			
+			}
 			new_location.setMethods(methods);
 		}
 		if (parametr[i] == "autoindex" && (i + 1) < parametr.size())
@@ -147,7 +161,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			new_location.setAutoindex(parametr[i]);
 		}
 		if (parametr[i] == "index" && (i + 1) < parametr.size())
-		{			
+		{
 			checkToken(parametr[++i]);
 			new_location.setIndex(parametr[i]);
 		}
@@ -213,7 +227,7 @@ bool ServerConfig::isValidLocations() const
 
 
 /* Get functions */
-std::string ServerConfig::getServerName()
+const std::string &ServerConfig::getServerName()
 {
 	return (this->_server_name);
 }
@@ -223,19 +237,34 @@ std::string ServerConfig::getServerName()
 // 	return (this->_root);
 // }
 
-in_addr_t ServerConfig::getHost()
+const in_addr_t &ServerConfig::getHost()
 {
 	return (this->_host);
 }
 
-uint16_t ServerConfig::getPort()
+const uint16_t &ServerConfig::getPort()
 {
 	return (this->_port);
 }
 
-size_t ServerConfig::getClientMaxBodySize()
+const size_t &ServerConfig::getClientMaxBodySize()
 {
 	return (this->_client_max_body_size);
+}
+
+// const std::string &ServerConfig::getSgiPass()
+// {
+// 	return (this->_sgi_path);
+// }
+
+const std::map<std::string, Location> &ServerConfig::getLocations()
+{
+	return (this->_locations);
+}
+
+const std::map<short, std::string> &ServerConfig::getErrorPages()
+{
+	return (this->_error_pages);
 }
 
 /* utils */

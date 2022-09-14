@@ -2,12 +2,12 @@
 
 Location::Location()
 {
-    this->_path = "";
-    this->_root = "/";
-    this->_autoindex = false;
+	this->_path = "";
+	this->_root = "/";
+	this->_autoindex = false;
 	this->_index = "";
 	this->_cgi_pass = "";
-    this->_methods.reserve(3);
+	this->_methods.reserve(3);
 	_methods[0] = 1;
 	_methods[1] = 0;
 	_methods[2] = 0;
@@ -15,9 +15,9 @@ Location::Location()
 
 Location::Location(const Location &other)
 {
-    this->_path = other._path;
-    this->_root = other._root;
-    this->_autoindex = other._autoindex;
+	this->_path = other._path;
+	this->_root = other._root;
+	this->_autoindex = other._autoindex;
 	this->_index = other._index;
 	this->_cgi_pass = other._cgi_pass;
     this->_methods = other._methods;
@@ -25,9 +25,9 @@ Location::Location(const Location &other)
 
 Location &Location::operator=(const Location &rhs)
 {
-    if (this != &rhs)
-    {
-        this->_path = rhs._path;
+	if (this != &rhs)
+	{
+		this->_path = rhs._path;
 		this->_root = rhs._root;
 		this->_autoindex = rhs._autoindex;
 		this->_index = rhs._index;
@@ -57,7 +57,7 @@ void Location::setMethods(std::vector<std::string> methods)
 			this->_methods[1] = 1;
 		else if (methods[i] == "DELETE")
 			this->_methods[2] = 1;
-		else 
+		else
 			throw ServerConfig::ErrorException("Allow method not supported " + methods[i]);
 	}
 }
@@ -66,7 +66,7 @@ void Location::setAutoindex(std::string parametr)
 {
 	if (parametr == "on" || parametr == "off")
 		this->_autoindex = (parametr == "on");
-	else 
+	else
 		throw ServerConfig::ErrorException("Wrong autoindex");
 }
 
@@ -109,4 +109,17 @@ const std::vector<short> &Location::getMethods() const
 const bool &Location::getAutoindex() const
 {
 	return (this->_autoindex);
+}
+
+std::string Location::getPrintMethods()
+{
+	std::string result;
+	result.reserve(50);
+	// if (_methods[0] == 1)
+		result += "GET ";
+	// if (this->_methods[1])
+	// 	result += "POST ";
+	// if (this->_methods[2])
+	// 	result += "DELETE";
+	return (result);
 }

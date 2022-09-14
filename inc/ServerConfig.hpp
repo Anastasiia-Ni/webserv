@@ -17,11 +17,10 @@ class ServerConfig
 		unsigned long					_client_max_body_size;
 		//bool							_autoindex;
 		//std::set<std::string> 			_allowed_methods;
+		//std::string						_sgi_path;
+		std::map<short, std::string>	_error_pages; // after checking move to private
 	public:
-
-		std::map<std::string, Location> _locations;
-		std::map<short, std::string>	_error_pages;
-
+		std::map<std::string, Location> _locations; // after checking move to private
 
 		ServerConfig();
 		~ServerConfig();
@@ -33,6 +32,7 @@ class ServerConfig
 		//void setRoot(std::string root);
 		void setPort(std::string parametr);
 		void setClientMaxBodySize(std::string parametr);
+		//void setSgiPass(std::string parametr);
 		void setErrorPages(std::vector<std::string> &parametr);
 		void setLocation(std::string nameLocation, std::vector<std::string> parametr);
 		//void setAutoindex(bool autoindex);
@@ -41,10 +41,13 @@ class ServerConfig
 		bool isValidErrorPages() const;
 		bool isValidLocations() const;
 
-		std::string getServerName();
-		uint16_t getPort();
-		in_addr_t getHost();
-		size_t getClientMaxBodySize();
+		const std::string &getServerName();
+		const uint16_t &getPort();
+		const in_addr_t &getHost();
+		const size_t &getClientMaxBodySize();
+		//const std::string &getSgiPass();
+		const std::map<std::string, Location> &getLocations();
+		const std::map<short, std::string> &getErrorPages();
 		//bool getAutoindex();
 		//std::string getRoot();
 		//std::set<std::string> getAllowedMethods();

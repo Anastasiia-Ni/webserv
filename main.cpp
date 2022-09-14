@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 			cluster.createCluster(config);
 			cluster.print(); // for cheking
 
-			//runServers();	
+			//runServers();
 		}
 		catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;

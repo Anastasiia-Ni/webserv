@@ -10,10 +10,10 @@ class Location
         std::string         _root;
         bool                _autoindex;
         std::string         _index;
-        std::vector<short>  _methods; // GET+ POST- DELETE-
 		std::string			_cgi_pass;
 
     public:
+        std::vector<short>  _methods; // GET+ POST- DELETE-
         Location();
         Location(const Location &other);
         Location &operator=(const Location &rhs);
@@ -31,6 +31,8 @@ class Location
 		const std::string &getCgiPass() const;
 		const std::vector<short> &getMethods() const;
 		const bool &getAutoindex() const;
+
+		std::string getPrintMethods(); // for checking only
 
 };
 
