@@ -4,15 +4,15 @@ ServerConfig::ServerConfig()
 {
 	this->_server_name = "";
 	this->_host = 0;
-	//this->_root = "";
+	this->_root = "";
 	this->_port = 0;
 	this->_client_max_body_size = 0;
-	//this->_autoindex = false;
+	this->_sgi_path = "";
+	this->initErrorPages();
+	this->_index = "";
 }
 
-ServerConfig::~ServerConfig()
-{
-}
+ServerConfig::~ServerConfig() { }
 
 /* copy constructor */
 ServerConfig::ServerConfig(const ServerConfig &other)
@@ -20,12 +20,12 @@ ServerConfig::ServerConfig(const ServerConfig &other)
 	if (this != &other)
 	{
 		this->_server_name = other._server_name;
-		//this->_root = other._root;
+		this->_root = other._root;
 		this->_port = other._port;
 		this->_port = other._port;
-		//this->_sgi_path = other._sgi_path;
+		this->_sgi_path = other._sgi_path;
 		this->_client_max_body_size = other._client_max_body_size;
-		//this->_autoindex = other._autoindex;
+		this->_index = other._index;
 		this->_error_pages = other._error_pages;
 		this->_locations = other._locations;
 	}
@@ -38,26 +38,38 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 	if (this != &rhs)
 	{
 		this->_server_name = rhs._server_name;
-		//this->_root = rhs._root;
+		this->_root = rhs._root;
 		this->_port = rhs._port;
 		this->_port = rhs._port;
-		//this->_sgi_path = rhs._sgi_path;
+		this->_sgi_path = rhs._sgi_path;
 		this->_client_max_body_size = rhs._client_max_body_size;
-		//this->_autoindex = rhs._autoindex;
+		this->_index = rhs._index;
 		this->_error_pages = rhs._error_pages;
 		this->_locations = rhs._locations;
 	}
 	return (*this);
 }
 
+/* init error page by default */
+void ServerConfig::initErrorPages(void)
+{
+	char dir[1024];
+	getcwd(dir, 1024);
+	std::string root = dir;
+
+	_error_pages[400] = root + "/website/error_pages/400.html";
+	_error_pages[403] = root + "/website/error_pages/403.html";
+	_error_pages[404] = root + "/website/error_pages/404.html";
+	_error_pages[405] = root + "/website/error_pages/405.html";
+	_error_pages[500] = root + "/website/error_pages/500.html";
+	_error_pages[505] = root + "/website/error_pages/505.html";
+}
 
 /* Set functions */
-
 void ServerConfig::setServerName(std::string server_name)
 {
 	checkToken(server_name);
 	this->_server_name = server_name;
-	//std::cout << "Name: " << this->_server_name << std::endl; // delete
 }
 
 void ServerConfig::setHost(std::string parametr)
@@ -65,14 +77,25 @@ void ServerConfig::setHost(std::string parametr)
 	checkToken(parametr);
 	if (parametr == "localhost")
 		parametr = "127.0.0.1";
+	if (!isValidHost(parametr))
+		throw ErrorException("Wrong syntax: host");
 	this->_host = inet_addr(parametr.data()); // проверить
 	//std::cout << "Host: " << this->_host << std::endl; // delete
+	// if (this->_host != INADDR_NONE);
 }
 
-// void ServerConfig::setRoot(std::string root)
-// {
-// 	this->_root = root;
-// }
+void ServerConfig::setRoot(std::string root)
+{
+	if (root != "/")
+		checkToken(root);
+
+	char dir[1024];
+	getcwd(dir, 1024);
+	std::string full_root = dir + root;
+	if (ConfigFile::getTypePath(full_root) != 2)
+		throw ErrorException("Wrong syntax: root");
+	this->_root = full_root;
+}
 
 void ServerConfig::setPort(std::string parametr)
 {
@@ -81,7 +104,7 @@ void ServerConfig::setPort(std::string parametr)
 
 	for (size_t i = 0; i < parametr.length(); i++)
 	{
-		if (parametr[i] < '0' || parametr[i] > '9')
+		if (!std::isdigit(parametr[i]))
 			throw ErrorException("Wrong syntax: port");
 	}
 	port = std::stoi((parametr));
@@ -100,48 +123,71 @@ void ServerConfig::setClientMaxBodySize(std::string parametr)
 		if (parametr[i] < '0' || parametr[i] > '9')
 			throw ErrorException("Wrong syntax: client_max_body_size");
 	}
+	if (!std::stoi(parametr))
+		throw ErrorException("Wrong syntax: client_max_body_size");
 	body_size = std::stoi(parametr) * 1000000; //value is given in mb
 	this->_client_max_body_size = body_size;
-
 }
 
-// void ServerConfig::setSgiPass(std::string parametr)
-// {
-// 	checkToken(parametr);
-// 	this->_sgi_path = parametr;
-// }
+void ServerConfig::setIndex(std::string index)
+{
+	checkToken(index);
+	this->_index = index;
+}
 
-void ServerConfig::setErrorPages(std::vector<std::string> &parametr) //может ли быть только страница?
+void ServerConfig::setCgiPass(std::string parametr)
+{
+	this->_sgi_path = parametr;
+}
+
+/* checks if there is such a default error code. If there is, it overwrites the path to the file, 
+otherwise it creates a new pair: error code - path to the file */
+void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
 	std::string path = parametr[parametr.size() - 1];
 	checkToken(path);
+	// if (ConfigFile::getTypePath(path) != 1)
+	// 	throw ErrorException ("incorrect path for error page file: " + path);
+	// if (ConfigFile::checkFile(path) == -1)
+	// 	throw ErrorException ("error page file :" + path + " is not accessible");
 	for (size_t i = 0; i < parametr.size() - 1; i++)
 	{
+		for (size_t j = 0; j < parametr[i].size(); j++) {
+			if (!std::isdigit(parametr[i][j]))
+				throw ErrorException("Error code is invalid");
+		}
 		short code_error = std::stoi(parametr[i]);
-		this->_error_pages.insert(std::make_pair(code_error, path));
+		std::map<short, std::string>::iterator it = this->_error_pages.find(code_error);
+		if (it != _error_pages.end())
+			this->_error_pages[code_error] = path;
+		else 
+			this->_error_pages.insert(std::make_pair(code_error, path));
 	}
-	//std::cout << "size error - " << _error_pages.size() << std::endl; //delete
-	// std::map<short, std::string>::iterator it = _error_pages.begin();
-	// for (; it != _error_pages.end(); it++)
-	// {
-	// 	std::cout << it->first << " - " << it->second << std::endl;
-	// }
 }
 
+/* set location */
 void ServerConfig::setLocation(std::string path, std::vector<std::string> parametr)
 {
 	Location new_location;
 	std::vector<std::string> methods;
+	bool flag_methods = false;
+	bool flag_autoindex = false;
 
+	new_location.setPath(path);
 	for (size_t i = 0; i < parametr.size(); i++)
 	{
 		if (parametr[i] == "root" && (i + 1) < parametr.size())
 		{
+			if (!new_location.getRootLocation().empty())
+				throw ErrorException("Root of location is duplicated");
 			checkToken(parametr[++i]);
-			new_location.setRoot(parametr[i]);
+			new_location.setRootLocation(this->_root + parametr[i]);
 		}
 		if ((parametr[i] == "allow_methods" || parametr[i] == "methods") && (i + 1) < parametr.size())
 		{
+			if (flag_methods)
+				throw ErrorException("Allow_methods of location is duplicated");
+			std::vector<std::string> methods;
 			while (++i < parametr.size())
 			{
 				if (parametr[i].find(";") != std::string::npos)
@@ -154,24 +200,36 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 					methods.push_back(parametr[i]);
 			}
 			new_location.setMethods(methods);
+			flag_methods = true;
 		}
 		if (parametr[i] == "autoindex" && (i + 1) < parametr.size())
 		{
+			if (flag_autoindex)
+				throw ErrorException("Autoindex of location is duplicated");
 			checkToken(parametr[++i]);
 			new_location.setAutoindex(parametr[i]);
+			flag_autoindex = true;
 		}
 		if (parametr[i] == "index" && (i + 1) < parametr.size())
 		{
+			if (!new_location.getIndexLocation().empty())
+				throw ErrorException("Index of location is duplicated");
 			checkToken(parametr[++i]);
-			new_location.setIndex(parametr[i]);
+			new_location.setIndexLocation(parametr[i]);
 		}
 		if (path[0] == '*' && parametr[i] == "cgi_pass" && (i + 1) < parametr.size())
 		{
+			if (!new_location.getCgiPass().empty())
+				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
-			new_location.setCgiPass(parametr[i]);
+			// setCgiPass(parametr[i]); - дает сегфолт, исправить его 
+			// может удалить его из локейшенов
 		}
 	}
-	this->_locations.insert(std::make_pair(path, new_location));
+	if (new_location.getRootLocation().empty())
+		new_location.setRootLocation(this->_root);
+	// добавить проверку существования и чтения индекса
+	this->_locations.push_back(new_location);
 }
 
 // void ServerConfig::setAutoindex(bool autoindex)
@@ -179,14 +237,13 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 // 	this->_autoindex = autoindex;
 // }
 
-
-
-
-
 /* validation of parametrs */
-bool ServerConfig::isValidHost() const
+bool ServerConfig::isValidHost(std::string host) const
 {
-	return (this->_host != INADDR_NONE);
+  	if (host.size() > 15)
+		return (false);
+	struct sockaddr_in sockaddr;
+  	return (inet_pton(AF_INET, host.c_str(), &(sockaddr.sin_addr)) ? true : false);
 }
 
 bool ServerConfig::isValidErrorPages() const
@@ -196,7 +253,7 @@ bool ServerConfig::isValidErrorPages() const
 	{
 		if (it->first < 100 || it->first > 599)
 			return (false);
-		// if (ConfigFile::checkFile(it->second) < 0)  - add this after creation error page files
+		// if (ConfigFile::checkFile(it->second) < 0)  //- add this after creation error page files
 		// 	return (false);
 	}
 	return (true);
@@ -204,27 +261,22 @@ bool ServerConfig::isValidErrorPages() const
 
 bool ServerConfig::isValidLocations() const
 {
-	std::map<std::string, Location>::const_iterator it;
+	std::vector<Location>::const_iterator it;
 	for (it = this->_locations.begin(); it != this->_locations.end(); it++)
 	{
-		if (it->first[0] == '*')
+		if (it->getPath()[0] == '*')
 		{
-			std::string path = it->second.getCgiPass();
-			if (path.empty() || ConfigFile::checkFile(path.c_str()) < 0)
-				return (false);
+	// 		std::string path = it->getCgiPass();
+	// 		if (path.empty() || ConfigFile::getTypePath(path) < 0)
+	// 			return (false);
 			continue;
 		}
-		if (it->first[0] != '/')
+		if (it->getPath()[0] != '/')
 			return (false);
-		// check root location
+	// 	// check path of location ?
 	}
 	return (true);
 }
-
-
-
-
-
 
 /* Get functions */
 const std::string &ServerConfig::getServerName()
@@ -232,10 +284,10 @@ const std::string &ServerConfig::getServerName()
 	return (this->_server_name);
 }
 
-// std::string ServerConfig::getRoot()
-// {
-// 	return (this->_root);
-// }
+const std::string &ServerConfig::getRoot()
+{
+	return (this->_root);
+}
 
 const in_addr_t &ServerConfig::getHost()
 {
@@ -252,14 +304,14 @@ const size_t &ServerConfig::getClientMaxBodySize()
 	return (this->_client_max_body_size);
 }
 
-// const std::string &ServerConfig::getSgiPass()
-// {
-// 	return (this->_sgi_path);
-// }
-
-const std::map<std::string, Location> &ServerConfig::getLocations()
+const std::vector<Location> &ServerConfig::getLocations()
 {
 	return (this->_locations);
+}
+
+const std::string &ServerConfig::getSgiPass()
+{
+	return (this->_sgi_path);
 }
 
 const std::map<short, std::string> &ServerConfig::getErrorPages()
@@ -267,25 +319,54 @@ const std::map<short, std::string> &ServerConfig::getErrorPages()
 	return (this->_error_pages);
 }
 
-/* utils */
+const std::string &ServerConfig::getIndex()
+{
+	return (this->_index);
+}
 
+/* the two functions below can be used later for response */
+const std::string &ServerConfig::getPathErrorPage(short key)
+{
+	std::map<short, std::string>::iterator it = this->_error_pages.find(key);
+	if (it == this->_error_pages.end())
+		throw ErrorException("Error_page does not exist");
+	return (it->second);
+}
+
+const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string key) 
+{
+	std::vector<Location>::iterator it;
+	for (it = this->_locations.begin(); it != this->_locations.end(); it++)
+	{
+		if (it->getPath() == key)
+			return (it);
+	}
+	throw ErrorException("Error: path to location not found");
+}
+
+/* utils */
 void ServerConfig::checkToken(std::string &parametr)
 {
 	size_t pos = parametr.rfind(';');
 	if (pos != parametr.size() - 1)
 	{
+		std::cout << parametr << std::endl;
 		throw ErrorException("Token is invalid"); // change sentence
 	}
 	parametr.erase(pos);
 }
 
-// bool ServerConfig::getAutoindex()
-// {
-// 	return (_autoindex);
-// }
-
-// std::set<std::string> ServerConfig::getAllowedMethods()
-// {
-// 	return (_allowed_methods);
-// }
-
+bool ServerConfig::checkLocaitons() const
+{
+	if (this->_locations.size() < 2)
+		return (false);
+	std::vector<Location>::const_iterator it1;
+	std::vector<Location>::const_iterator it2;
+	for (it1 = this->_locations.begin(); it1 != _locations.end() - 1; it1++) {
+		for (it2 = it1 + 1; it2 != _locations.end(); it2++) {
+			if (it1->getPath() == it2->getPath())
+				return (true);
+		}
+	}
+	return (false);
+}

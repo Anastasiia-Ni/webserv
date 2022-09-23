@@ -11,33 +11,34 @@ class ServerConfig
 {
 	private:
 		uint16_t						_port;
-		in_addr_t						_host; //from #include <machine/types.h>  base type of internet address
+		in_addr_t						_host; //in_addr_t//from #include <machine/types.h>  base type of internet address
 		std::string						_server_name;
-		// std::string						_root;
+		std::string						_root;
 		unsigned long					_client_max_body_size;
-		//bool							_autoindex;
-		//std::set<std::string> 			_allowed_methods;
-		//std::string						_sgi_path;
-		std::map<short, std::string>	_error_pages; // after checking move to private
-	public:
-		std::map<std::string, Location> _locations; // after checking move to private
+		std::string						_index;
+		std::string						_sgi_path;
+		std::map<short, std::string>	_error_pages;
+		std::vector<Location> 			_locations;
 
+	public:
 		ServerConfig();
 		~ServerConfig();
 		ServerConfig(const ServerConfig &other);
 		ServerConfig &operator=(const ServerConfig & rhs);
+		
+		void initErrorPages(void);
 
 		void setServerName(std::string server_name);
 		void setHost(std::string parametr);
-		//void setRoot(std::string root);
+		void setRoot(std::string root);
 		void setPort(std::string parametr);
 		void setClientMaxBodySize(std::string parametr);
-		//void setSgiPass(std::string parametr);
+		void setCgiPass(std::string parametr);
 		void setErrorPages(std::vector<std::string> &parametr);
+		void setIndex(std::string index);
 		void setLocation(std::string nameLocation, std::vector<std::string> parametr);
-		//void setAutoindex(bool autoindex);
 
-		bool isValidHost() const;
+		bool isValidHost(std::string host) const;
 		bool isValidErrorPages() const;
 		bool isValidLocations() const;
 
@@ -45,14 +46,16 @@ class ServerConfig
 		const uint16_t &getPort();
 		const in_addr_t &getHost();
 		const size_t &getClientMaxBodySize();
-		//const std::string &getSgiPass();
-		const std::map<std::string, Location> &getLocations();
+		const std::string &getSgiPass();
+		const std::vector<Location> &getLocations();
+		const std::string &getRoot();
 		const std::map<short, std::string> &getErrorPages();
-		//bool getAutoindex();
-		//std::string getRoot();
-		//std::set<std::string> getAllowedMethods();
+		const std::string &getIndex();
+		const std::string &getPathErrorPage(short key);
+		const std::vector<Location>::iterator getLocationKey(std::string key);
 
 		void checkToken(std::string &parametr);
+		bool checkLocaitons() const;
 
 		public:
 		class ErrorException : public std::exception

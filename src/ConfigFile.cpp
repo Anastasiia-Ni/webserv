@@ -18,7 +18,7 @@ int ConfigFile::getTypePath(std::string const path)
 	{
 		if (buffer.st_mode & S_IFREG)
 		{
-			this->_size = buffer.st_size;
+			//_size = buffer.st_size;
 			return (1);
 		}
 		else if (buffer.st_mode & S_IFDIR)

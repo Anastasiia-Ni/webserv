@@ -72,6 +72,8 @@
         "deque": "cpp",
         "fstream": "cpp",
         "iomanip": "cpp",
-        "stack": "cpp"
-    }
+        "stack": "cpp",
+        "filesystem": "cpp"
+    },
+    "liveServer.settings.port": 5501
 }

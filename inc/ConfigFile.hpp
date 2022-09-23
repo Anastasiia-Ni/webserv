@@ -6,14 +6,14 @@
 class ConfigFile {
     private:
 		std::string		_path;
-		size_t			_size;
+		size_t			_size;	// проверить нужен ли 
 
     public:
 		ConfigFile();
 		ConfigFile(std::string const path);
 		~ConfigFile();
 
-		int getTypePath(std::string const path);
+		static int getTypePath(std::string const path);
 		static int checkFile(std::string const path);
 		std::string	readFile(std::string path);
 
