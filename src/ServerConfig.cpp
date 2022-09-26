@@ -89,6 +89,11 @@ void ServerConfig::setRoot(std::string root)
 	if (root != "/")
 		checkToken(root);
 
+	if (ConfigFile::getTypePath(root) == 2)
+	{
+		this->_root = root;
+		return ;
+	}
 	char dir[1024];
 	getcwd(dir, 1024);
 	std::string full_root = dir + root;
@@ -140,16 +145,22 @@ void ServerConfig::setCgiPass(std::string parametr)
 	this->_sgi_path = parametr;
 }
 
-/* checks if there is such a default error code. If there is, it overwrites the path to the file, 
+/* checks if there is such a default error code. If there is, it overwrites the path to the file,
 otherwise it creates a new pair: error code - path to the file */
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
 	std::string path = parametr[parametr.size() - 1];
 	checkToken(path);
-	// if (ConfigFile::getTypePath(path) != 1)
-	// 	throw ErrorException ("incorrect path for error page file: " + path);
-	// if (ConfigFile::checkFile(path) == -1)
-	// 	throw ErrorException ("error page file :" + path + " is not accessible");
+	// if (ConfigFile::getTypePath(path) != 2)
+	// {
+	// 	char dir[1024];
+	// 	getcwd(dir, 1024);
+	// 	path = dir + path;
+	// 	if (ConfigFile::getTypePath(path) != 1)
+	// 		throw ErrorException ("incorrect path for error page file: " + path);
+	// 	if (ConfigFile::checkFile(path) == -1)
+	// 		throw ErrorException ("error page file :" + path + " is not accessible");
+	// }
 	for (size_t i = 0; i < parametr.size() - 1; i++)
 	{
 		for (size_t j = 0; j < parametr[i].size(); j++) {
@@ -160,7 +171,7 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 		std::map<short, std::string>::iterator it = this->_error_pages.find(code_error);
 		if (it != _error_pages.end())
 			this->_error_pages[code_error] = path;
-		else 
+		else
 			this->_error_pages.insert(std::make_pair(code_error, path));
 	}
 }
@@ -181,7 +192,10 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getRootLocation().empty())
 				throw ErrorException("Root of location is duplicated");
 			checkToken(parametr[++i]);
-			new_location.setRootLocation(this->_root + parametr[i]);
+			if (ConfigFile::getTypePath(parametr[++i]) == 2)
+				new_location.setRootLocation(parametr[i]);
+			else
+				new_location.setRootLocation(this->_root + parametr[i]);
 		}
 		if ((parametr[i] == "allow_methods" || parametr[i] == "methods") && (i + 1) < parametr.size())
 		{
@@ -197,7 +211,11 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 					break ;
 				}
 				else
+				{
 					methods.push_back(parametr[i]);
+					if (i + 1 >= parametr.size())
+						throw ErrorException("Allow_methods is invalid");
+				}
 			}
 			new_location.setMethods(methods);
 			flag_methods = true;
@@ -222,7 +240,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getCgiPass().empty())
 				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
-			// setCgiPass(parametr[i]); - дает сегфолт, исправить его 
+			// setCgiPass(parametr[i]); - дает сегфолт, исправить его
 			// может удалить его из локейшенов
 		}
 	}
@@ -333,7 +351,7 @@ const std::string &ServerConfig::getPathErrorPage(short key)
 	return (it->second);
 }
 
-const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string key) 
+const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string key)
 {
 	std::vector<Location>::iterator it;
 	for (it = this->_locations.begin(); it != this->_locations.end(); it++)

@@ -44,6 +44,8 @@ void Location::setPath(std::string parametr)
 
 void Location::setRootLocation(std::string parametr)
 {
+	// if ()
+
 	if (ConfigFile::getTypePath(parametr) != 2)
 		throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_root = parametr;

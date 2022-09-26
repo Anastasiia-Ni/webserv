@@ -4,11 +4,11 @@
 #include "Webserv.hpp"
 
 class ConfigFile {
-    private:
+	private:
 		std::string		_path;
-		size_t			_size;	// проверить нужен ли 
+		size_t			_size;	// проверить нужен ли
 
-    public:
+	public:
 		ConfigFile();
 		ConfigFile(std::string const path);
 		~ConfigFile();

@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
 			/* configuration file as argument or default path */
 			config = (argc == 1 ? "default.conf" : argv[1]);
 			cluster.createCluster(config);
-			cluster.print(); // for cheking
+			cluster.print(); // for checking
 
 			//runServers();
 		}

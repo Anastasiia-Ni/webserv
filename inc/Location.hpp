@@ -5,20 +5,20 @@
 
 class Location
 {
-    private:
-		std::string         _path;
-        std::string         _root;
-        bool                _autoindex;
-        std::string         _index;
-        std::vector<short>  _methods; // GET+ POST- DELETE-
+	private:
+		std::string			_path;
+		std::string			_root;
+		bool				_autoindex;
+		std::string			_index;
+		std::vector<short>	_methods; // GET+ POST- DELETE-
 
 		std::string			_cgi_pass;
 
-    public:
-        Location();
-        Location(const Location &other);
-        Location &operator=(const Location &rhs);
-        ~Location();
+	public:
+		Location();
+		Location(const Location &other);
+		Location &operator=(const Location &rhs);
+		~Location();
 
 		void setPath(std::string parametr);
 		void setRootLocation(std::string parametr);
