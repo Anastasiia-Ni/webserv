@@ -19,13 +19,14 @@ class ServerConfig
 		std::string						_sgi_path;
 		std::map<short, std::string>	_error_pages;
 		std::vector<Location> 			_locations;
+		// listing ?
 
 	public:
 		ServerConfig();
 		~ServerConfig();
 		ServerConfig(const ServerConfig &other);
 		ServerConfig &operator=(const ServerConfig & rhs);
-		
+
 		void initErrorPages(void);
 
 		void setServerName(std::string server_name);
@@ -54,7 +55,7 @@ class ServerConfig
 		const std::string &getPathErrorPage(short key);
 		const std::vector<Location>::iterator getLocationKey(std::string key);
 
-		void checkToken(std::string &parametr);
+		static void checkToken(std::string &parametr);
 		bool checkLocaitons() const;
 
 		public:

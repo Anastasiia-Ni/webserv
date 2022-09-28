@@ -86,8 +86,8 @@ void ServerConfig::setHost(std::string parametr)
 
 void ServerConfig::setRoot(std::string root)
 {
-	if (root != "/")
-		checkToken(root);
+	//if (root != "/")
+	checkToken(root);
 
 	if (ConfigFile::getTypePath(root) == 2)
 	{
@@ -184,6 +184,12 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	bool flag_methods = false;
 	bool flag_autoindex = false;
 
+	// std::vector<std::string>::iterator it = parametr.begin(); // delete
+	// std::cout << "-----------" << std::endl;
+	// for (; it != parametr.end(); it++)
+	// {
+	// 	std::cout << *it << std::endl;
+	// }
 	new_location.setPath(path);
 	for (size_t i = 0; i < parametr.size(); i++)
 	{
@@ -192,12 +198,12 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getRootLocation().empty())
 				throw ErrorException("Root of location is duplicated");
 			checkToken(parametr[++i]);
-			if (ConfigFile::getTypePath(parametr[++i]) == 2)
-				new_location.setRootLocation(parametr[i]);
-			else
-				new_location.setRootLocation(this->_root + parametr[i]);
+			// if (ConfigFile::getTypePath(parametr[++i]) == 2)
+			// 	new_location.setRootLocation(parametr[i]);
+			// else
+				new_location.setRootLocation(this->_root + parametr[i]); // check with print
 		}
-		if ((parametr[i] == "allow_methods" || parametr[i] == "methods") && (i + 1) < parametr.size())
+		else if ((parametr[i] == "allow_methods" || parametr[i] == "methods") && (i + 1) < parametr.size())
 		{
 			if (flag_methods)
 				throw ErrorException("Allow_methods of location is duplicated");
@@ -214,13 +220,13 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 				{
 					methods.push_back(parametr[i]);
 					if (i + 1 >= parametr.size())
-						throw ErrorException("Allow_methods is invalid");
+						throw ErrorException("Token is invalid");
 				}
 			}
 			new_location.setMethods(methods);
 			flag_methods = true;
 		}
-		if (parametr[i] == "autoindex" && (i + 1) < parametr.size())
+		else if (parametr[i] == "autoindex" && (i + 1) < parametr.size())
 		{
 			if (flag_autoindex)
 				throw ErrorException("Autoindex of location is duplicated");
@@ -228,21 +234,35 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			new_location.setAutoindex(parametr[i]);
 			flag_autoindex = true;
 		}
-		if (parametr[i] == "index" && (i + 1) < parametr.size())
+		else if (parametr[i] == "index" && (i + 1) < parametr.size())
 		{
 			if (!new_location.getIndexLocation().empty())
 				throw ErrorException("Index of location is duplicated");
 			checkToken(parametr[++i]);
 			new_location.setIndexLocation(parametr[i]);
 		}
-		if (path[0] == '*' && parametr[i] == "cgi_pass" && (i + 1) < parametr.size())
+		else if (parametr[i] == "return" && (i + 1) < parametr.size())
+		{
+			checkToken(parametr[++i]);
+			new_location.setReturn(parametr[i]);
+		}
+		else if (path[0] == '*' && parametr[i] == "cgi_pass" && (i + 1) < parametr.size())
 		{
 			if (!new_location.getCgiPass().empty())
 				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
+			std::cout << "here: " << parametr[i] << std::endl; // delete;
 			// setCgiPass(parametr[i]); - дает сегфолт, исправить его
 			// может удалить его из локейшенов
 		}
+		else if (i < parametr.size())
+		{
+			if (i + 1 < parametr.size())
+				ServerConfig::checkToken(parametr[++i]);
+			else
+				throw ErrorException("Parametr in a location is invalid"); // chenge sentence
+		}
+		// else error config file
 	}
 	if (new_location.getRootLocation().empty())
 		new_location.setRootLocation(this->_root);
@@ -367,10 +387,7 @@ void ServerConfig::checkToken(std::string &parametr)
 {
 	size_t pos = parametr.rfind(';');
 	if (pos != parametr.size() - 1)
-	{
-		std::cout << parametr << std::endl;
 		throw ErrorException("Token is invalid"); // change sentence
-	}
 	parametr.erase(pos);
 }
 

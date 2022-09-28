@@ -44,10 +44,8 @@ void Location::setPath(std::string parametr)
 
 void Location::setRootLocation(std::string parametr)
 {
-	// if ()
-
-	if (ConfigFile::getTypePath(parametr) != 2)
-		throw ServerConfig::ErrorException("Wrong syntax: root of location");
+	// if (ConfigFile::getTypePath(parametr) == 2)
+	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_root = parametr;
 }
 
@@ -80,6 +78,12 @@ void Location::setIndexLocation(std::string parametr)
 	this->_index = parametr;
 }
 
+void Location::setReturn(std::string parametr)
+{
+	// do we need check is it exist?
+	this->_return = parametr;
+}
+
 /* get functions */
 const std::string &Location::getPath() const
 {
@@ -109,6 +113,11 @@ const std::string &Location::getCgiPass() const
 const bool &Location::getAutoindex() const
 {
 	return (this->_autoindex);
+}
+
+const std::string &Location::getReturn() const
+{
+	return (this->_return);
 }
 
 /* for printing allowed methods*/

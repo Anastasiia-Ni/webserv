@@ -11,7 +11,7 @@ class Location
 		bool				_autoindex;
 		std::string			_index;
 		std::vector<short>	_methods; // GET+ POST- DELETE-
-
+		std::string			_return;
 		std::string			_cgi_pass;
 
 	public:
@@ -26,13 +26,15 @@ class Location
 		void setAutoindex(std::string parametr);
 		void setIndexLocation(std::string parametr);
 		void setCgiPass(std::string parametr);
+		void setReturn(std::string parametr);
 
 		const std::string &getPath() const;
 		const std::string &getRootLocation() const;
 		const std::string &getIndexLocation() const;
-		const std::string &getCgiPass() const;
 		const std::vector<short> &getMethods() const;
 		const bool &getAutoindex() const;
+		const std::string &getReturn() const;
+		const std::string &getCgiPass() const;
 
 		std::string getPrintMethods() const; // for checking only
 

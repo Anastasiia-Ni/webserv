@@ -63,6 +63,9 @@ int ConfigParser::createCluster(const std::string &config_file)
 		throw ErrorException("Somthing with size"); //rewrite the sentence
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
+		// std::vector<std::string>::iterator it	= _server_config.begin(); //delete
+		// for (; it != _server_config.end(); it++)
+		// 	std::cout << *it << std::endl;
 		ServerConfig server;
 		createServer(this->_server_config[i], server);
 		validServer(server);
@@ -212,7 +215,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 				throw  ErrorException("Port is duplicated");
 			server.setPort(parametrs[++i]);
 		}
-		if (parametrs[i] == "location" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "location" && (i + 1) < parametrs.size())
 		{
 			std::string	path;
 			i++;
@@ -229,19 +232,19 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			if (i < parametrs.size() && parametrs[i] != "}")
 				throw  ErrorException("Wrong character in server scope{}");
 		}
-		if (parametrs[i] == "host" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "host" && (i + 1) < parametrs.size())
 		{
 			if (server.getHost())
 				throw  ErrorException("Host is duplicated");
 			server.setHost(parametrs[++i]);
 		}
-		if (parametrs[i] == "root" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "root" && (i + 1) < parametrs.size())
 		{
 			if (!server.getRoot().empty())
 				throw  ErrorException("Root is duplicated");
 			server.setRoot(parametrs[++i]);
 		}
-		if (parametrs[i] == "error_page" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size())
 		{
 			std::vector<std::string> codes;
 			while (++i < parametrs.size())
@@ -254,19 +257,19 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			}
 			server.setErrorPages(codes);
 		}
-		if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size())
 		{
 			if (server.getClientMaxBodySize())
 				throw  ErrorException("Client_max_body_size is duplicated");
 			server.setClientMaxBodySize(parametrs[++i]);
 		}
-		if (parametrs[i] == "server_name" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size())
 		{
 			if (!server.getServerName().empty())
 				throw  ErrorException("Server_name is duplicated");
 			server.setServerName(parametrs[++i]);
 		}
-		if (parametrs[i] == "index" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "index" && (i + 1) < parametrs.size())
 		{
 			if (!server.getIndex().empty())
 				throw  ErrorException("Index is duplicated");
@@ -276,12 +279,18 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		// {
 		// 	server.setSgiPass(parametrs[++i]);
 		// }
+		else if (parametrs[i] != "}" && parametrs[i] != "{")
+		{
+			ServerConfig::checkToken(parametrs[++i]);
+		}
 	// 	std::cout << parametrs[i] << std::endl; // delete
 	}
 	if (server.getRoot().empty())
-		server.setRoot("/");
+		server.setRoot("/;");
 	if (server.checkLocaitons())
 		throw  ErrorException("Locaition is duplicated");
+	if (!server.getPort())
+		throw  ErrorException("Port does not found"); // check sentense
 	// добавить проверку существования и чтения индекса
 }
 
