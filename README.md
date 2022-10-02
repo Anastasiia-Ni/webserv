@@ -10,4 +10,4 @@
 - [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html)
 - [NGINX code](https://github.com/nginx/nginx)
 - [RFC CGI](https://datatracker.ietf.org/doc/html/rfc3875)
-- [video webprogrammong CGI in C](https://www.youtube.com/watch?v=_j5spdsJdV8&t=562s)
+- [Webprogramming (CGI) in C](https://www.youtube.com/watch?v=_j5spdsJdV8&t=562s)
