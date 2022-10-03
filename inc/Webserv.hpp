@@ -20,7 +20,8 @@
 # include <sys/stat.h>
 # include <sys/time.h>
 # include <unistd.h>
-#include <machine/types.h>
+# include <machine/types.h>
+# include <signal.h>
 
 /* Network */
 # include <sys/socket.h>
