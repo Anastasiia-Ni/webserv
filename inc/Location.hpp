@@ -36,6 +36,7 @@ class Location
 		const std::string &getCgiPass() const;
 		const std::string &getReturn() const;
 
+		
 		std::string getPrintMethods() const; // for checking only
 
 };

@@ -31,16 +31,19 @@ int ConfigParser::print()
 		std::vector<Location>::const_iterator itl = _servers[i].getLocations().begin();
 		while (itl != _servers[i].getLocations().end())
 		{
-			if (itl->getCgiPass().empty()) 
+			if (itl->getCgiPass().empty())
 			{
-				std::cout << "name location: " << itl->getPath() << " - " << itl->getRootLocation() << std::endl;
+				std::cout << "name location: " << itl->getPath() << std::endl;
+				std::cout << "root: " << itl->getRootLocation() << std::endl;
 				std::cout << "methods: " << itl->getPrintMethods() << std::endl;
 				std::cout << "index: " << itl->getIndexLocation() << std::endl;
 				std::cout << "root: " << itl->getRootLocation() << std::endl;
+				if (!itl->getReturn().empty())
+				std::cout << "return: " << itl->getReturn() << std::endl;
 			}
-			else 
+			else
 			{
-				std::cout << "root: " << itl->getRootLocation() << std::endl;
+				std::cout << "cgi root: " << itl->getRootLocation() << std::endl;
 				std::cout << "sgi_path: " << itl->getCgiPass() << std::endl;
 			}
 			++itl;
@@ -213,11 +216,12 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
 	std::vector<std::string>parametrs;
+	int flag_loc = 1;
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 	for (size_t i = 0; i < parametrs.size(); i++)
 	{
-		if (parametrs[i] == "listen" && (i + 1) < parametrs.size())
+		if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (server.getPort())
 				throw  ErrorException("Port is duplicated");
@@ -239,20 +243,21 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			server.setLocation(path, codes);
 			if (i < parametrs.size() && parametrs[i] != "}")
 				throw  ErrorException("Wrong character in server scope{}");
+			flag_loc = 0;
 		}
-		else if (parametrs[i] == "host" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "host" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (server.getHost())
 				throw  ErrorException("Host is duplicated");
 			server.setHost(parametrs[++i]);
 		}
-		else if (parametrs[i] == "root" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "root" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (!server.getRoot().empty())
 				throw  ErrorException("Root is duplicated");
 			server.setRoot(parametrs[++i]);
 		}
-		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			std::vector<std::string> codes;
 			while (++i < parametrs.size())
@@ -265,19 +270,19 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			}
 			server.setErrorPages(codes);
 		}
-		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (server.getClientMaxBodySize())
 				throw  ErrorException("Client_max_body_size is duplicated");
 			server.setClientMaxBodySize(parametrs[++i]);
 		}
-		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (!server.getServerName().empty())
 				throw  ErrorException("Server_name is duplicated");
 			server.setServerName(parametrs[++i]);
 		}
-		else if (parametrs[i] == "index" && (i + 1) < parametrs.size())
+		else if (parametrs[i] == "index" && (i + 1) < parametrs.size() && flag_loc)
 		{
 			if (!server.getIndex().empty())
 				throw  ErrorException("Index is duplicated");
@@ -285,9 +290,11 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		}
 		else if (parametrs[i] != "}" && parametrs[i] != "{")
 		{
-			ServerConfig::checkToken(parametrs[++i]);
+			if (!flag_loc)
+				throw  ErrorException("Parametrs after location");
+			else
+				ServerConfig::checkToken(parametrs[++i]);
 		}
-	// 	std::cout << parametrs[i] << std::endl; // delete
 	}
 	if (server.getRoot().empty())
 		server.setRoot("/;");
@@ -318,7 +325,7 @@ int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 /* calls functions to check parameters for servers */
 int ConfigParser::validServer(const ServerConfig &server)
 {
-	if (server.isValidErrorPages() && server.isValidLocations())
+	if (server.isValidErrorPages())
 		return (1);
 	else
 		throw ErrorException("Failed server validation");

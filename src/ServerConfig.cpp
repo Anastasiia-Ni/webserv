@@ -134,7 +134,6 @@ void ServerConfig::setIndex(std::string index)
 {
 	checkToken(index);
 	this->_index = index;
-	// добавить проверку существования и чтения индекса
 }
 
 /* checks if there is such a default error code. If there is, it overwrites the path to the file,
@@ -143,16 +142,16 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
 	std::string path = parametr[parametr.size() - 1];
 	checkToken(path);
-	// if (ConfigFile::getTypePath(path) != 2)
-	// {
-	// 	char dir[1024];
-	// 	getcwd(dir, 1024);
-	// 	path = dir + path;
-	// 	if (ConfigFile::getTypePath(path) != 1)
-	// 		throw ErrorException ("incorrect path for error page file: " + path);
-	// 	if (ConfigFile::checkFile(path) == -1)
-	// 		throw ErrorException ("error page file :" + path + " is not accessible");
-	// }
+	if (ConfigFile::getTypePath(path) != 2)
+	{
+		char dir[1024];
+		getcwd(dir, 1024);
+		path = dir + path;
+		if (ConfigFile::getTypePath(path) != 1)
+			throw ErrorException ("incorrect path for error page file: " + path);
+		if (ConfigFile::checkFile(path) == -1)
+			throw ErrorException ("error page file :" + path + " is not accessible");
+	}
 	for (size_t i = 0; i < parametr.size() - 1; i++)
 	{
 		for (size_t j = 0; j < parametr[i].size(); j++) {
@@ -175,6 +174,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	std::vector<std::string> methods;
 	bool flag_methods = false;
 	bool flag_autoindex = false;
+	int valid;
 
 	new_location.setPath(path);
 	for (size_t i = 0; i < parametr.size(); i++)
@@ -184,10 +184,10 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getRootLocation().empty())
 				throw ErrorException("Root of location is duplicated");
 			checkToken(parametr[++i]);
-			// if (ConfigFile::getTypePath(parametr[++i]) == 2)
-			// 	new_location.setRootLocation(parametr[i]);
-			// else
-				new_location.setRootLocation(this->_root + parametr[i]); // check with print
+			if (ConfigFile::getTypePath(parametr[i]) == 2)
+				new_location.setRootLocation(parametr[i]);
+			else
+				new_location.setRootLocation(this->_root + parametr[i]);
 		}
 		else if ((parametr[i] == "allow_methods" || parametr[i] == "methods") && (i + 1) < parametr.size())
 		{
@@ -247,21 +247,16 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			else
 				throw ErrorException("Parametr in a location is invalid"); // chenge sentence
 		}
-		// else error config file
 	}
-	if (new_location.getRootLocation().empty())
-		new_location.setRootLocation(this->_root);
-	// добавить проверку существования и чтения индекса
-	// если есть рут изменить путь
-	// добавить проверку path и учесть случаи cgi
-	// проверить в cgi наличие cgi_passAnastasiia
+	valid = isValidLocation(new_location); // 1 - cgi problem, 2
+	if (valid == 1)
+		throw ErrorException("Failed CGI validation");
+	else if (valid == 2)
+		throw ErrorException("Failed path in locaition validation");
+	else if (valid == 3)
+		throw ErrorException("Failed redirection file in locaition validation");
 	this->_locations.push_back(new_location);
 }
-
-// void ServerConfig::setAutoindex(bool autoindex)
-// {
-// 	this->_autoindex = autoindex;
-// }
 
 /* validation of parametrs */
 bool ServerConfig::isValidHost(std::string host) const
@@ -279,29 +274,45 @@ bool ServerConfig::isValidErrorPages() const
 	{
 		if (it->first < 100 || it->first > 599)
 			return (false);
-		// if (ConfigFile::checkFile(it->second) < 0)  //- add this after creation error page files
-		// 	return (false);
+		if (ConfigFile::checkFile(it->second) < 0)
+			return (false);
 	}
 	return (true);
 }
 
-bool ServerConfig::isValidLocations() const
+int ServerConfig::isValidLocation(Location &location) const
 {
-	std::vector<Location>::const_iterator it;
-	for (it = this->_locations.begin(); it != this->_locations.end(); it++)
+	char dir[1024];
+	getcwd(dir, 1024);
+
+	if (location.getPath()[0] == '*')
 	{
-		if (it->getPath()[0] == '*')
-		{
-	// 		std::string path = it->getCgiPass();
-	// 		if (path.empty() || ConfigFile::getTypePath(path) < 0)
-	// 			return (false);
-			continue;
-		}
-		if (it->getPath()[0] != '/')
-			return (false);
-	// 	// check path of location ?
+		std::string path = location.getCgiPass();
+		if (ConfigFile::getTypePath(path) < 0)
+			path = dir + location.getCgiPass();
+		if (path.empty() || ConfigFile::getTypePath(path) < 0)
+			return (1);
+		if (location.getRootLocation().empty())
+			location.setRootLocation(dir);
 	}
-	return (true);
+	else
+	{
+		if (location.getPath()[0] != '/')
+			return (2);
+		if (location.getRootLocation().empty())
+			location.setRootLocation(this->_root);
+		if (!location.getReturn().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getReturn()) != 1)
+			return (3);
+
+
+	}
+	// 	// check path of location ?
+	// добавить проверку существования и чтения индекса
+	// proverka return tyt
+	// если есть рут изменить путь
+	// добавить проверку path
+	// проверить в cgi наличие cgi_pass
+	return (0);
 }
 
 /* Get functions */

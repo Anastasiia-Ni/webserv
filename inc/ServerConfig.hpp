@@ -38,7 +38,7 @@ class ServerConfig
 
 		bool isValidHost(std::string host) const;
 		bool isValidErrorPages() const;
-		bool isValidLocations() const;
+		int isValidLocation(Location &location) const;
 
 		const std::string &getServerName();
 		const uint16_t &getPort();

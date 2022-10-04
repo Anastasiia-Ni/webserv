@@ -50,8 +50,8 @@ void Location::setPath(std::string parametr)
 
 void Location::setRootLocation(std::string parametr)
 {
-	// if (ConfigFile::getTypePath(parametr) != 2)
-	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
+	if (ConfigFile::getTypePath(parametr) != 2)
+		throw ServerConfig::ErrorException("root of location");
 	this->_root = parametr;
 }
 
@@ -86,7 +86,7 @@ void Location::setIndexLocation(std::string parametr)
 
 void Location::setReturn(std::string parametr)
 {
-	// if (ConfigFile::getTypePath(parametr) != 1)
+	// if (ConfigFile::getTypePath(parametr) != 1) // move to validation
 	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_return = parametr;
 }
