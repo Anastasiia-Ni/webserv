@@ -30,11 +30,11 @@ class Location
 
 		const std::string &getPath() const;
 		const std::string &getRootLocation() const;
-		const std::string &getIndexLocation() const;
 		const std::vector<short> &getMethods() const;
 		const bool &getAutoindex() const;
-		const std::string &getReturn() const;
+		const std::string &getIndexLocation() const;
 		const std::string &getCgiPass() const;
+		const std::string &getReturn() const;
 
 		std::string getPrintMethods() const; // for checking only
 

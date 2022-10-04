@@ -16,10 +16,8 @@ class ServerConfig
 		std::string						_root;
 		unsigned long					_client_max_body_size;
 		std::string						_index;
-		std::string						_sgi_path;
 		std::map<short, std::string>	_error_pages;
 		std::vector<Location> 			_locations;
-		// listing ?
 
 	public:
 		ServerConfig();
@@ -34,7 +32,6 @@ class ServerConfig
 		void setRoot(std::string root);
 		void setPort(std::string parametr);
 		void setClientMaxBodySize(std::string parametr);
-		void setCgiPass(std::string parametr);
 		void setErrorPages(std::vector<std::string> &parametr);
 		void setIndex(std::string index);
 		void setLocation(std::string nameLocation, std::vector<std::string> parametr);
@@ -47,7 +44,6 @@ class ServerConfig
 		const uint16_t &getPort();
 		const in_addr_t &getHost();
 		const size_t &getClientMaxBodySize();
-		const std::string &getSgiPass();
 		const std::vector<Location> &getLocations();
 		const std::string &getRoot();
 		const std::map<short, std::string> &getErrorPages();

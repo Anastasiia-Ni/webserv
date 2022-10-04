@@ -2,14 +2,13 @@
 
 ServerConfig::ServerConfig()
 {
-	this->_server_name = "";
-	this->_host = 0;
-	this->_root = "";
 	this->_port = 0;
+	this->_host = 0;
+	this->_server_name = "";
+	this->_root = "";
 	this->_client_max_body_size = 0;
-	this->_sgi_path = "";
-	this->initErrorPages();
 	this->_index = "";
+	this->initErrorPages();
 }
 
 ServerConfig::~ServerConfig() { }
@@ -21,9 +20,8 @@ ServerConfig::ServerConfig(const ServerConfig &other)
 	{
 		this->_server_name = other._server_name;
 		this->_root = other._root;
+		this->_host = other._host;
 		this->_port = other._port;
-		this->_port = other._port;
-		this->_sgi_path = other._sgi_path;
 		this->_client_max_body_size = other._client_max_body_size;
 		this->_index = other._index;
 		this->_error_pages = other._error_pages;
@@ -40,8 +38,7 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 		this->_server_name = rhs._server_name;
 		this->_root = rhs._root;
 		this->_port = rhs._port;
-		this->_port = rhs._port;
-		this->_sgi_path = rhs._sgi_path;
+		this->_port = rhs._host;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_index = rhs._index;
 		this->_error_pages = rhs._error_pages;
@@ -86,7 +83,6 @@ void ServerConfig::setHost(std::string parametr)
 
 void ServerConfig::setRoot(std::string root)
 {
-	//if (root != "/")
 	checkToken(root);
 
 	if (ConfigFile::getTypePath(root) == 2)
@@ -138,11 +134,7 @@ void ServerConfig::setIndex(std::string index)
 {
 	checkToken(index);
 	this->_index = index;
-}
-
-void ServerConfig::setCgiPass(std::string parametr)
-{
-	this->_sgi_path = parametr;
+	// добавить проверку существования и чтения индекса
 }
 
 /* checks if there is such a default error code. If there is, it overwrites the path to the file,
@@ -184,12 +176,6 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	bool flag_methods = false;
 	bool flag_autoindex = false;
 
-	// std::vector<std::string>::iterator it = parametr.begin(); // delete
-	// std::cout << "-----------" << std::endl;
-	// for (; it != parametr.end(); it++)
-	// {
-	// 	std::cout << *it << std::endl;
-	// }
 	new_location.setPath(path);
 	for (size_t i = 0; i < parametr.size(); i++)
 	{
@@ -251,9 +237,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getCgiPass().empty())
 				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
-			std::cout << "here: " << parametr[i] << std::endl; // delete;
-			// setCgiPass(parametr[i]); - дает сегфолт, исправить его
-			// может удалить его из локейшенов
+			//std::cout << "here: " << parametr[i] << std::endl; // delete;
+			new_location.setCgiPass(parametr[i]);
 		}
 		else if (i < parametr.size())
 		{
@@ -267,6 +252,9 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	if (new_location.getRootLocation().empty())
 		new_location.setRootLocation(this->_root);
 	// добавить проверку существования и чтения индекса
+	// если есть рут изменить путь
+	// добавить проверку path и учесть случаи cgi
+	// проверить в cgi наличие cgi_passAnastasiia
 	this->_locations.push_back(new_location);
 }
 
@@ -345,11 +333,6 @@ const size_t &ServerConfig::getClientMaxBodySize()
 const std::vector<Location> &ServerConfig::getLocations()
 {
 	return (this->_locations);
-}
-
-const std::string &ServerConfig::getSgiPass()
-{
-	return (this->_sgi_path);
 }
 
 const std::map<short, std::string> &ServerConfig::getErrorPages()

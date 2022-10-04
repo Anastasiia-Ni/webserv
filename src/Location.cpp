@@ -6,6 +6,8 @@ Location::Location()
 	this->_root = "";
 	this->_autoindex = false;
 	this->_index = "";
+	this->_cgi_pass = "";
+	this->_return = "";
 	this->_methods.reserve(3);
 	this->_methods.push_back(1);
 	this->_methods.push_back(0);
@@ -18,6 +20,8 @@ Location::Location(const Location &other)
 	this->_root = other._root;
 	this->_autoindex = other._autoindex;
 	this->_index = other._index;
+	this->_cgi_pass = other._cgi_pass;
+	this->_return = other._return;
     this->_methods = other._methods;
 }
 
@@ -29,6 +33,8 @@ Location &Location::operator=(const Location &rhs)
 		this->_root = rhs._root;
 		this->_autoindex = rhs._autoindex;
 		this->_index = rhs._index;
+		this->_cgi_pass = rhs._cgi_pass;
+		this->_return = rhs._return;
 		this->_methods = rhs._methods;
     }
 	return (*this);
@@ -44,7 +50,7 @@ void Location::setPath(std::string parametr)
 
 void Location::setRootLocation(std::string parametr)
 {
-	// if (ConfigFile::getTypePath(parametr) == 2)
+	// if (ConfigFile::getTypePath(parametr) != 2)
 	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_root = parametr;
 }
@@ -80,8 +86,14 @@ void Location::setIndexLocation(std::string parametr)
 
 void Location::setReturn(std::string parametr)
 {
-	// do we need check is it exist?
+	// if (ConfigFile::getTypePath(parametr) != 1)
+	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_return = parametr;
+}
+
+void Location::setCgiPass(std::string parametr)
+{
+	this->_cgi_pass = parametr;
 }
 
 /* get functions */

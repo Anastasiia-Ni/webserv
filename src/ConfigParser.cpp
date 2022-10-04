@@ -18,7 +18,6 @@ int ConfigParser::print()
 		std::cout << "Host: " << _servers[i].getHost() << std::endl;
 		std::cout << "Root: " << _servers[i].getRoot() << std::endl;
 		std::cout << "Index: " << _servers[i].getIndex() << std::endl;
-		std::cout << "sgi_path " << _servers[i].getSgiPass() << std::endl;
 		std::cout << "Port: " << _servers[i].getPort() << std::endl;
 		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
 		std::cout << "Error pages: " << _servers[i].getErrorPages().size() << std::endl;
@@ -32,12 +31,21 @@ int ConfigParser::print()
 		std::vector<Location>::const_iterator itl = _servers[i].getLocations().begin();
 		while (itl != _servers[i].getLocations().end())
 		{
-			std::cout << "name location " << itl->getPath() << " - " << itl->getRootLocation() << std::endl;
-			std::cout << "methods " << itl->getPrintMethods() << std::endl;
-			std::cout << "index " << itl->getIndexLocation() << std::endl;
-			std::cout << "root " << itl->getRootLocation() << std::endl;
+			if (itl->getCgiPass().empty()) 
+			{
+				std::cout << "name location: " << itl->getPath() << " - " << itl->getRootLocation() << std::endl;
+				std::cout << "methods: " << itl->getPrintMethods() << std::endl;
+				std::cout << "index: " << itl->getIndexLocation() << std::endl;
+				std::cout << "root: " << itl->getRootLocation() << std::endl;
+			}
+			else 
+			{
+				std::cout << "root: " << itl->getRootLocation() << std::endl;
+				std::cout << "sgi_path: " << itl->getCgiPass() << std::endl;
+			}
 			++itl;
 		}
+		itl = _servers[i].getLocations().begin();
 		std::cout << "-----------------------------" << std::endl;
 	}
 	return (0);
@@ -275,10 +283,6 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 				throw  ErrorException("Index is duplicated");
 			server.setIndex(parametrs[++i]);
 		}
-		// if (parametrs[i] == "cgi_pass" && (i + 1) < parametrs.size())
-		// {
-		// 	server.setSgiPass(parametrs[++i]);
-		// }
 		else if (parametrs[i] != "}" && parametrs[i] != "{")
 		{
 			ServerConfig::checkToken(parametrs[++i]);
@@ -287,11 +291,12 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 	}
 	if (server.getRoot().empty())
 		server.setRoot("/;");
+	if (server.getHost() == 0)
+		server.setHost("localhost;");
 	if (server.checkLocaitons())
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
 		throw  ErrorException("Port does not found"); // check sentense
-	// добавить проверку существования и чтения индекса
 }
 
 /* comparing strings from position */
