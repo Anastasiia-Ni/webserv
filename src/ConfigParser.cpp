@@ -74,12 +74,8 @@ int ConfigParser::createCluster(const std::string &config_file)
 		throw ErrorException("Somthing with size"); //rewrite the sentence
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
-		// std::vector<std::string>::iterator it	= _server_config.begin(); //delete
-		// for (; it != _server_config.end(); it++)
-		// 	std::cout << *it << std::endl;
 		ServerConfig server;
 		createServer(this->_server_config[i], server);
-		validServer(server);
 		this->_servers.push_back(server);
 	}
 	if (this->_nb_server > 1)
@@ -110,11 +106,6 @@ void ConfigParser::removeWhiteSpace(std::string &content)
 	while (content[i] && isspace(content[i]))
 		i++;
 	content = content.substr(i);
-	// for (i = 0; content[i]; i++) // will think need it
-	// {
-	// 	if (isspace(content[i]) && content[i + 1] && isspace(content[i + 1]))
-	// 		content.erase(i, 1);
-	// }
 	i = content.length() - 1;
 	while (i > 0 && isspace(content[i]))
 		i--;
@@ -132,11 +123,6 @@ void ConfigParser::splitServers(std::string &content)
 	while (start != end && start < content.length())
 	{
 		start = findStartServer(start, content);
-		// if (start == 0)
-		// {
-		// 	std::cout << "no server" << std::endl; //throw
-		// 	return ;
-		// }
 		end = findEndServer(start, content);
 		if (start == end)
 			throw ErrorException("problem with scope");
@@ -217,6 +203,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
 	std::vector<std::string>parametrs;
 	int flag_loc = 1;
+	std::vector<std::string> error_codes;
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 	for (size_t i = 0; i < parametrs.size(); i++)
@@ -259,16 +246,14 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		}
 		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
 		{
-			std::vector<std::string> codes;
 			while (++i < parametrs.size())
 			{
-				codes.push_back(parametrs[i]);
+				error_codes.push_back(parametrs[i]);
 				if (parametrs[i].find(';') != std::string::npos)
 					break ;
 				if (i + 1 >= parametrs.size())
 					throw ErrorException("Wrong character out of server scope{}");
 			}
-			server.setErrorPages(codes);
 		}
 		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
 		{
@@ -304,6 +289,9 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
 		throw  ErrorException("Port does not found"); // check sentense
+	server.setErrorPages(error_codes);	
+	if (!server.isValidErrorPages())
+		throw ErrorException("Incorrect path for error page or number of error");
 }
 
 /* comparing strings from position */
@@ -320,15 +308,6 @@ int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 	if (i == str2.length() && pos <= str1.length() && (str1.length() == pos || isspace(str1[pos])))
 		return (0);
 	return (1);
-}
-
-/* calls functions to check parameters for servers */
-int ConfigParser::validServer(const ServerConfig &server)
-{
-	if (server.isValidErrorPages())
-		return (1);
-	else
-		throw ErrorException("Failed server validation");
 }
 
 /* checking repeat and mandatory parametrs*/

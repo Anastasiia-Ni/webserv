@@ -26,7 +26,6 @@ class ConfigParser {
 		size_t findStartServer(size_t start, std::string &content);
 		size_t findEndServer(size_t start, std::string &content);
 		void createServer(std::string &config, ServerConfig &server);
-		int validServer(const ServerConfig &server);
 		void checkServers();
 
 		int	stringCompare(std::string str1, std::string str2, size_t pos);

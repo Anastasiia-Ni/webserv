@@ -76,8 +76,7 @@ void ServerConfig::setHost(std::string parametr)
 		parametr = "127.0.0.1";
 	if (!isValidHost(parametr))
 		throw ErrorException("Wrong syntax: host");
-	this->_host = inet_addr(parametr.data()); // проверить
-	//std::cout << "Host: " << this->_host << std::endl; // delete
+	this->_host = inet_addr(parametr.data()); // check with select 
 	// if (this->_host != INADDR_NONE);
 }
 
@@ -140,13 +139,11 @@ void ServerConfig::setIndex(std::string index)
 otherwise it creates a new pair: error code - path to the file */
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
-	std::string path = parametr[parametr.size() - 1];
+std::string path = parametr[parametr.size() - 1];
 	checkToken(path);
 	if (ConfigFile::getTypePath(path) != 2)
 	{
-		char dir[1024];
-		getcwd(dir, 1024);
-		path = dir + path;
+		path = this->_root + path;
 		if (ConfigFile::getTypePath(path) != 1)
 			throw ErrorException ("incorrect path for error page file: " + path);
 		if (ConfigFile::checkFile(path) == -1)
@@ -167,7 +164,7 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 	}
 }
 
-/* set location */
+/* parsing and set location */
 void ServerConfig::setLocation(std::string path, std::vector<std::string> parametr)
 {
 	Location new_location;
@@ -237,7 +234,6 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			if (!new_location.getCgiPass().empty())
 				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
-			//std::cout << "here: " << parametr[i] << std::endl; // delete;
 			new_location.setCgiPass(parametr[i]);
 		}
 		else if (i < parametr.size())
@@ -248,7 +244,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 				throw ErrorException("Parametr in a location is invalid"); // chenge sentence
 		}
 	}
-	valid = isValidLocation(new_location); // 1 - cgi problem, 2
+	valid = isValidLocation(new_location);
 	if (valid == 1)
 		throw ErrorException("Failed CGI validation");
 	else if (valid == 2)
@@ -280,6 +276,7 @@ bool ServerConfig::isValidErrorPages() const
 	return (true);
 }
 
+/*check some parametrs of location */
 int ServerConfig::isValidLocation(Location &location) const
 {
 	char dir[1024];
@@ -287,10 +284,12 @@ int ServerConfig::isValidLocation(Location &location) const
 
 	if (location.getPath()[0] == '*')
 	{
+		if (location.getCgiPass().empty())
+			return (1);
 		std::string path = location.getCgiPass();
 		if (ConfigFile::getTypePath(path) < 0)
 			path = dir + location.getCgiPass();
-		if (path.empty() || ConfigFile::getTypePath(path) < 0)
+		if (path.empty() || ConfigFile::getTypePath(path) < 0) //возможно более детально полсе добавления cgi
 			return (1);
 		if (location.getRootLocation().empty())
 			location.setRootLocation(dir);
@@ -299,19 +298,12 @@ int ServerConfig::isValidLocation(Location &location) const
 	{
 		if (location.getPath()[0] != '/')
 			return (2);
-		if (location.getRootLocation().empty())
+		if (location.getRootLocation().empty()) {
 			location.setRootLocation(this->_root);
+		}
 		if (!location.getReturn().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getReturn()) != 1)
 			return (3);
-
-
 	}
-	// 	// check path of location ?
-	// добавить проверку существования и чтения индекса
-	// proverka return tyt
-	// если есть рут изменить путь
-	// добавить проверку path
-	// проверить в cgi наличие cgi_pass
 	return (0);
 }
 
@@ -365,6 +357,7 @@ const std::string &ServerConfig::getPathErrorPage(short key)
 	return (it->second);
 }
 
+/* find location by a name */ //do not using in parser, created for server manager
 const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string key)
 {
 	std::vector<Location>::iterator it;
@@ -376,15 +369,16 @@ const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string k
 	throw ErrorException("Error: path to location not found");
 }
 
-/* utils */
+/* check is a properly end of parametr */
 void ServerConfig::checkToken(std::string &parametr)
 {
 	size_t pos = parametr.rfind(';');
 	if (pos != parametr.size() - 1)
-		throw ErrorException("Token is invalid"); // change sentence
+		throw ErrorException("Token is invalid");
 	parametr.erase(pos);
 }
 
+/* check location on a dublicate */
 bool ServerConfig::checkLocaitons() const
 {
 	if (this->_locations.size() < 2)

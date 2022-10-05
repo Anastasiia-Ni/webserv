@@ -86,8 +86,6 @@ void Location::setIndexLocation(std::string parametr)
 
 void Location::setReturn(std::string parametr)
 {
-	// if (ConfigFile::getTypePath(parametr) != 1) // move to validation
-	// 	throw ServerConfig::ErrorException("Wrong syntax: root of location");
 	this->_return = parametr;
 }
 
