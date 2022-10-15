@@ -162,8 +162,8 @@ void    ServerManager::readRequest(int &i)
     char    buffer[8192];
     int     bytes_read = 0;
 
-    std::cout << "Message from: " << inet_ntoa(_clients_map[i].getAddress().sin_addr) << " Socket no : " <<
-    i << std::endl;
+    // std::cout << "Message from: " << inet_ntoa(_clients_map[i].getAddress().sin_addr) << " Socket no : " <<
+    // i << std::endl;
 
     bytes_read = read(i, buffer, sizeof(buffer));
     
