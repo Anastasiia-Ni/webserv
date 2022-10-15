@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/password.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Fusion</title>
+</head>
+<body>
+    
+    <header class="header">
+        <div class="container">
+            <div class ="header__inner">
+                <a class = "nav__link__dop" href="tours/tours.html">Tour</a>
+                <nav class="nav">
+                    <a class="nav__link__dop" href="home.html">Home</a>
+                    <a class="nav__link__dop" href="services.html">Services</a>
+                    <a class="nav__link__dop" href="about.html">About</a>
+                    <a class="nav__link__dop" href="contact.html">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+<div class="pass__block"> 
+    <div class = "text__pass">
+        Enter you secret words:
+    </div>
+    <form action="">
+        <input type="password" onkeyup="password_length(event);">
+        <div class="bar_container">
+            <div id="password-length"></div>
+        </div>
+    </form>
+</div>
+
+    <script src="assets/js/password.js"></script>
+</body>
+</html>

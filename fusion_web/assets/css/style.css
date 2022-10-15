@@ -186,17 +186,6 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-/* poloska 
-
-.name_text:after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 3px;
-    background-color: white;
-    margin: 60px auto 0;
-} */
-
 /* knopka 
 
 .button {
@@ -247,7 +236,7 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
 }
 
-.panel.activ {
+.panel.active {
     flex: 5;
 }
 
@@ -256,9 +245,38 @@ h1, h2, h3, h4, h5, h6 {
     transition: opacity 0.3s ease-in 0.4s;
 }
 
-.titles {
-    background-color: red;
-    display: block;
-    
 
+/* about */
+
+.cont__title {
+    width: 850px;
+    height: 250px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 40%;
+    left: 0;
+    margin: auto; 
 }
+.titles__inner {
+    padding: 10px 20px;
+    /* background-color: red; */
+    text-align: center;
+}
+
+.text__about {
+    padding: 10px 20px;
+    text-align: center;
+}
+
+/* poloska */
+
+.titles__inner:after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: #333;
+    margin: 10px auto 0;
+}
+
