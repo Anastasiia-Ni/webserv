@@ -346,7 +346,15 @@ void    HttpRequest::feed(char *data, size_t size)
                     _fields_done_flag = true;
                     _handle_headers();
                     if (_body_flag == 1)
+                    {
                         _state = Message_Body;
+                        if(_body_length > _max_body_size)
+                        {
+                            _error_code = 400;
+                            std::cout << "Body size is bigger than max allowed!" << std::endl;
+                            return;
+                        }
+                    }
                     else
                         _state = Parsing_Done;
                     continue;
@@ -409,13 +417,7 @@ void    HttpRequest::feed(char *data, size_t size)
             case Message_Body:
             {
                 if(_body.size() < _body_length )
-                    _body.push_back(character);
-                else if (_body.size() > _max_body_size)
-                {
-                    _error_code = 400;
-                    return;
-                }
-                
+                    _body.push_back(character);   
                 else
                 {
                     _body_done_flag = true;
