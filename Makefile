@@ -1,6 +1,8 @@
 NAME = webserv
 
-SRCS = main.cpp src/ConfigFile.cpp src/ConfigParser.cpp src/ServerConfig.cpp src/Location.cpp
+SRCS = main.cpp src/ServerManager.cpp src/Response.cpp src/Client.cpp src/HttpRequest.cpp \
+	   src/ConfigFile.cpp src/ConfigParser.cpp src/ServerConfig.cpp src/Location.cpp \
+	   src/CgiHandler.cpp
 
 HEADERS	= inc/Webserv.hpp
 
@@ -9,6 +11,7 @@ OBJS = $(SRCS:.cpp=.o)
 CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -g3 
 
 RM = rm -rf
 
@@ -17,20 +20,17 @@ BLACK = "\033[1m\033[37m"
 
 all: $(NAME)
 
-$(NAME) : $(OBJS) 
+$(NAME) : $(OBJS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled 🌐 $(RESET)
 
 clean:
-		$(RM) $(NAME)
+	$(RM) $(OBJS)
 
 fclean: clean
-		$(RM) $(OBJS)
+	$(RM) $(NAME)
 		@echo OBJ files removed
 
 re: 	fclean all
 
-fmt:
-	clang-format -i $(SRCS) $(HEADERS)
-
-.PHONY: all clean fclean re fmt
+.PHONY: all clean fclean re

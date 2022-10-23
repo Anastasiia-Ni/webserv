@@ -1,10 +1,16 @@
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <fcntl.h>
+# include <iostream>
+// # include <fstream>
+# include <fcntl.h>
+# include <cstring>
+# include <string> 
+# include <unistd.h>
+# include <sstream>
+# include <cstdlib>
+# include <fstream>
+# include <sstream>
 
 /* STL Containers */
 # include <map>
@@ -20,7 +26,7 @@
 # include <sys/stat.h>
 # include <sys/time.h>
 # include <unistd.h>
-# include <machine/types.h>
+// # include <machine/types.h>
 # include <signal.h>
 
 /* Network */
@@ -33,5 +39,6 @@
 # include "ConfigFile.hpp"
 # include "ServerConfig.hpp"
 # include "Location.hpp"
+
 
 #endif
