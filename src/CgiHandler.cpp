@@ -83,18 +83,18 @@ const std::string &CgiHandler::getCgiPath() const
 void CgiHandler::initEnv(std::string msg)
 {
 	this->_env["AUTH_TYPE"] = ""; // or "Basic"
-	this->_env["CONTENT_LENGTH"] = msg; //getHeader("Content-Length") // проверить если не находит то через итератор и find
+	this->_env["CONTENT_LENGTH"] = "4000"; //getHeader("Content-Length") // проверить если не находит то через итератор и find
 	this->_env["CONTENT_TYPE"] = msg; // getHeader("Content-Type")
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = "";//location->getCgiPass()
     this->_env["SCRIPT_FILENAME"] = ""; //full path
-    this->_env["PATH_INFO"] = "" ; // Request Uri
+    this->_env["PATH_INFO"] = "/usr/bin" ; // Request Uri
     this->_env["PATH_TRANSLATED"] = ""; //root from reguest + this->_env["PATH_INFO"]
     this->_env["QUERY_STRING"] = msg; //getHeader("Query_string");
     this->_env["REMOTE_ADDR"] = msg; //getHeader("Host"); like 172.17.42.1
     this->_env["SERVER_NAME"] = msg; //getBeforeColon(from request ["Host"], ':'); - will write a funct or check getHeader
     this->_env["SERVER_PORT"] = msg; //getAfterColon(from request ["Host"], ':');  - will write a funct or check getHeader
-    this->_env["REQUEST_METHOD"] = msg; // getHeader("Request");
+    this->_env["REQUEST_METHOD"] = "GET"; // getHeader("Request");
     this->_env["HTTP_COOKIE"] = msg; // getHeader("Cookie");
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
@@ -118,9 +118,11 @@ void CgiHandler::initEnv(std::string msg)
 	//this->_argv[2] = NULL;
 
 	//for check//
-	this->_argv[0] = strdup("/Users/anastasiianifantova/Desktop/ft-server/cgi_bin/env");
-	this->_argv[1] = strdup("chto za hernya");
-	this->_argv[2] = NULL;
+	this->_argv[0] = strdup("/Users/anastasiianifantova/Desktop/ft-server/cgi_bin/calc.py");
+	this->_argv[1] = strdup("99");
+	this->_argv[2] = strdup("*");
+	this->_argv[3] = strdup("100");
+	this->_argv[4] = NULL;
 
 }
 
@@ -156,7 +158,7 @@ void CgiHandler::execute(std::string msg)
 		close(pipe_out[1]);
 		//std::cout<< "argv[0]:" << this->_argv[0] << std::endl; //delete
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
-		//std::cout<< "exit: " << this->_exit_status << std::endl; //delete
+		std::cout<< "exit: " << this->_exit_status << std::endl; //delete
 		exit(this->_exit_status);
 	}
 	else if (this->_cgi_pid > 0)

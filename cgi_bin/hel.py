@@ -2,6 +2,7 @@
 
 import datetime
 
-print("Content-Type: text/plain")
+
+print("Content-type: text/html\r\n\r\n")
 print()
 print(datetime.datetime.strftime(datetime.datetime.now(), "%H:%M:%S"))
