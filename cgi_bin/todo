@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo 'Content-Type: text/plain'
+echo ''
+
+echo '<form method="POST">'
+
+for i in list/*
+do
+    echo '<h3>''basename $i''</h1>'
+    echo '<pre>'
+    cat $i
+    echo '</pre>'
+    echo '<input type="submit" value="delete" name="'$i'"/></input>'
+    echo '<hr>'
+done
+
+echo '<br>'
+echo '<input type="text" name="new"></input>'
+echo '<input type="submit" name="save"></input>'
+
+echo '</form>'

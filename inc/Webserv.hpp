@@ -7,10 +7,13 @@
 # include <cstring>
 # include <string> 
 # include <unistd.h>
-# include <bits/stdc++.h>
+# include <sstream>
+// # include <bits/stdc++.h>
 # include <cstdlib>
 # include <fstream>
 # include <sstream>
+# include <cctype>
+# include <ctime>
 
 /* STL Containers */
 # include <map>
@@ -39,6 +42,7 @@
 # include "ConfigFile.hpp"
 # include "ServerConfig.hpp"
 # include "Location.hpp"
+# include "CgiHandler.hpp"
 
 
 #endif

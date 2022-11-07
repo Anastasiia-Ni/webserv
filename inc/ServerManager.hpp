@@ -31,6 +31,8 @@ class ServerManager
         void setupSelect();
         void readRequest(int &);
         void sendResponse(int &i);
+        void checkTimeout();
+        void closeConnection(int);
 
 };
 

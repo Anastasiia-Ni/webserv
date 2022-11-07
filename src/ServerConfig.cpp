@@ -417,7 +417,9 @@ void	ServerConfig::setupServer(void)
     memset(&_server_address, 0, sizeof(_server_address));
 
     _server_address.sin_family = AF_INET;
-    _server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    _server_address.sin_addr.s_addr = _host;
+	char tmp[512];
+	std::cout << inet_ntop(AF_INET, &_host, tmp, 512) << std::endl;
     _server_address.sin_port = htons(_port);
 
 

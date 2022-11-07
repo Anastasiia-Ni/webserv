@@ -38,7 +38,16 @@ enum ParsingState
     Field_Name,
     Field_Value,
     Field_Value_End,
-    Before_Message_Body,
+    Chunked_Length_Begin,
+    Chunked_Length,
+    Chunked_Ignore,
+    Chunked_Length_CR,
+    Chunked_Length_LF,
+    Chunked_Data,
+    Chunked_Data_CR,
+    Chunked_Data_LF,
+    Chunked_End_CR,
+    Chunked_End_LF,
     Message_Body,
     Parsing_Done
 };
@@ -62,7 +71,7 @@ class HttpRequest
         std::string &getHeader(std::string &);
 
         void        setMethod(HttpMethod &);
-        void        setHeader(std::string , std::string );
+        void        setHeader(std::string &, std::string &);
         void        setMaxBodySize(size_t);
 
         void        feed(char *data, size_t size);
@@ -87,7 +96,9 @@ class HttpRequest
         bool            _body_flag;
         bool            _body_done_flag;
         bool            _complete_flag;
+        bool            _chunked_flag;
         int             _error_code;
+        int             _chunk_length;
         std::string     _storage;
         std::string     _key_storage;
         int             _method_index;

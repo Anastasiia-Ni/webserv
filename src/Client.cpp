@@ -8,6 +8,7 @@ Client::Client(ServerConfig &server): _total_bytes_read(0)
 {
     _response.setServer(server);
     _request.setMaxBodySize(_server.getClientMaxBodySize());
+    _last_msg_time = time(NULL);
 }
 
 void    Client::setSocket(int &sock)
@@ -38,6 +39,11 @@ struct sockaddr_in    Client::getAddress()
 size_t      Client::getTotalBytes()
 {
     return(_total_bytes_read);
+}
+
+time_t     Client::getLastTime()
+{
+    return _last_msg_time;
 }
 
 void        Client::feedData(char *data, size_t size)
@@ -105,4 +111,20 @@ int              Client::getResponseCode()
 void             Client::setRespError(short error_code)
 {
     _response.errResponse(error_code);
+}
+
+void             Client::printReq()
+{
+    _request.printMessage();
+}
+
+void             Client::updateTime()
+{
+    _last_msg_time = time(NULL);
+}
+
+void                Client::handleCgi()
+{
+    _response.setRequest(_request);
+    _response.handleCgi();
 }
