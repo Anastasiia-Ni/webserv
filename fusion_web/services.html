@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="assets/css/serv.css">
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <title>Fusion</title>
-    <script>
-        if ( window.history.replaceState ) {
-            window.history.replaceState(null, null, window.location.href);
+    <!-- <script>
+        if (window.history.replaceState) {  
+            window.history.replaceState(null, null, window.location.href);  //
         }
-    </script>
+    </script> -->
 </head>
 <body>
 
@@ -39,24 +39,39 @@
         Name: <input id="nameForm" type="text" name="user">
         <input type="submit" value="OK">
     </form>
-	<!-- <script>
-		function setAction(form, name){
-			form.action = "../cgi-bin/script.php"; //дописать скрипт 
-			document.cookie = "user=" + name;
-		}
-		const value = `${document.cookie}`;
-		const parts = value.split("=");
-		document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
-	</script> -->
 
 </div>
+
     <footer>
         <p><span class="sight">Thank you for using AMANIX</p>
     </footer>
 
-
-
-
 </body>
 </html>
+
+<!-- <style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Verdana, Arial, sans-serif;
+    }
+</style> -->
+<html>
+    <body>
+    <h1 id="header"></h1>
+    <!-- <p>Messege for checking</p> -->
+	<script>
+		function setAction(form, name){
+			//form.action = "../cgi-bin/script.php"; //дописать скрипт 
+			document.cookie = "user=" + name;
+		}
+		const value = `${document.cookie}`;
+		const parts = value.split("=");
+    //    document.getElementById("parts").innerHTML = parts[parts.indexOf("user")]; // delete for checking
+		document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
+	</script>
+    </body>
+</html>
+
+    
 
