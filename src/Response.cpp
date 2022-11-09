@@ -94,7 +94,8 @@ void    Response::constructTarget()
                     {
                         biggest_match = it->getPath().length();
                         location_key = it->getPath(); 
-                        std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation()<< std::endl;
+                        std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
+                         " and index is = " << it->getIndexLocation() << std::endl;
                     }
                }
         }
@@ -102,10 +103,19 @@ void    Response::constructTarget()
     std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
     if (biggest_match > 0)
     {
+        std::string root_path = _server.getLocationKey(location_key)->getRootLocation();
+
+        if (root_path.back() == '/' && _request.getPath()[0] == '/')
+            _request.getPath().erase(0, 1);
         _target_file = _server.getLocationKey(location_key)->getRootLocation() +
         _request.getPath();
         if (isDirectory(_target_file))
+        {
+            if (_target_file.back() != '/' && _server.getLocationKey(location_key)->getIndexLocation()[0] != '/')
+                _target_file += '/';
             _target_file += _server.getLocationKey(location_key)->getIndexLocation();
+        }
+        std::cout << "TARGET FILE = " << _target_file << std::endl;
     }
     else
     {
