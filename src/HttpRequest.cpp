@@ -602,7 +602,7 @@ HttpMethod  &HttpRequest::getMethod()
     return _method;
 }
 
-std::string &HttpRequest::getHeader(std::string &name)
+std::string HttpRequest::getHeader(std::string const &name)
 {
     return _request_headers[name];
 }

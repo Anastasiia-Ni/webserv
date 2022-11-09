@@ -23,25 +23,26 @@ class Response
         size_t      getBodyLength() const;
         int         getErrorCode() const;
         int         getCode() const;
-        void        handleCgi();
+
         void        setRequest(HttpRequest &);
         void        setServer(ServerConfig &);
         
         void        buildResponse();
         void        clearResponse();
         void        errResponse(short error_code);
+        void        handleCgi();
 
 
 
 
     private:
-        HttpRequest _request;
-        std::string _target_file;
-        size_t      _body_length;
-        char*       _response_body;
-        std::string _response_content;
-        int         _code;
+        HttpRequest     _request;
         ServerConfig    _server;
+        std::string     _target_file;
+        size_t          _body_length;
+        char*           _response_body;
+        std::string     _response_content;
+        int             _code;
 
         int     buildBody();
         size_t  file_size();
@@ -50,7 +51,9 @@ class Response
         int     readFile();
         void    contentType();
         void    contentLength();
-        void    constructTargetFile();
+        void    connection();
+        void    server();
+        void    constructTarget();
 
 
 };

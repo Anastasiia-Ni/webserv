@@ -15,7 +15,7 @@ void   Response::errResponse(short error_code)
 
 void   Response::contentType()
 {
-    std::cout << "File is = " << _target_file << std::endl;
+    // std::cout << "File is = " << _target_file << std::endl;
     if(_target_file.rfind(".html", std::string::npos) != std::string::npos)
         _response_content.append("Content-Type: text/html\r\n");
     else if(_target_file.rfind(".jpg", std::string::npos) != std::string::npos)
@@ -42,10 +42,23 @@ void   Response::contentLength()
 
 }
 
+void   Response::connection()
+{
+    if(_request.getHeader("Connection") == "keep-alive")
+        _response_content.append("Connection: keep-alive\r\n");
+}
+
+void   Response::server()
+{
+        _response_content.append("Server: AMAnix\r\n");
+}
+
 void    Response::addHeaders()
 {
     contentType();
     contentLength();
+    connection();
+    server();
     _response_content.append("\r\n");
 }
 
@@ -54,12 +67,54 @@ bool fileExists (const std::string& f) {
     return (file.good());
 }
 
-void    Response::constructTargetFile()
+static bool    isDirectory(std::string path)
 {
-    if (_request.getPath().compare("/") == 0)
-        _target_file = _server.getRoot() + _server.getIndex();
+    struct stat file_stat;
+
+    stat(path.c_str(), &file_stat);
+
+    return (S_ISDIR(file_stat.st_mode));
+        
+}
+
+void    Response::constructTarget()
+{
+    std::cout << "URI is = " << _request.getPath() << std::endl;
+    std::string path = _request.getPath();
+    int biggest_match = 0;
+    std::string location_key;
+    for(std::vector<Location>::const_iterator it = _server.getLocations().begin(); it != _server.getLocations().end(); ++it)
+    {
+
+        if(path.find_first_of(it->getPath()) == 0)
+        {
+               if(path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
+               {
+                    if (it->getPath().length() > biggest_match)
+                    {
+                        biggest_match = it->getPath().length();
+                        location_key = it->getPath(); 
+                        std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation()<< std::endl;
+                    }
+               }
+        }
+    }
+    std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
+    if (biggest_match > 0)
+    {
+        _target_file = _server.getLocationKey(location_key)->getRootLocation() +
+        _request.getPath();
+        if (isDirectory(_target_file))
+            _target_file += _server.getLocationKey(location_key)->getIndexLocation();
+    }
     else
-        _target_file = _server.getRoot() +_request.getPath().substr(1, _request.getPath().length() - 1);
+    {
+        if (_request.getPath().compare("/") == 0)
+            _target_file = _server.getRoot() + _server.getIndex();
+        else
+            _target_file = _server.getRoot() +_request.getPath().substr(1, _request.getPath().length() - 1);
+    }
+    // remove this later, and check while reading file.
     if(!fileExists(_target_file))
     {
         _target_file = _server.getErrorPages().at(404);
@@ -71,7 +126,6 @@ void    Response::constructTargetFile()
 
 void    Response::buildResponse()
 {
-
 /*  if(checkReqError() || buildBody())
         buildErrorBody()
     setStatusLine()
@@ -84,7 +138,7 @@ void    Response::buildResponse()
     //buildStatusLine
     //buildHeader
     if(_request.errorCode() == 0)
-        constructTargetFile();
+        constructTarget();
     if(buildBody())
     {   
         addStatusLine();

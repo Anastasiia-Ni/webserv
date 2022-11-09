@@ -68,7 +68,7 @@ class HttpRequest
         std::string &getPath();
         std::string &getQuery();
         std::string &getFragment();
-        std::string &getHeader(std::string &);
+        std::string getHeader(std::string const &);
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
