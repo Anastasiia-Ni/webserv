@@ -31,7 +31,7 @@ CgiHandler::~CgiHandler() {
 		free(_argv);
 	}
 	this->_env.clear();
-
+  
    	std::cout << "CGI DIED" << std::endl; // delete
 //    std::cout << "Exit status was " << WEXITSTATUS(_exit_status) << std::endl;
 

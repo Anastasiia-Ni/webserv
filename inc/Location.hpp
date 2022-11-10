@@ -41,8 +41,7 @@ class Location
 		const std::string &getAlias() const;
 		const std::vector<std::string> &getCgiPath() const;
 		const std::vector<std::string> &getCgiExtension() const;
-
-		
+	
 		std::string getPrintMethods() const; // for checking only
 
 };

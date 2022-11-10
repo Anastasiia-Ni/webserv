@@ -39,7 +39,6 @@ class CgiHandler {
 		std::string	decode(std::string& path);
 		int	countCookies(const std::string& str);
 		void splitQuery(std::string &query);
-
 };
 
 

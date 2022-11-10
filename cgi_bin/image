@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo 'Content-Type: image/jpeg'
+echo ''
+
+cat /Users/anastasiianifantova/Desktop/ft-server/website/img/apple.jpeg
