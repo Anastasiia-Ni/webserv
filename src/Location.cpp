@@ -6,8 +6,8 @@ Location::Location()
 	this->_root = "";
 	this->_autoindex = false;
 	this->_index = "";
-	this->_cgi_pass = "";
 	this->_return = "";
+	this->_alias = "";
 	this->_methods.reserve(3);
 	this->_methods.push_back(1);
 	this->_methods.push_back(0);
@@ -20,8 +20,10 @@ Location::Location(const Location &other)
 	this->_root = other._root;
 	this->_autoindex = other._autoindex;
 	this->_index = other._index;
-	this->_cgi_pass = other._cgi_pass;
+	this->_cgi_path = other._cgi_path;
+	this->_cgi_ext = other._cgi_ext;
 	this->_return = other._return;
+	this->_alias = other._alias;
     this->_methods = other._methods;
 }
 
@@ -33,8 +35,10 @@ Location &Location::operator=(const Location &rhs)
 		this->_root = rhs._root;
 		this->_autoindex = rhs._autoindex;
 		this->_index = rhs._index;
-		this->_cgi_pass = rhs._cgi_pass;
+		this->_cgi_path = rhs._cgi_path;
+		this->_cgi_ext = rhs._cgi_ext;
 		this->_return = rhs._return;
+		this->_alias = rhs._alias;
 		this->_methods = rhs._methods;
     }
 	return (*this);
@@ -89,9 +93,19 @@ void Location::setReturn(std::string parametr)
 	this->_return = parametr;
 }
 
-void Location::setCgiPass(std::string parametr)
+void Location::setAlias(std::string parametr)
 {
-	this->_cgi_pass = parametr;
+	this->_alias = parametr;
+}
+
+void Location::setCgiPath(std::vector<std::string> path)
+{
+	this->_cgi_path = path;
+}
+
+void Location::setCgiExtension(std::vector<std::string> extension)
+{
+	this->_cgi_ext = extension;
 }
 
 /* get functions */
@@ -115,9 +129,14 @@ const std::vector<short> &Location::getMethods() const
 	return (this->_methods);
 }
 
-const std::string &Location::getCgiPass() const
+const std::vector<std::string> &Location::getCgiPath() const
 {
-	return (this->_cgi_pass);
+	return (this->_cgi_path);
+}
+
+const std::vector<std::string> &Location::getCgiExtension() const
+{
+	return (this->_cgi_ext);
 }
 
 const bool &Location::getAutoindex() const
@@ -128,6 +147,11 @@ const bool &Location::getAutoindex() const
 const std::string &Location::getReturn() const
 {
 	return (this->_return);
+}
+
+const std::string &Location::getAlias() const
+{
+	return (this->_alias);
 }
 
 /* for printing allowed methods*/

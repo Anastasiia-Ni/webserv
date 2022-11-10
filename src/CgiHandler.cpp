@@ -11,6 +11,8 @@ CgiHandler::CgiHandler(std::string path)
     this->_cgi_pid = -1;
 	this->_exit_status = 0;
 	this->_cgi_path = path;
+	this->_ch_env = NULL;
+	this->_argv = NULL;
 	std::cout << "CgiHandler: " << this->_cgi_path << std::endl;
 }
 
@@ -18,33 +20,31 @@ CgiHandler::~CgiHandler() {
 	
 	if (this->_ch_env) 
 	{
-		// for (int i = 0; this->_ch_env[i]; i++) // dobavit proverku
-		// 	free(this->_ch_env[i]);
+		for (int i = 0; this->_ch_env[i]; i++) // dobavit proverku
+			free(this->_ch_env[i]);
 		free(this->_ch_env);
 	}
 	if (this->_argv)
 	{
-		// for (int i = 0; this->_argv[i]; i++)
-		// 	free(_argv[i]);
+		for (int i = 0; this->_argv[i]; i++)
+			free(_argv[i]);
 		free(_argv);
 	}
 	this->_env.clear();
-
-
-	// if (waitpid(_cgi_pid, &_exit_status, WNOHANG) == 0)
-	// 	kill(_cgi_pid, SIGKILL);
-	// if (_response_pipe != -1)
-	// 	close(_response_pipe);
-	// if (_request_pipe != -1)
-	// 	close(_request_pipe);
-   	std::cout << "CGI DIED" << std::endl;
+  
+   	std::cout << "CGI DIED" << std::endl; // delete
 //    std::cout << "Exit status was " << WEXITSTATUS(_exit_status) << std::endl;
 
 }
 
 CgiHandler::CgiHandler(const CgiHandler &other)
 {
-	//TODO
+		this->_env = other._env;
+		this->_ch_env = other._ch_env;
+		this->_argv = other._argv;
+		this->_cgi_path = other._cgi_path;
+		this->_cgi_pid = other._cgi_pid;
+		this->_exit_status = other._exit_status;
 }
 
 CgiHandler &CgiHandler::operator=(const CgiHandler &rhs) 
@@ -52,13 +52,16 @@ CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
     if (this != &rhs)
 	{
 		this->_env = rhs._env;
-		// TODO
+		this->_ch_env = rhs._ch_env;
+		this->_argv = rhs._argv;
+		this->_cgi_path = rhs._cgi_path;
+		this->_cgi_pid = rhs._cgi_pid;
+		this->_exit_status = rhs._exit_status;
 	}	
 	return (*this);
 }
 
 /*Set functions */
-
 void CgiHandler::setCgiPid(pid_t cgi_pid) 
 {
     this->_cgi_pid = cgi_pid;
@@ -72,10 +75,10 @@ void CgiHandler::setCgiPath(const std::string &cgi_path)
 /* Get functions */
 const std::map<std::string, std::string> &CgiHandler::getEnv() const 
 {
-    return (this-> _env);
+    return (this->_env);
 }
 
-const pid_t CgiHandler::getCgiPid() const 
+const pid_t &CgiHandler::getCgiPid() const 
 {
     return (this->_cgi_pid);
 }
@@ -90,7 +93,7 @@ void CgiHandler::initEnv(std::string path, std::string query)
 {
 	this->_env["AUTH_TYPE"] = ""; // or "Basic"
 	this->_env["CONTENT_LENGTH"] = "4000"; //getHeader("Content-Length") // проверить если не находит то через итератор и find
-	this->_env["CONTENT_TYPE"] = query; // getHeader("Content-Type")
+	this->_env["CONTENT_TYPE"] = ""; // getHeader("Content-Type")
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = "";//location->getCgiPass()
     this->_env["SCRIPT_FILENAME"] = ""; //full path
@@ -114,21 +117,21 @@ void CgiHandler::initEnv(std::string path, std::string query)
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	// for (int i = 0; this->_ch_env[i]; i++)
-	// {
-	// 	std::cout << i << " " << this->_ch_env[i] <<std::endl;
-	// }
+	splitQuery(query);
 	this->_argv = (char **)malloc(sizeof(char *) * 5);
 	// this->_argv[0] = strdup(this->_cgi_path.c_str());
 	// this->_argv[1] = strdup(this->_env["SCRIPT_FILENAME"].c_str());
 	//this->_argv[2] = NULL;
 
 	//for check//
+	std::string arg1 = "90";
+	std::string arg2 = "+";
+	std::string arg3 = "100";
 
-	this->_argv[0] = strdup("/Users/mal-guna/Desktop/ws_moa/cgi_bin/Roman");
-	this->_argv[1] = strdup("9");
-	this->_argv[2] = strdup("+");
-	this->_argv[3] = strdup("100");
+	this->_argv[0] = strdup(this->_cgi_path.c_str());
+	this->_argv[1] = strdup(arg1.c_str());
+	this->_argv[2] = strdup(arg2.c_str());
+	this->_argv[3] = strdup(arg3.c_str());
 	this->_argv[4] = NULL;
 }
 
@@ -162,10 +165,10 @@ void CgiHandler::execute()
 		close(pipe_in[1]);
 		close(pipe_out[0]);
 		close(pipe_out[1]);
-		std::cout<< "argv[0]:" << this->_argv[0] << std::endl; //delete
-		std::cout<< "argv[1]:" << this->_argv[1] << std::endl; //delete
-		std::cout<< "argv[2]:" << this->_argv[2] << std::endl; //delete
-		std::cout<< "argv[3]:" << this->_argv[3] << std::endl; //delete
+		// std::cout<< "argv[0]:" << this->_argv[0] << std::endl; //delete
+		// std::cout<< "argv[1]:" << this->_argv[1] << std::endl; //delete
+		// std::cout<< "argv[2]:" << this->_argv[2] << std::endl; //delete
+		// std::cout<< "argv[3]:" << this->_argv[3] << std::endl; //delete
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
 		exit(this->_exit_status);
@@ -243,6 +246,18 @@ std::string CgiHandler::setCookie(const std::string& str)
 	std::string cook = str;
 	//size_t		pos; 
 	return cook;
+}
+
+void CgiHandler::splitQuery(std::string &query)
+{
+	std::cout << query << std::endl;
+	size_t pos = query.find("?");
+	if (pos != std::string::npos)
+		this->_name_bin.insert(query.begin(), pos);
+	else
+		return ;
+	
+
 }
 // decode(std::string& path)
 // {

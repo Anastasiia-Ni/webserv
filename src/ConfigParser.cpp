@@ -31,20 +31,22 @@ int ConfigParser::print()
 		std::vector<Location>::const_iterator itl = _servers[i].getLocations().begin();
 		while (itl != _servers[i].getLocations().end())
 		{
-			if (itl->getCgiPass().empty())
+			std::cout << "name location: " << itl->getPath() << std::endl;
+			std::cout << "methods: " << itl->getPrintMethods() << std::endl;
+			std::cout << "index: " << itl->getIndexLocation() << std::endl;
+			if (itl->getCgiPath().empty())
 			{
-				std::cout << "name location: " << itl->getPath() << std::endl;
-				std::cout << "root: " << itl->getRootLocation() << std::endl;
-				std::cout << "methods: " << itl->getPrintMethods() << std::endl;
-				std::cout << "index: " << itl->getIndexLocation() << std::endl;
 				std::cout << "root: " << itl->getRootLocation() << std::endl;
 				if (!itl->getReturn().empty())
-				std::cout << "return: " << itl->getReturn() << std::endl;
+					std::cout << "return: " << itl->getReturn() << std::endl;
+				if (!itl->getAlias().empty())
+					std::cout << "alias: " << itl->getAlias() << std::endl;
 			}
 			else
 			{
 				std::cout << "cgi root: " << itl->getRootLocation() << std::endl;
-				std::cout << "sgi_path: " << itl->getCgiPass() << std::endl;
+				std::cout << "sgi_path: " << itl->getCgiPath().size() << std::endl;
+				std::cout << "sgi_ext: " << itl->getCgiExtension().size() << std::endl;
 			}
 			++itl;
 		}

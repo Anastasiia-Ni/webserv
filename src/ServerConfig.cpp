@@ -237,12 +237,50 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			checkToken(parametr[++i]);
 			new_location.setReturn(parametr[i]);
 		}
-		else if (path[0] == '*' && parametr[i] == "cgi_pass" && (i + 1) < parametr.size())
+		else if (parametr[i] == "alias" && (i + 1) < parametr.size())
 		{
-			if (!new_location.getCgiPass().empty())
-				throw ErrorException("Cgi_pass is duplicated");
 			checkToken(parametr[++i]);
-			new_location.setCgiPass(parametr[i]);
+			new_location.setAlias(parametr[i]);
+		}
+		else if (parametr[i] == "cgi_ext" && (i + 1) < parametr.size())
+		{
+			std::vector<std::string> extension;
+			while (++i < parametr.size())
+			{
+				if (parametr[i].find(";") != std::string::npos)
+				{
+					checkToken(parametr[i]);
+					extension.push_back(parametr[i]);
+					break ;
+				}
+				else
+				{
+					extension.push_back(parametr[i]);
+					if (i + 1 >= parametr.size())
+						throw ErrorException("Token is invalid");
+				}
+			}
+			new_location.setCgiExtension(extension);
+		}
+		else if (parametr[i] == "cgi_path" && (i + 1) < parametr.size())
+		{
+			std::vector<std::string> path;
+			while (++i < parametr.size())
+			{
+				if (parametr[i].find(";") != std::string::npos)
+				{
+					checkToken(parametr[i]);
+					path.push_back(parametr[i]);
+					break ;
+				}
+				else
+				{
+					path.push_back(parametr[i]);
+					if (i + 1 >= parametr.size())
+						throw ErrorException("Token is invalid");
+				}
+			}
+			new_location.setCgiPath(path);
 		}
 		else if (i < parametr.size())
 		{
@@ -259,6 +297,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		throw ErrorException("Failed path in locaition validation");
 	else if (valid == 3)
 		throw ErrorException("Failed redirection file in locaition validation");
+	else if (valid == 4)
+		throw ErrorException("Failed alias file in locaition validation");
 	this->_locations.push_back(new_location);
 }
 
@@ -287,20 +327,32 @@ bool ServerConfig::isValidErrorPages() const
 /*check some parametrs of location */
 int ServerConfig::isValidLocation(Location &location) const
 {
-	char dir[1024];
-	getcwd(dir, 1024);
+	// char dir[1024];
+	// getcwd(dir, 1024);
 
-	if (location.getPath()[0] == '*')
+	if (location.getPath() == "/cgi-bin") // изменить
 	{
-		if (location.getCgiPass().empty())
+		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
 			return (1);
-		std::string path = location.getCgiPass();
-		if (ConfigFile::getTypePath(path) < 0)
-			path = dir + location.getCgiPass();
-		if (path.empty() || ConfigFile::getTypePath(path) < 0) //возможно более детально полсе добавления cgi
-			return (1);
-		if (location.getRootLocation().empty())
-			location.setRootLocation(dir);
+		std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
+		if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path) < 0)
+			return 1;
+		std::vector<std::string>::const_iterator it;
+		for (it = location.getCgiPath().begin(); it != location.getCgiPath().end(); ++it)
+		{
+			if (ConfigFile::getTypePath(*it) < 0)
+				return (1);
+		}
+		for (it = location.getCgiExtension().begin(); it != location.getCgiExtension().end(); ++it)
+		{
+			std::string tmp = *it;
+			if (tmp.size() < 3 || tmp.size() > 10)
+				return (1);
+			if (tmp[0] != '.' && tmp[0] != '*')
+				return (1);
+			if (tmp[0] == '*' && tmp[1] != '.')
+				return (1);
+		}
 	}
 	else
 	{
@@ -311,6 +363,9 @@ int ServerConfig::isValidLocation(Location &location) const
 		}
 		if (!location.getReturn().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getReturn()) != 1)
 			return (3);
+		if (!location.getAlias().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getAlias()) != 2)
+			return (4);
+		//надо ли проверять сам файл?
 	}
 	return (0);
 }

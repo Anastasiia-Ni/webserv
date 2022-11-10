@@ -195,7 +195,8 @@ int      Response::getCode() const
 
 void        Response::handleCgi()
 {
-    CgiHandler obj(_request.getPath());
+    //CgiHandler obj(_request.getPath());
+    CgiHandler obj("/Users/anastasiianifantova/Desktop/ft-server/cgi-bin/time.py");
     obj.initEnv(_request.getPath(), _request.getQuery());
     obj.execute();
 }

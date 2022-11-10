@@ -11,6 +11,8 @@ class CgiHandler {
 		std::string							_cgi_path;
 		pid_t								_cgi_pid;
 		int									_exit_status;
+		std::map<std::string, std::string>	_var; // add
+		std::string							_name_bin; //add
 
 	public:
 		CgiHandler();
@@ -29,14 +31,14 @@ class CgiHandler {
 		void setCgiPath(const std::string &cgi_path);
 		
 		const std::map<std::string, std::string> &getEnv() const;
-		const pid_t getCgiPid() const;
+		const pid_t &getCgiPid() const;
 		const std::string &getCgiPath() const;
 
 		std::string	getAfter(const std::string& path, char delim);
 		std::string	getBefore(const std::string& path, char delim);
 		std::string	decode(std::string& path);
 		int	countCookies(const std::string& str);
-
+		void splitQuery(std::string &query);
 };
 
 
