@@ -23,7 +23,7 @@ class Response
         size_t      getBodyLength() const;
         int         getErrorCode() const;
         int         getCode() const;
-
+        void        handleCgi();
         void        setRequest(HttpRequest &);
         void        setServer(ServerConfig &);
         

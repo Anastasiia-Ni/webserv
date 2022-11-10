@@ -71,6 +71,18 @@ void    Response::constructTargetFile()
 
 void    Response::buildResponse()
 {
+
+/*  if(checkReqError() || buildBody())
+        buildErrorBody()
+    setStatusLine()
+    setHeaders();
+    
+*/
+    //checkConfig() // 
+    //constructTarget() // If there is an error then target file will be error html file, either default or from config.
+    //buildBody()
+    //buildStatusLine
+    //buildHeader
     if(_request.errorCode() == 0)
         constructTargetFile();
     if(buildBody())
@@ -178,4 +190,13 @@ void   Response::clearResponse()
 int      Response::getCode() const
 {
     return (_code);
+}
+
+
+void        Response::handleCgi()
+{
+    //CgiHandler obj(_request.getPath());
+    CgiHandler obj("/Users/anastasiianifantova/Desktop/ft-server/cgi-bin/time.py");
+    obj.initEnv(_request.getPath(), _request.getQuery());
+    obj.execute();
 }

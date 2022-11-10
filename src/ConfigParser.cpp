@@ -1,7 +1,5 @@
 #include "../inc/ConfigParser.hpp"
 
-#include "../inc/CgiHandler.hpp" // DELETE
-
 ConfigParser::ConfigParser()
 {
 	this->_nb_server = 0;
@@ -12,55 +10,48 @@ ConfigParser::~ConfigParser() { }
 /* printing parametrs of servers from config file */
 int ConfigParser::print()
 {
-	//std::cout << "------------- Config -------------" << std::endl;
+	std::cout << "------------- Config -------------" << std::endl;
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
-		// std::cout << "Server #" << i + 1 << std::endl;
-		// std::cout << "Server name: " << _servers[i].getServerName() << std::endl;
-		// std::cout << "Host: " << _servers[i].getHost() << std::endl;
-		// std::cout << "Root: " << _servers[i].getRoot() << std::endl;
-		// std::cout << "Index: " << _servers[i].getIndex() << std::endl;
-		// std::cout << "Port: " << _servers[i].getPort() << std::endl;
-		// std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
-		// std::cout << "Error pages: " << _servers[i].getErrorPages().size() << std::endl;
-		// std::map<short, std::string>::const_iterator it = _servers[i].getErrorPages().begin();
-		// while (it != _servers[i].getErrorPages().end())
-		// {
-		// 	std::cout << (*it).first << " - " << it->second << std::endl;
-		// 	++it;
-		// }
-		// std::cout << "Locations: " << _servers[i].getLocations().size() << std::endl;
+		std::cout << "Server #" << i + 1 << std::endl;
+		std::cout << "Server name: " << _servers[i].getServerName() << std::endl;
+		std::cout << "Host: " << _servers[i].getHost() << std::endl;
+		std::cout << "Root: " << _servers[i].getRoot() << std::endl;
+		std::cout << "Index: " << _servers[i].getIndex() << std::endl;
+		std::cout << "Port: " << _servers[i].getPort() << std::endl;
+		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
+		std::cout << "Error pages: " << _servers[i].getErrorPages().size() << std::endl;
+		std::map<short, std::string>::const_iterator it = _servers[i].getErrorPages().begin();
+		while (it != _servers[i].getErrorPages().end())
+		{
+			std::cout << (*it).first << " - " << it->second << std::endl;
+			++it;
+		}
+		std::cout << "Locations: " << _servers[i].getLocations().size() << std::endl;
 		std::vector<Location>::const_iterator itl = _servers[i].getLocations().begin();
 		while (itl != _servers[i].getLocations().end())
 		{
-			if (itl->getCgiPass().empty())
+			std::cout << "name location: " << itl->getPath() << std::endl;
+			std::cout << "methods: " << itl->getPrintMethods() << std::endl;
+			std::cout << "index: " << itl->getIndexLocation() << std::endl;
+			if (itl->getCgiPath().empty())
 			{
-				// std::cout << "name location: " << itl->getPath() << std::endl;
-				// std::cout << "root: " << itl->getRootLocation() << std::endl;
-				// std::cout << "methods: " << itl->getPrintMethods() << std::endl;
-				// std::cout << "index: " << itl->getIndexLocation() << std::endl;
-				// std::cout << "root: " << itl->getRootLocation() << std::endl;
-				// if (!itl->getReturn().empty())
-				// std::cout << "return: " << itl->getReturn() << std::endl;
+				std::cout << "root: " << itl->getRootLocation() << std::endl;
+				if (!itl->getReturn().empty())
+					std::cout << "return: " << itl->getReturn() << std::endl;
+				if (!itl->getAlias().empty())
+					std::cout << "alias: " << itl->getAlias() << std::endl;
 			}
 			else
 			{
 				std::cout << "cgi root: " << itl->getRootLocation() << std::endl;
-				std::cout << "sgi_path: " << itl->getCgiPass() << std::endl;
-				CgiHandler cgi("hey"); // only for colling CGI
-				cgi.initEnv("hey"); // change for response
-				// std::map<std::string, std::string>::const_iterator it_env = cgi.getEnv().begin();
-				// while(it_env != cgi.getEnv().end())
-				// {
-				// 	std::cout << it_env->first << " - " << it_env->second << std::endl;
-				// 	++it_env;
-				// }
-				cgi.execute("hey"); // change for response
+				std::cout << "sgi_path: " << itl->getCgiPath().size() << std::endl;
+				std::cout << "sgi_ext: " << itl->getCgiExtension().size() << std::endl;
 			}
 			++itl;
 		}
-		// itl = _servers[i].getLocations().begin();
-		// std::cout << "-----------------------------" << std::endl;
+		itl = _servers[i].getLocations().begin();
+		std::cout << "-----------------------------" << std::endl;
 	}
 	return (0);
 }
@@ -300,8 +291,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
 		throw  ErrorException("Port does not found"); // check sentense
-	if (!error_codes.empty())
-		server.setErrorPages(error_codes);	
+	server.setErrorPages(error_codes);	
 	if (!server.isValidErrorPages())
 		throw ErrorException("Incorrect path for error page or number of error");
 }

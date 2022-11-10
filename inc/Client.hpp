@@ -20,6 +20,7 @@ class Client
         int                 getSocket();
         struct sockaddr_in  getAddress();
         HttpRequest         &getRequest();
+        time_t              getLastTime();
 
         void                setSocket(int &);
         void                setAddress(sockaddr_in &);
@@ -30,6 +31,9 @@ class Client
         bool                keepAlive();
         void                clearRequest();
         void                buildResponse();
+        void                printReq();
+        void                updateTime();
+        void                handleCgi();
 
         std::string         getResponse();
         size_t              getResponseLength();
@@ -48,6 +52,7 @@ class Client
         Response            _response;
         ServerConfig        _server;
         size_t              _total_bytes_read;
+        time_t              _last_msg_time;
 };
 
 
