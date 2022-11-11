@@ -76,16 +76,16 @@ static bool    isDirectory(std::string path)
     return (S_ISDIR(file_stat.st_mode));
         
 }
-
-void    Response::constructTarget()
+/* 
+    Compares URI with locations from config file and tries to find the best match. 
+    If match found, then location_key is set to that location, otherwise location_key will be an empty string.
+*/
+void     getLocationKey(std::string &path, std::vector<Location> locations, std::string &location_key)
 {
-    std::cout << "URI is = " << _request.getPath() << std::endl;
-    std::string path = _request.getPath();
     int biggest_match = 0;
-    std::string location_key;
-    for(std::vector<Location>::const_iterator it = _server.getLocations().begin(); it != _server.getLocations().end(); ++it)
+    
+    for(std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it)
     {
-
         if(path.find_first_of(it->getPath()) == 0)
         {
                if(path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
@@ -94,14 +94,20 @@ void    Response::constructTarget()
                     {
                         biggest_match = it->getPath().length();
                         location_key = it->getPath(); 
-                        std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
-                         " and index is = " << it->getIndexLocation() << std::endl;
+                        // std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
+                        //  " and index is = " << it->getIndexLocation() << std::endl;
                     }
                }
         }
     }
+}
+void    Response::constructTarget()
+{
+    std::cout << "URI is = " << _request.getPath() << std::endl;
+    std::string location_key;
+    getLocationKey(_request.getPath(), _server.getLocations(), location_key);
     std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
-    if (biggest_match > 0)
+    if (location_key.length() > 0)
     {
         std::string root_path = _server.getLocationKey(location_key)->getRootLocation();
 
