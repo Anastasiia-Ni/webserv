@@ -38,7 +38,7 @@ class Client
         std::string         getResponse();
         size_t              getResponseLength();
         size_t              getTotalBytes();    
-        const char         *getResponseBody();
+        char         *getResponseBody();
         size_t              getResponseBodyLength();
         void                clearResponse();
         int                 getResponseCode();

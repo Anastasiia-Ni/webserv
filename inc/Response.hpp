@@ -19,7 +19,7 @@ class Response
 
 
         std::string getContent() const;
-        const char* getBody() const;
+        char* getBody() ;
         size_t      getBodyLength() const;
         int         getErrorCode() const;
         int         getCode() const;
@@ -40,20 +40,23 @@ class Response
         ServerConfig    _server;
         std::string     _target_file;
         size_t          _body_length;
-        char*           _response_body;
+        std::vector<uint8_t> _body;
         std::string     _response_content;
         int             _code;
 
         int     buildBody();
         size_t  file_size();
-        void    addStatusLine();
-        void    addHeaders();
+        void    setStatusLine();
+        void    setHeaders();
         int     readFile();
         void    contentType();
         void    contentLength();
         void    connection();
         void    server();
-        void    constructTarget();
+        int     handleTarget();
+        void    buildErrorBody();
+        bool    reqError();
+
 
 
 };

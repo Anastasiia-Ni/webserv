@@ -53,7 +53,7 @@ void   Response::server()
         _response_content.append("Server: AMAnix\r\n");
 }
 
-void    Response::addHeaders()
+void    Response::setHeaders()
 {
     contentType();
     contentLength();
@@ -101,14 +101,21 @@ void     getLocationKey(std::string &path, std::vector<Location> locations, std:
         }
     }
 }
-void    Response::constructTarget()
+int    Response::handleTarget()
 {
+    // if (_request.getPath().find("..") != std::string::npos)
+    // {
+    //     _code = 403;
+    //     return (1);
+    // }
     std::cout << "URI is = " << _request.getPath() << std::endl;
     std::string location_key;
     getLocationKey(_request.getPath(), _server.getLocations(), location_key);
     std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
+    // If URI matches with a Location block
     if (location_key.length() > 0)
     {
+        //decide here to use alias or root
         std::string root_path = _server.getLocationKey(location_key)->getRootLocation();
 
         if (root_path.back() == '/' && _request.getPath()[0] == '/')
@@ -125,19 +132,31 @@ void    Response::constructTarget()
     }
     else
     {
-        if (_request.getPath().compare("/") == 0)
+        if (_request.getPath().compare("/") == 0 || isDirectory(_target_file))
             _target_file = _server.getRoot() + _server.getIndex();
         else
             _target_file = _server.getRoot() +_request.getPath().substr(1, _request.getPath().length() - 1);
     }
     // remove this later, and check while reading file.
-    if(!fileExists(_target_file))
-    {
-        _target_file = _server.getErrorPages().at(404);
-        // std::cout << "err targer file = " << _target_file << std::endl;
-        _code = 404;
-    }
-        
+    // if(!fileExists(_target_file))
+    // {
+
+    //     // std::cout << "err targer file = " << _target_file << std::endl;
+    //     _code = 404;
+    // }
+    return (0);
+}
+
+bool    Response::reqError()
+{
+    if(_code = _request.errorCode())
+        return (1);
+    return (0);
+}
+void    Response::buildErrorBody()
+{
+        _target_file = _server.getErrorPages().at(_code);
+        readFile();
 }
 
 void    Response::buildResponse()
@@ -153,86 +172,80 @@ void    Response::buildResponse()
     //buildBody()
     //buildStatusLine
     //buildHeader
-    if(_request.errorCode() == 0)
-        constructTarget();
-    if(buildBody())
-    {   
-        addStatusLine();
-        addHeaders();
-    }
+    std::cerr << "HERE" << std::endl;
+    if(reqError() || buildBody())
+        buildErrorBody();
+    
+    setStatusLine();
+    setHeaders();
 }
 
+
 std::string Response::getContent() const { return _response_content; }
-const char*       Response::getBody() const { return _response_body; }
+char*       Response::getBody() { return reinterpret_cast<char*> (&_body[0]); }
 size_t      Response::getBodyLength() const { return _body_length; }
 
 /* Check if there is any error and assign the correct status code to response message */
-void        Response::addStatusLine()
+void        Response::setStatusLine()
 {
     if(_code == 200)
         _response_content.append("HTTP/1.1 200 OK\r\n");
     else if(_code == 400)
-        _response_content.append("HTTP/1.1 400 BadRequest\r\n");   
-    else if(_code == 404)
+        _response_content.append("HTTP/1.1 400 BadRequest\r\n");
+    else if(_code == 403)
+        _response_content.append("HTTP/1.1 403 Forbidden\r\n");   
+    else
         _response_content.append("HTTP/1.1 404 Not Found\r\n");
+    
 
 }
 
-size_t Response::file_size() 
-{
-    FILE* fin = fopen(_target_file.c_str(), "rb");
-    if (fin == NULL) {
-        _code = 404;
-        std::cerr << " webserv: open error 1 " << strerror(errno) << std::endl;
-        std::cerr << "Target file = |" << _target_file << "|" << std::endl; 
-        return (-1);
-    }
+// size_t Response::file_size() 
+// {
+//     FILE* fin = fopen(_target_file.c_str(), "rb");
+//     if (fin == NULL) {
+//         _code = 404;
+//         std::cerr << " webserv: open error 1 " << strerror(errno) << std::endl;
+//         std::cerr << "Target file = |" << _target_file << "|" << std::endl; 
+//         return (-1);
+//     }
 
-    fseek(fin, 0L, SEEK_END);
-    size_t size = ftell(fin);
-    fclose(fin);
-    return size;
-}
+//     fseek(fin, 0L, SEEK_END);
+//     size_t size = ftell(fin);
+//     fclose(fin);
+//     return size;
+// }
 
 int    Response::buildBody()
 {
-    if(!readFile())
-    {
-        std::cout << "readFile Fail !" << std::endl;
-        _code = 404;
-        _response_content.append("HTTP/1.1 404 Not Found\r\n\r\n");
-        return (0);
-    }
-    return (1);
+    if (handleTarget())
+        return (1);
+    if(readFile())
+        return (1);
+
+    return (0);
 }
 
 int     Response::readFile()
 {
-    int         file_fd;
-    int         bytes_read;
-
-    _body_length = file_size();
-    if(_body_length == -1)
-        return (0); 
-    _response_body = (char*) calloc(sizeof(char), _body_length);
-
-    file_fd = open(_target_file.c_str(), O_RDONLY);
-
-    if (file_fd < 0 )
-    {
-        std::cerr << " webserv: open error " << strerror(errno) << std::endl;
-        return (0); 
-    }
+    std::ifstream file(_target_file.c_str());
     
-    bytes_read = read(file_fd, _response_body, _body_length);
-    if(bytes_read < 0)
+    if (file.fail())
     {
-        std::cerr << " webserv: read error *_*" << strerror(errno) << std::endl;
-        return (0);
+        _code = 404;
+        return (1);
     }
-    else
-        _code = 200;
-    return (1);
+    std::ostringstream ss;
+	if(!(ss << file.rdbuf()))
+    {
+        _code = 404;
+        return (1);
+    }
+    std::string temp_str = ss.str();
+    _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
+    _body_length = _body.size();
+    _code = 200;
+    return (0);
 }
 
 int      Response::getErrorCode() const
@@ -254,6 +267,7 @@ void   Response::clearResponse()
 {
     _body_length = 0;
     _response_content.clear();
+    _body.clear();
     _code = 0;
 }
 

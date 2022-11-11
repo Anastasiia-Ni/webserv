@@ -7,7 +7,7 @@ ServerConfig::ServerConfig()
 	this->_server_name = "";
 	this->_root = "";
 	this->_client_max_body_size = 0;
-	this->_index = "";
+	this->_index = "index.html";
 	this->_listen_fd = 0;
 	this->initErrorPages();
 }

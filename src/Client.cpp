@@ -88,7 +88,7 @@ size_t          Client::getResponseLength()
     return (_response.getContent().length());
 }
 
-const   char    *Client::getResponseBody()
+char    *Client::getResponseBody()
 {
     return (_response.getBody());
 }
