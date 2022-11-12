@@ -81,8 +81,8 @@ class HttpRequest
         int         errorCode();
         bool        keepAlive();
         
-    private:
         std::string     _path;
+    private:
         std::string     _query;
         std::string     _fragment;
         std::map<std::string, std::string> _request_headers;

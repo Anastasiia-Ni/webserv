@@ -217,6 +217,12 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Request_Line_Ver:
             {
+                if (_path.find("/../") != std::string::npos)
+                {
+                    _error_code = 400;
+                    std::cout << "Bad URI (Request_Line_Ver)" << std::endl;
+                    return;
+                }
                 if (character != 'H')
                 {
                     _error_code = 400;
@@ -369,7 +375,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     else
                     {
                         _state = Parsing_Done;
-                        std::cout << "Query = " << getQuery() << std::endl;
+                        // std::cout << "Query = " << getQuery() << std::endl;
                     }
                     continue;
                 }
@@ -663,6 +669,7 @@ void        HttpRequest::_handle_headers()
 {
     std::stringstream ss;
 
+    if (_request_headers.count("Referer"))
     if (_request_headers.count("Content-Length"))
     {
         _body_flag = true;
@@ -720,8 +727,8 @@ bool        HttpRequest::keepAlive()
 {
     if (_request_headers.count("Connection"))
     {
-        if(_request_headers["Connection"].find("keep-alive", 0) != std::string::npos)
-            return true;
+        if(_request_headers["Connection"].find("close", 0) != std::string::npos)
+            return false;
     }
-    return false;
+    return true;
 }

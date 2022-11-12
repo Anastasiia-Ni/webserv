@@ -1,35 +1,28 @@
 # include "../inc/Response.hpp"
 
-Response::Response(){}
+Mime Response::_mime;
 
-Response::~Response(){}
+Response::Response(): _code(0), _res(NULL), _target_file(""), _body_length(0) {}
 
-Response::Response(HttpRequest &req): _request(req), _code(0) {}
-
-void   Response::errResponse(short error_code)
+Response::~Response()
 {
-    _target_file = _server.getErrorPages().at(error_code);
-    _code = error_code;
-    
+    if(_res)
+        delete [] _res;
 }
+
+Response::Response(HttpRequest &req): _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0) {}
+
 
 void   Response::contentType()
 {
-    // std::cout << "File is = " << _target_file << std::endl;
-    if(_target_file.rfind(".html", std::string::npos) != std::string::npos)
-        _response_content.append("Content-Type: text/html\r\n");
-    else if(_target_file.rfind(".jpg", std::string::npos) != std::string::npos)
-        _response_content.append("Content-Type: image/jpeg\r\n");
-    else if(_target_file.rfind(".png", std::string::npos) != std::string::npos)
-        _response_content.append("Content-Type: image/png\r\n");
-    else if(_target_file.rfind(".ico", std::string::npos) != std::string::npos)
-        _response_content.append("Content-Type: image/x-icon\r\n");
-    else if(_target_file.rfind(".css", std::string::npos) != std::string::npos)
-        _response_content.append("Content-Type: text/css\r\n");
+    std::cout << "File is = " << _target_file << std::endl;
+    _response_content.append("Content-Type: ");
+    if(_target_file.rfind(".", std::string::npos) != std::string::npos)
+        _response_content.append(_mime.getMimeType(_target_file.substr(_target_file.rfind(".", std::string::npos))) );
     else
-    {
-        _response_content.append("Content-Type: text/plain\r\n");
-    }
+        _response_content.append(_mime.getMimeType("default"));
+    _response_content.append("\r\n");
+
 }
 
 void   Response::contentLength()
@@ -53,12 +46,20 @@ void   Response::server()
         _response_content.append("Server: AMAnix\r\n");
 }
 
+void    Response::location()
+{
+    if(_location.length())
+        _response_content.append("Location: "+ _location +"\r\n");
+    
+
+}
 void    Response::setHeaders()
 {
     contentType();
     contentLength();
     connection();
     server();
+    location();
     _response_content.append("\r\n");
 }
 
@@ -70,11 +71,10 @@ bool fileExists (const std::string& f) {
 static bool    isDirectory(std::string path)
 {
     struct stat file_stat;
-
-    stat(path.c_str(), &file_stat);
+    if(stat(path.c_str(), &file_stat) != 0)
+        return (false); 
 
     return (S_ISDIR(file_stat.st_mode));
-        
 }
 /* 
     Compares URI with locations from config file and tries to find the best match. 
@@ -103,15 +103,11 @@ void     getLocationKey(std::string &path, std::vector<Location> locations, std:
 }
 int    Response::handleTarget()
 {
-    // if (_request.getPath().find("..") != std::string::npos)
-    // {
-    //     _code = 403;
-    //     return (1);
-    // }
-    std::cout << "URI is = " << _request.getPath() << std::endl;
+    
+    // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationKey(_request.getPath(), _server.getLocations(), location_key);
-    std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
+    // std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
     // If URI matches with a Location block
     if (location_key.length() > 0)
     {
@@ -122,18 +118,35 @@ int    Response::handleTarget()
             _request.getPath().erase(0, 1);
         _target_file = _server.getLocationKey(location_key)->getRootLocation() +
         _request.getPath();
+
         if (isDirectory(_target_file))
         {
-            if (_target_file.back() != '/' && _server.getLocationKey(location_key)->getIndexLocation()[0] != '/')
-                _target_file += '/';
+            if (_target_file.back() != '/')
+            {
+                 _code = 301;
+                _location = _request.getPath() + "/";
+                return (1);
+            }
             _target_file += _server.getLocationKey(location_key)->getIndexLocation();
+            if(!fileExists(_target_file))
+            {
+                _code = 403;
+                return (1);
+            }
         }
-        std::cout << "TARGET FILE = " << _target_file << std::endl;
+        // std::cout << "TARGET FILE = " << _target_file << std::endl;
     }
     else
     {
         if (_request.getPath().compare("/") == 0 || isDirectory(_target_file))
+        {
             _target_file = _server.getRoot() + _server.getIndex();
+            if(!fileExists(_target_file))
+            {
+                _code = 403;
+                return (1);
+            }
+        }
         else
             _target_file = _server.getRoot() +_request.getPath().substr(1, _request.getPath().length() - 1);
     }
@@ -155,7 +168,15 @@ bool    Response::reqError()
 }
 void    Response::buildErrorBody()
 {
-        _target_file = _server.getErrorPages().at(_code);
+        // if(_code == 301)
+        //     return;
+        // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
+        if(_code >= 400 && _code < 500) 
+        {
+            _location = _server.getErrorPages().at(_code);
+            _code = 302;
+        }
+        _target_file = _server.getRoot() +_server.getErrorPages().at(_code);
         readFile();
 }
 
@@ -172,7 +193,7 @@ void    Response::buildResponse()
     //buildBody()
     //buildStatusLine
     //buildHeader
-    std::cerr << "HERE" << std::endl;
+    // std::cerr << "HERE" << std::endl;
     if(reqError() || buildBody())
         buildErrorBody();
     
@@ -180,41 +201,27 @@ void    Response::buildResponse()
     setHeaders();
 }
 
+/* Returns the entire reponse ( Headers + Body)*/
+char  *Response::getRes(){ 
 
-std::string Response::getContent() const { return _response_content; }
-char*       Response::getBody() { return reinterpret_cast<char*> (&_body[0]); }
-size_t      Response::getBodyLength() const { return _body_length; }
+    _res = new char[_response_content.length() + _body_length];
 
-/* Check if there is any error and assign the correct status code to response message */
-void        Response::setStatusLine()
-{
-    if(_code == 200)
-        _response_content.append("HTTP/1.1 200 OK\r\n");
-    else if(_code == 400)
-        _response_content.append("HTTP/1.1 400 BadRequest\r\n");
-    else if(_code == 403)
-        _response_content.append("HTTP/1.1 403 Forbidden\r\n");   
-    else
-        _response_content.append("HTTP/1.1 404 Not Found\r\n");
-    
-
+    memcpy(_res, _response_content.data(), _response_content.length());
+    memcpy(_res + _response_content.length(), &_body[0], _body_length);
+    return _res;
 }
 
-// size_t Response::file_size() 
-// {
-//     FILE* fin = fopen(_target_file.c_str(), "rb");
-//     if (fin == NULL) {
-//         _code = 404;
-//         std::cerr << " webserv: open error 1 " << strerror(errno) << std::endl;
-//         std::cerr << "Target file = |" << _target_file << "|" << std::endl; 
-//         return (-1);
-//     }
+/* Returns the length of entire reponse ( Headers + Body) */
+size_t Response::getLen() const { return (_response_content.length() + _body_length); }
 
-//     fseek(fin, 0L, SEEK_END);
-//     size_t size = ftell(fin);
-//     fclose(fin);
-//     return size;
-// }
+/* Constructs Status line based on status code. */
+void        Response::setStatusLine()
+{
+    _response_content.append("HTTP/1.1 " + std::to_string(_code));
+    _response_content.append(statusCodeString(_code));
+    _response_content.append("\r\n");
+
+}
 
 int    Response::buildBody()
 {
@@ -222,7 +229,7 @@ int    Response::buildBody()
         return (1);
     if(readFile())
         return (1);
-
+    _code = 200;
     return (0);
 }
 
@@ -232,25 +239,22 @@ int     Response::readFile()
     
     if (file.fail())
     {
+        std::cout << "FILE READ FAILED, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
     std::ostringstream ss;
 	if(!(ss << file.rdbuf()))
     {
+        std::cout << "FILE READ FAILED, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
     std::string temp_str = ss.str();
     _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
     _body_length = _body.size();
-    _code = 200;
+    // _code = 200;
     return (0);
-}
-
-int      Response::getErrorCode() const
-{
-    return (_code);
 }
 
 void     Response::setServer(ServerConfig &server)
@@ -269,6 +273,12 @@ void   Response::clearResponse()
     _response_content.clear();
     _body.clear();
     _code = 0;
+    _location = "";
+    if(_res)
+    {
+        delete [] _res;
+        _res = NULL;
+    }
 }
 
 int      Response::getCode() const

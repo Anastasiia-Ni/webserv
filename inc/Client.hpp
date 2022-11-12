@@ -35,14 +35,11 @@ class Client
         void                updateTime();
         void                handleCgi();
 
-        std::string         getResponse();
+        char                *getResponse();
         size_t              getResponseLength();
         size_t              getTotalBytes();    
-        char         *getResponseBody();
-        size_t              getResponseBodyLength();
         void                clearResponse();
         int                 getResponseCode();
-        void                setRespError(short);
 
 
     private:

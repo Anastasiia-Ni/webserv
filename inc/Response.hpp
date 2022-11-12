@@ -13,15 +13,14 @@ class Response
 {
     public:
 
+        static     Mime _mime;
         Response();
         Response(HttpRequest&);
         ~Response();
 
 
-        std::string getContent() const;
-        char* getBody() ;
-        size_t      getBodyLength() const;
-        int         getErrorCode() const;
+        char  *getRes();
+        size_t getLen() const;
         int         getCode() const;
 
         void        setRequest(HttpRequest &);
@@ -29,7 +28,6 @@ class Response
         
         void        buildResponse();
         void        clearResponse();
-        void        errResponse(short error_code);
         void        handleCgi();
 
 
@@ -39,10 +37,12 @@ class Response
         HttpRequest     _request;
         ServerConfig    _server;
         std::string     _target_file;
-        size_t          _body_length;
         std::vector<uint8_t> _body;
+        size_t          _body_length;
         std::string     _response_content;
-        int             _code;
+        std::string     _location;
+        short           _code;
+        char            *_res;
 
         int     buildBody();
         size_t  file_size();
@@ -53,10 +53,10 @@ class Response
         void    contentLength();
         void    connection();
         void    server();
+        void    location();
         int     handleTarget();
         void    buildErrorBody();
         bool    reqError();
-
 
 
 };
