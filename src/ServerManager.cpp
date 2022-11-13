@@ -183,9 +183,7 @@ void    ServerManager::sendResponse(int &i)
     send(i, _clients_map[i].getResponse(), _clients_map[i].getResponseLength(), 0);
 
     if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
-    {
         closeConnection(i);
-    }
     else
     {
         FD_CLR(i, &_write_fd_pool);

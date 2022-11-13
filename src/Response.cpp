@@ -50,11 +50,10 @@ void    Response::location()
 {
     if(_location.length())
         _response_content.append("Location: "+ _location +"\r\n");
-    
-
 }
 void    Response::setHeaders()
 {
+    //date();
     contentType();
     contentLength();
     connection();
@@ -107,10 +106,24 @@ int    Response::handleTarget()
     // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationKey(_request.getPath(), _server.getLocations(), location_key);
-    // std::cerr << "LOCATION KEY WINNER ISSSS = " << location_key << std::endl; 
+
     // If URI matches with a Location block
     if (location_key.length() > 0)
     {
+        std::vector<short> methods = _server.getLocationKey(location_key)->getMethods();
+        if(_request.getMethod() == GET && !methods[0] || _request.getMethod() == POST && !methods[1] || 
+           _request.getMethod() == DELETE && !methods[3])
+        {
+            _code = 405;
+            return (1);
+        }
+        if (_server.getLocationKey(location_key)->getReturn().length())
+        {
+            _code = 301;
+            _location = _server.getLocationKey(location_key)->getReturn();
+            return (1);
+        }
+
         //decide here to use alias or root
         std::string root_path = _server.getLocationKey(location_key)->getRootLocation();
 
@@ -171,7 +184,7 @@ void    Response::buildErrorBody()
         // if(_code == 301)
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
-        if(_code >= 400 && _code < 500) 
+        if(_code >= 400 && _code < 500 && _code != 405) 
         {
             _location = _server.getErrorPages().at(_code);
             _code = 302;
@@ -204,8 +217,12 @@ void    Response::buildResponse()
 /* Returns the entire reponse ( Headers + Body)*/
 char  *Response::getRes(){ 
 
-    _res = new char[_response_content.length() + _body_length];
-
+    _res = new(std::nothrow) char[_response_content.length() + _body_length];
+    if(!_res)
+    {
+        std::cerr << "new Failed" << std::endl;
+        exit(1);
+    }   
     memcpy(_res, _response_content.data(), _response_content.length());
     memcpy(_res + _response_content.length(), &_body[0], _body_length);
     return _res;

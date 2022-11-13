@@ -28,7 +28,7 @@ std::string statusCodeString(short statusCode)
     case 301:
         return "Moved Permanently";
     case 302:
-        return "Found";
+        return "Moved Temporarily";
     case 303:
         return "See Other";
     case 304:
