@@ -71,18 +71,18 @@ static bool    isDirectory(std::string path)
 {
     struct stat file_stat;
     if(stat(path.c_str(), &file_stat) != 0)
-        return (false); 
+        return (false);
 
     return (S_ISDIR(file_stat.st_mode));
 }
-/* 
-    Compares URI with locations from config file and tries to find the best match. 
+/*
+    Compares URI with locations from config file and tries to find the best match.
     If match found, then location_key is set to that location, otherwise location_key will be an empty string.
 */
 void     getLocationKey(std::string &path, std::vector<Location> locations, std::string &location_key)
 {
     int biggest_match = 0;
-    
+
     for(std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it)
     {
         if(path.find_first_of(it->getPath()) == 0)
@@ -92,7 +92,7 @@ void     getLocationKey(std::string &path, std::vector<Location> locations, std:
                     if (it->getPath().length() > biggest_match)
                     {
                         biggest_match = it->getPath().length();
-                        location_key = it->getPath(); 
+                        location_key = it->getPath();
                         // std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
                         //  " and index is = " << it->getIndexLocation() << std::endl;
                     }
@@ -102,7 +102,7 @@ void     getLocationKey(std::string &path, std::vector<Location> locations, std:
 }
 int    Response::handleTarget()
 {
-    
+
     // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationKey(_request.getPath(), _server.getLocations(), location_key);
@@ -111,7 +111,7 @@ int    Response::handleTarget()
     if (location_key.length() > 0)
     {
         std::vector<short> methods = _server.getLocationKey(location_key)->getMethods();
-        if(_request.getMethod() == GET && !methods[0] || _request.getMethod() == POST && !methods[1] || 
+        if(_request.getMethod() == GET && !methods[0] || _request.getMethod() == POST && !methods[1] ||
            _request.getMethod() == DELETE && !methods[3])
         {
             _code = 405;
@@ -175,7 +175,7 @@ int    Response::handleTarget()
 
 bool    Response::reqError()
 {
-    if(_code = _request.errorCode())
+    if(_request.errorCode())
         return (1);
     return (0);
 }
@@ -184,7 +184,7 @@ void    Response::buildErrorBody()
         // if(_code == 301)
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
-        if(_code >= 400 && _code < 500 && _code != 405) 
+        if(_code >= 400 && _code < 500 && _code != 405)
         {
             _location = _server.getErrorPages().at(_code);
             _code = 302;
@@ -199,9 +199,9 @@ void    Response::buildResponse()
         buildErrorBody()
     setStatusLine()
     setHeaders();
-    
+
 */
-    //checkConfig() // 
+    //checkConfig() //
     //constructTarget() // If there is an error then target file will be error html file, either default or from config.
     //buildBody()
     //buildStatusLine
@@ -209,20 +209,20 @@ void    Response::buildResponse()
     // std::cerr << "HERE" << std::endl;
     if(reqError() || buildBody())
         buildErrorBody();
-    
+
     setStatusLine();
     setHeaders();
 }
 
 /* Returns the entire reponse ( Headers + Body)*/
-char  *Response::getRes(){ 
+char  *Response::getRes(){
 
     _res = new(std::nothrow) char[_response_content.length() + _body_length];
     if(!_res)
     {
         std::cerr << "new Failed" << std::endl;
         exit(1);
-    }   
+    }
     memcpy(_res, _response_content.data(), _response_content.length());
     memcpy(_res + _response_content.length(), &_body[0], _body_length);
     return _res;
@@ -253,7 +253,7 @@ int    Response::buildBody()
 int     Response::readFile()
 {
     std::ifstream file(_target_file.c_str());
-    
+
     if (file.fail())
     {
         std::cout << "FILE READ FAILED, PATH is: " + _target_file << std::endl;
