@@ -42,7 +42,7 @@ class ServerConfig
 		void setLocation(std::string nameLocation, std::vector<std::string> parametr);
 
 		bool isValidHost(std::string host) const;
-		bool isValidErrorPages() const;
+		bool isValidErrorPages();
 		int isValidLocation(Location &location) const;
 
 		const std::string &getServerName();

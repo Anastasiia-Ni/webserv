@@ -62,6 +62,9 @@ void Location::setRootLocation(std::string parametr)
 void Location::setMethods(std::vector<std::string> methods)
 {
 	this->_methods[0] = 0;
+	this->_methods[1] = 0;
+	this->_methods[2] = 0;
+
 	for (size_t i = 0; i < methods.size(); i++)
 	{
 		if (methods[i] == "GET")

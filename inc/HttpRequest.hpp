@@ -68,7 +68,7 @@ class HttpRequest
         std::string &getPath();
         std::string &getQuery();
         std::string &getFragment();
-        std::string &getHeader(std::string &);
+        std::string getHeader(std::string const &);
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
@@ -81,8 +81,8 @@ class HttpRequest
         int         errorCode();
         bool        keepAlive();
         
-    private:
         std::string     _path;
+    private:
         std::string     _query;
         std::string     _fragment;
         std::map<std::string, std::string> _request_headers;

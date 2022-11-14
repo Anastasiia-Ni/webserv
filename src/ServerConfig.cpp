@@ -7,7 +7,7 @@ ServerConfig::ServerConfig()
 	this->_server_name = "";
 	this->_root = "";
 	this->_client_max_body_size = 0;
-	this->_index = "";
+	this->_index = "index.html";
 	this->_listen_fd = 0;
 	this->initErrorPages();
 }
@@ -61,13 +61,15 @@ void ServerConfig::initErrorPages(void)
 	char dir[1024];
 	getcwd(dir, 1024);
 	std::string root = dir;
-
-	_error_pages[400] = root + "/website/error_pages/400.html";
-	_error_pages[403] = root + "/website/error_pages/403.html";
-	_error_pages[404] = root + "/website/error_pages/404.html";
-	_error_pages[405] = root + "/website/error_pages/405.html";
-	_error_pages[500] = root + "/website/error_pages/500.html";
-	_error_pages[505] = root + "/website/error_pages/505.html";
+	_error_pages[302] = "error_pages/302.html";
+	_error_pages[301] = "error_pages/301.html";
+	_error_pages[400] = "error_pages/400.html";
+	_error_pages[403] = "error_pages/403.html";
+	_error_pages[404] = "error_pages/404.html";
+	_error_pages[405] = "error_pages/405.html";
+	_error_pages[500] = "error_pages/500.html";
+	_error_pages[505] = "error_pages/505.html";
+	// std::cout << "ERROR 500 = " << _error_pages[500] << std::endl;
 }
 
 /* Set functions */
@@ -147,15 +149,16 @@ void ServerConfig::setIndex(std::string index)
 otherwise it creates a new pair: error code - path to the file */
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
-std::string path = parametr[parametr.size() - 1];
+	if(parametr.empty())
+		return;
+	std::string path = parametr[parametr.size() - 1];
 	checkToken(path);
 	if (ConfigFile::getTypePath(path) != 2)
 	{
-		path = this->_root + path;
-		if (ConfigFile::getTypePath(path) != 1)
-			throw ErrorException ("incorrect path for error page file: " + path);
-		if (ConfigFile::checkFile(path) == -1)
-			throw ErrorException ("error page file :" + path + " is not accessible");
+		if (ConfigFile::getTypePath(this->_root + path) != 1)
+			throw ErrorException ("incorrect path for error page file: " + this->_root + path);
+		if (ConfigFile::checkFile(this->_root + path) == -1)
+			throw ErrorException ("error page file :" + this->_root + path + " is not accessible");
 	}
 	for (size_t i = 0; i < parametr.size() - 1; i++)
 	{
@@ -311,14 +314,14 @@ bool ServerConfig::isValidHost(std::string host) const
   	return (inet_pton(AF_INET, host.c_str(), &(sockaddr.sin_addr)) ? true : false);
 }
 
-bool ServerConfig::isValidErrorPages() const
+bool ServerConfig::isValidErrorPages()
 {
 	std::map<short, std::string>::const_iterator it;
 	for (it = this->_error_pages.begin(); it != this->_error_pages.end(); it++)
 	{
 		if (it->first < 100 || it->first > 599)
 			return (false);
-		if (ConfigFile::checkFile(it->second) < 0)
+		if (ConfigFile::checkFile(getRoot() + it->second) < 0)
 			return (false);
 	}
 	return (true);

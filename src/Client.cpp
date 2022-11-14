@@ -77,25 +77,14 @@ void        Client::buildResponse()
     _response.buildResponse();
 }
 
-std::string     Client::getResponse()
+char     *Client::getResponse()
 {
-    return (_response.getContent());
+    return (_response.getRes());
 }
 
 size_t          Client::getResponseLength()
 {
-
-    return (_response.getContent().length());
-}
-
-const   char    *Client::getResponseBody()
-{
-    return (_response.getBody());
-}
-
-size_t           Client::getResponseBodyLength()
-{
-    return (_response.getBodyLength());
+    return (_response.getLen());
 }
 
 void             Client::clearResponse()
@@ -108,10 +97,6 @@ int              Client::getResponseCode()
     return (_response.getCode());
 }
 
-void             Client::setRespError(short error_code)
-{
-    _response.errResponse(error_code);
-}
 
 void             Client::printReq()
 {

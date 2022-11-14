@@ -43,6 +43,8 @@
 # include "ServerConfig.hpp"
 # include "Location.hpp"
 # include "CgiHandler.hpp"
+# include "Mime.hpp"
 
+std::string statusCodeString(short statusCode);
 
 #endif

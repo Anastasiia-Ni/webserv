@@ -180,13 +180,10 @@ void    ServerManager::sendResponse(int &i)
     }
     else
         _clients_map[i].buildResponse();
-    send(i, _clients_map[i].getResponse().c_str(), _clients_map[i].getResponseLength(), 0);
-    send(i, _clients_map[i].getResponseBody(), _clients_map[i].getResponseBodyLength(), 0);
-    if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError() ||
-       _clients_map[i].getResponseCode() == 404)
-    {
+    send(i, _clients_map[i].getResponse(), _clients_map[i].getResponseLength(), 0);
+
+    if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
         closeConnection(i);
-    }
     else
     {
         FD_CLR(i, &_write_fd_pool);
@@ -211,6 +208,8 @@ void    ServerManager::readRequest(int &i)
     // i << std::endl;
 
     bytes_read = read(i, buffer, sizeof(buffer));
+    // std::cout << "REQUEST = --------------------------------------------\n" << buffer << std::endl;
+    // std::cout << "---------------------------------------" << std::endl;
     if(bytes_read == 0)
         closeConnection(i);
     if(bytes_read < 0)
@@ -225,14 +224,14 @@ void    ServerManager::readRequest(int &i)
         _clients_map[i].updateTime();
     }
 
-    if (_clients_map[i].requestError()) // if error was found in request, send 400 bad_request and close connection after sending.
-    {
-        // std::cout << "Bad Request, Connection Closed !" << std::endl; 
-        _clients_map[i].setRespError(_clients_map[i].requestError());
-        FD_CLR(i, &_recv_fd_pool);
-        FD_SET(i, &_write_fd_pool);
-    }
-    else if(_clients_map[i].parsingCompleted()) // 1 = parsing completed and we can work on the response.
+    // if (_clients_map[i].requestError()) // if error was found in request, send 400 bad_request and close connection after sending.
+    // {
+    //     // std::cout << "Bad Request, Connection Closed !" << std::endl; 
+    //     _clients_map[i].setRespError(_clients_map[i].requestError());
+    //     FD_CLR(i, &_recv_fd_pool);
+    //     FD_SET(i, &_write_fd_pool);
+    // }
+    if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
     {
         FD_CLR(i, &_recv_fd_pool);
         FD_SET(i, &_write_fd_pool); // move socket i from recive fd_set to write fd_set so response can be sent on next iteration
