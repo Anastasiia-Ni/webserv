@@ -2,7 +2,9 @@
 #define CGIHANDLER_HPP
 
 #include "Webserv.hpp"
+#include "HttpRequest.hpp"
 
+class HttpRequest;
 class CgiHandler {
 	private:
 		std::map<std::string, std::string>	_env;
@@ -21,7 +23,7 @@ class CgiHandler {
 		CgiHandler(CgiHandler const &other);
 		CgiHandler &operator=(CgiHandler const &rhs);
 
-		void initEnv(std::string path, std::string query); // change atributs
+		void initEnv(HttpRequest& req);
 		void execute();
 		void sendHeaderBody(int &pipe_out);
 		void fixHeader(std::string &header);
@@ -29,7 +31,7 @@ class CgiHandler {
 
 		void setCgiPid(pid_t cgi_pid);
 		void setCgiPath(const std::string &cgi_path);
-		
+
 		const std::map<std::string, std::string> &getEnv() const;
 		const pid_t &getCgiPid() const;
 		const std::string &getCgiPath() const;

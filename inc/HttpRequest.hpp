@@ -6,7 +6,7 @@
 enum HttpMethod
 {
     GET,
-    POST, 
+    POST,
     DELETE,
     NONE
 };
@@ -52,9 +52,9 @@ enum ParsingState
     Parsing_Done
 };
 
-/** 
- * 
- * - HttpRequest Class will be used to parase and store the request. 
+/**
+ *
+ * - HttpRequest Class will be used to parase and store the request.
    It gets feeded with the request and will triiger a flag when parasing is finished.
    - If any error was found in the request, _code will be set to the correct error code.
 **/
@@ -69,6 +69,7 @@ class HttpRequest
         std::string &getQuery();
         std::string &getFragment();
         std::string getHeader(std::string const &);
+		std::map<std::string, std::string> getHeaders() const;
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
@@ -80,7 +81,7 @@ class HttpRequest
         void        clear();
         int         errorCode();
         bool        keepAlive();
-        
+
         std::string     _path;
     private:
         std::string     _query;
@@ -104,7 +105,7 @@ class HttpRequest
         int             _method_index;
         u_int8_t        _ver_major;
         u_int8_t        _ver_minor;
-        
+
         void        _handle_headers();
 };
 

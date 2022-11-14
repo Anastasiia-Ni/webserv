@@ -22,7 +22,7 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
  *      if server fd --> accept new client
  *      if client fd in read_set --> read message from client
  *      if client fd in write_set --> send response to client
- * 
+ *
  * - servers and clients sockets will be added to _recv_set_pool initially,
  *   after that, when a request is fully parsed, socket will be moved to _write_set_pool
  */
@@ -92,7 +92,7 @@ void    ServerManager::checkTimeout()
 }
 
 /**
- * Accept new incomming connection.  
+ * Accept new incomming connection.
  * Create new Client object and add it to _client_map
  * Add client socket to _recv_fd_pool
 */
@@ -102,7 +102,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     long  client_address_size = sizeof(client_address);
     int client_sock;
     Client  new_client(serv);
-    
+
     if ( (client_sock = accept(serv.getFd(), (struct sockaddr *)&client_address,
      (socklen_t*)&client_address_size)) == -1)
     {
@@ -128,17 +128,17 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
 }
 
 /*
-    initialize recv+write fd_sets and add all server listening sockets to _recv_fd_pool. 
+    initialize recv+write fd_sets and add all server listening sockets to _recv_fd_pool.
 */
 void    ServerManager::setupSelect()
 {
     FD_ZERO(&_recv_fd_pool);
     FD_ZERO(&_write_fd_pool);
-    
+
     // adds servers sockets to _recv_fd_pool set
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
-        if (listen(it->getFd(), 10) == -1) 
+        if (listen(it->getFd(), 10) == -1)
         {
             std::cerr << " webserv: listen error: " << strerror(errno) << std::endl;
             exit(EXIT_FAILURE);
@@ -162,24 +162,24 @@ void    ServerManager::closeConnection(int i)
         FD_CLR(i, &_write_fd_pool);
     if(FD_ISSET(i, &_recv_fd_pool))
         FD_CLR(i, &_recv_fd_pool);
-    close(i);  
+    close(i);
     _clients_map.erase(i);
 }
 /**
- * Build the response and send it to client. 
+ * Build the response and send it to client.
  * If no error was found in request and Connection header value is keep-alive,
  * connection is kept, otherwise connection will be closed.
  */
 void    ServerManager::sendResponse(int &i)
 {
-    // _clients_map[i].printReq();
-    if(_clients_map[i].getRequest().getPath().find("cgi-bin") != std::string::npos)
-    {
-        std::cout << "Found CGI -- " <<  _clients_map[i].getRequest().getPath() << std::endl;
-        _clients_map[i].handleCgi();
-    }
-    else
-        _clients_map[i].buildResponse();
+    _clients_map[i].printReq();
+    // if(_clients_map[i].getRequest().getPath().find("cgi-bin") != std::string::npos)
+    // {
+    //     std::cout << "Found CGI -- " <<  _clients_map[i].getRequest().getPath() << std::endl;
+    //     _clients_map[i].handleCgi();
+    // }
+    // else
+    _clients_map[i].buildResponse();
     send(i, _clients_map[i].getResponse(), _clients_map[i].getResponseLength(), 0);
 
     if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
@@ -196,7 +196,7 @@ void    ServerManager::sendResponse(int &i)
 /**
  * - Reads data from client and feed it to the parser.
  * Once parser is done or an error was found in the request,
- * socket will be moved from _recv_fd_pool to _write_fd_pool 
+ * socket will be moved from _recv_fd_pool to _write_fd_pool
  * and response will be sent on the next iteration of select().
  */
 void    ServerManager::readRequest(int &i)
@@ -226,7 +226,7 @@ void    ServerManager::readRequest(int &i)
 
     // if (_clients_map[i].requestError()) // if error was found in request, send 400 bad_request and close connection after sending.
     // {
-    //     // std::cout << "Bad Request, Connection Closed !" << std::endl; 
+    //     // std::cout << "Bad Request, Connection Closed !" << std::endl;
     //     _clients_map[i].setRespError(_clients_map[i].requestError());
     //     FD_CLR(i, &_recv_fd_pool);
     //     FD_SET(i, &_write_fd_pool);

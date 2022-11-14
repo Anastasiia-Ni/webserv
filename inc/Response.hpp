@@ -5,8 +5,8 @@
 # include "HttpRequest.hpp"
 
 
-/* 
-    Takes a string object that contain the whole request message and parse it into 3 Variables 
+/*
+    Takes a string object that contain the whole request message and parse it into 3 Variables
     _request_line, _request_headers, _response_body. And build the response message.
 */
 class Response
@@ -25,10 +25,10 @@ class Response
 
         void        setRequest(HttpRequest &);
         void        setServer(ServerConfig &);
-        
+
         void        buildResponse();
         void        clearResponse();
-        void        handleCgi();
+        void        handleCgi(HttpRequest&);
 
 
 
@@ -43,6 +43,8 @@ class Response
         std::string     _location;
         short           _code;
         char            *_res;
+		int				_cgi;
+		CgiHandler		_cgi_obj;
 
         int     buildBody();
         size_t  file_size();

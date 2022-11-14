@@ -111,5 +111,5 @@ void             Client::updateTime()
 void                Client::handleCgi()
 {
     _response.setRequest(_request);
-    _response.handleCgi();
+    _response.handleCgi(_request);
 }

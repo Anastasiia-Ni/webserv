@@ -2,7 +2,7 @@
 
 /* Constructor */
 
-CgiHandler::CgiHandler() { 
+CgiHandler::CgiHandler() {
     std::cout << "CgiHandler constructor" << std::endl;
 }
 
@@ -17,8 +17,8 @@ CgiHandler::CgiHandler(std::string path)
 }
 
 CgiHandler::~CgiHandler() {
-	
-	if (this->_ch_env) 
+
+	if (this->_ch_env)
 	{
 		for (int i = 0; this->_ch_env[i]; i++) // dobavit proverku
 			free(this->_ch_env[i]);
@@ -31,7 +31,7 @@ CgiHandler::~CgiHandler() {
 		free(_argv);
 	}
 	this->_env.clear();
-  
+
    	std::cout << "CGI DIED" << std::endl; // delete
 //    std::cout << "Exit status was " << WEXITSTATUS(_exit_status) << std::endl;
 
@@ -47,7 +47,7 @@ CgiHandler::CgiHandler(const CgiHandler &other)
 		this->_exit_status = other._exit_status;
 }
 
-CgiHandler &CgiHandler::operator=(const CgiHandler &rhs) 
+CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
 {
     if (this != &rhs)
 	{
@@ -57,54 +57,54 @@ CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
 		this->_cgi_path = rhs._cgi_path;
 		this->_cgi_pid = rhs._cgi_pid;
 		this->_exit_status = rhs._exit_status;
-	}	
+	}
 	return (*this);
 }
 
 /*Set functions */
-void CgiHandler::setCgiPid(pid_t cgi_pid) 
+void CgiHandler::setCgiPid(pid_t cgi_pid)
 {
     this->_cgi_pid = cgi_pid;
 }
 
-void CgiHandler::setCgiPath(const std::string &cgi_path) 
+void CgiHandler::setCgiPath(const std::string &cgi_path)
 {
     this->_cgi_path = cgi_path;
 }
 
 /* Get functions */
-const std::map<std::string, std::string> &CgiHandler::getEnv() const 
+const std::map<std::string, std::string> &CgiHandler::getEnv() const
 {
     return (this->_env);
 }
 
-const pid_t &CgiHandler::getCgiPid() const 
+const pid_t &CgiHandler::getCgiPid() const
 {
     return (this->_cgi_pid);
 }
 
-const std::string &CgiHandler::getCgiPath() const 
+const std::string &CgiHandler::getCgiPath() const
 {
     return (this->_cgi_path);
 }
 
 /* initialization environment variable */
-void CgiHandler::initEnv(std::string path, std::string query)
+void CgiHandler::initEnv(HttpRequest& req)
 {
-	this->_env["AUTH_TYPE"] = ""; // or "Basic"
-	this->_env["CONTENT_LENGTH"] = "4000"; //getHeader("Content-Length") // проверить если не находит то через итератор и find
-	this->_env["CONTENT_TYPE"] = ""; // getHeader("Content-Type")
+	this->_env["AUTH_TYPE"] = "Basic";
+	this->_env["CONTENT_LENGTH"] = req.getHeader ("Content-Length");
+	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_env["SCRIPT_NAME"] = "";//location->getCgiPass()
+	this->_env["SCRIPT_NAME"] = this->_cgi_path;
     this->_env["SCRIPT_FILENAME"] = ""; //full path
-    this->_env["PATH_INFO"] = path ; // Request Uri
+    this->_env["PATH_INFO"] = "" ; // Request Uri
     this->_env["PATH_TRANSLATED"] = ""; //root from reguest + this->_env["PATH_INFO"]
-    this->_env["QUERY_STRING"] = query; //getQuery(), getHeader("Query_string");
-    this->_env["REMOTE_ADDR"] = ""; //getHeader("Host"); like 172.17.42.1
+    this->_env["QUERY_STRING"] = req.getHeader ("Query_string");
+    this->_env["REMOTE_ADDR"] = req.getHeader ("Host");
     this->_env["SERVER_NAME"] = ""; //getBeforeColon(from request ["Host"], ':'); - will write a funct or check getHeader
     this->_env["SERVER_PORT"] = "query"; //getAfterColon(from request ["Host"], ':');  - will write a funct or check getHeader
-    this->_env["REQUEST_METHOD"] = "GET"; // getHeader("Request");
-    this->_env["HTTP_COOKIE"] = ""; // getHeader("Cookie");
+    this->_env["REQUEST_METHOD"] = req.getHeader("Request");
+    this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
@@ -117,7 +117,7 @@ void CgiHandler::initEnv(std::string path, std::string query)
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	splitQuery(query);
+	splitQuery(req.getQuery());
 	this->_argv = (char **)malloc(sizeof(char *) * 5);
 	// this->_argv[0] = strdup(this->_cgi_path.c_str());
 	// this->_argv[1] = strdup(this->_env["SCRIPT_FILENAME"].c_str());
@@ -196,7 +196,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out) // add fd freom responce
 {
 	char	tmp[4001];
 	int 	res;
-	
+
 	res = read(pipe_out, tmp, 4000);
 	tmp[res] = '\0';
 	std::string header(tmp);
@@ -216,7 +216,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out) // add fd freom responce
 	std::cout << "------------------BODY------------------\n";
 	std::cout << body << std::endl;
 	//add chunk send
-	
+
 	//send(fd, "0\r\n\r\n", 5, 0);
 }
 
@@ -244,7 +244,7 @@ void CgiHandler::fixHeader(std::string &header)
 std::string CgiHandler::setCookie(const std::string& str)
 {
 	std::string cook = str;
-	//size_t		pos; 
+	//size_t		pos;
 	return cook;
 }
 
@@ -256,7 +256,7 @@ void CgiHandler::splitQuery(std::string &query)
 		this->_name_bin.insert(query.begin(), pos);
 	else
 		return ;
-	
+
 
 }
 // decode(std::string& path)
@@ -278,7 +278,7 @@ void CgiHandler::splitQuery(std::string &query)
 // Convert from Hex to Dec
 unsigned int fromHexToDec(const std::string& nb)
 {
-    unsigned int x;   
+    unsigned int x;
     std::stringstream ss;
     ss << nb;
     ss >> std::hex >> x;

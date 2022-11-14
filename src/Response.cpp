@@ -2,7 +2,7 @@
 
 Mime Response::_mime;
 
-Response::Response(): _code(0), _res(NULL), _target_file(""), _body_length(0) {}
+Response::Response(): _code(0), _res(NULL), _target_file(""), _body_length(0),  _cgi(0) {}
 
 Response::~Response()
 {
@@ -10,7 +10,7 @@ Response::~Response()
         delete [] _res;
 }
 
-Response::Response(HttpRequest &req): _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0) {}
+Response::Response(HttpRequest &req): _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0), _cgi(0){}
 
 
 void   Response::contentType()
@@ -102,7 +102,6 @@ void     getLocationKey(std::string &path, std::vector<Location> locations, std:
 }
 int    Response::handleTarget()
 {
-
     // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationKey(_request.getPath(), _server.getLocations(), location_key);
@@ -123,6 +122,16 @@ int    Response::handleTarget()
             _location = _server.getLocationKey(location_key)->getReturn();
             return (1);
         }
+		if(_server.getLocationKey(location_key)->getPath().find("cgi-bin") != std::string::npos)
+		{
+			std::cout << "CGI FOUND \n";
+			// this->_cgi_obj.setPath();
+			CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py"); // for execve 1 arg
+			_cgi = 1;
+			obj.initEnv(_request);
+			obj.execute();
+			return 0;
+		}
 
         //decide here to use alias or root
         std::string root_path = _server.getLocationKey(location_key)->getRootLocation();
@@ -209,7 +218,8 @@ void    Response::buildResponse()
     // std::cerr << "HERE" << std::endl;
     if(reqError() || buildBody())
         buildErrorBody();
-
+	if(_cgi)
+		return;
     setStatusLine();
     setHeaders();
 }
@@ -217,6 +227,8 @@ void    Response::buildResponse()
 /* Returns the entire reponse ( Headers + Body)*/
 char  *Response::getRes(){
 
+	// if(_cgi)
+	// 	return(_cgi_obj.getResponse());
     _res = new(std::nothrow) char[_response_content.length() + _body_length];
     if(!_res)
     {
@@ -244,6 +256,8 @@ int    Response::buildBody()
 {
     if (handleTarget())
         return (1);
+	if(_cgi == 1)
+		return (0);
     if(readFile())
         return (1);
     _code = 200;
@@ -296,6 +310,8 @@ void   Response::clearResponse()
         delete [] _res;
         _res = NULL;
     }
+
+	_cgi = 0;
 }
 
 int      Response::getCode() const
@@ -304,10 +320,10 @@ int      Response::getCode() const
 }
 
 
-void        Response::handleCgi()
+void        Response::handleCgi(HttpRequest& req)
 {
     //CgiHandler obj(_request.getPath());
-    CgiHandler obj("/Users/anastasiianifantova/Desktop/ft-server/cgi-bin/time.py");
-    obj.initEnv(_request.getPath(), _request.getQuery());
+    CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py");
+    obj.initEnv(req);
     obj.execute();
 }

@@ -5,7 +5,7 @@
 #include "HttpRequest.hpp"
 #include "Response.hpp"
 
-/** 
+/**
      Client
    - Stores all information related to the client such as socket and address
      along with request and response objects. each Client also have an object of the server it's conntected to.
@@ -37,7 +37,7 @@ class Client
 
         char                *getResponse();
         size_t              getResponseLength();
-        size_t              getTotalBytes();    
+        size_t              getTotalBytes();
         void                clearResponse();
         int                 getResponseCode();
 
