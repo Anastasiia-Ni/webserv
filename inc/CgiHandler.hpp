@@ -24,8 +24,8 @@ class CgiHandler {
 		CgiHandler &operator=(CgiHandler const &rhs);
 
 		void initEnv(HttpRequest& req);
-		void execute();
-		void sendHeaderBody(int &pipe_out);
+		void execute(HttpRequest& req, int &fd);
+		void sendHeaderBody(int &pipe_out, int &fd);
 		void fixHeader(std::string &header);
 		std::string setCookie(const std::string& str);
 
@@ -41,6 +41,7 @@ class CgiHandler {
 		std::string	decode(std::string& path);
 		int	countCookies(const std::string& str);
 		void splitQuery(std::string &query);
+		int findStart(const std::string path, const std::string delim);
 };
 
 

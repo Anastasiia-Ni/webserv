@@ -634,6 +634,12 @@ std::string &HttpRequest::getFragment()
     return _fragment;
 }
 
+std::string HttpRequest::getMethodStr()
+{
+	return _method_str[_method];
+}
+
+
 void    HttpRequest::setMethod(HttpMethod & method)
 {
     _method = method;

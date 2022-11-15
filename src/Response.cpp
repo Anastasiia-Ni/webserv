@@ -2,7 +2,7 @@
 
 Mime Response::_mime;
 
-Response::Response(): _code(0), _res(NULL), _target_file(""), _body_length(0),  _cgi(0) {}
+Response::Response(): _cgi_response_length(0), _code(0), _res(NULL), _target_file(""), _body_length(0),  _cgi(0) {}
 
 Response::~Response()
 {
@@ -10,7 +10,7 @@ Response::~Response()
         delete [] _res;
 }
 
-Response::Response(HttpRequest &req): _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0), _cgi(0){}
+Response::Response(HttpRequest &req): _cgi_response_length(0), _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0), _cgi(0){}
 
 
 void   Response::contentType()
@@ -126,10 +126,12 @@ int    Response::handleTarget()
 		{
 			std::cout << "CGI FOUND \n";
 			// this->_cgi_obj.setPath();
-			CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py"); // for execve 1 arg
+			_server.getLocationKey(location_key); // give location
+			CgiHandler obj("cgi-bin/get_hello.py"); //
+
 			_cgi = 1;
-			obj.initEnv(_request);
-			obj.execute();
+			obj.initEnv(_request); // + URI
+			obj.execute(_request, this->_cgi_fd);
 			return 0;
 		}
 
@@ -229,19 +231,39 @@ char  *Response::getRes(){
 
 	// if(_cgi)
 	// 	return(_cgi_obj.getResponse());
-    _res = new(std::nothrow) char[_response_content.length() + _body_length];
-    if(!_res)
-    {
-        std::cerr << "new Failed" << std::endl;
-        exit(1);
-    }
-    memcpy(_res, _response_content.data(), _response_content.length());
-    memcpy(_res + _response_content.length(), &_body[0], _body_length);
+	if(_cgi)
+	{
+    	char *temp = new(std::nothrow) char[4001];
+		std::cout << "------------getRes" << std::endl;
+		_cgi_response_length = read(_cgi_fd, temp, 4001);
+		std::cout << "Fd from getRest ==" << _cgi_fd << "Response Lenght = "
+		 << _cgi_response_length << " CONTENT = " << temp  << "_______________" << std::endl;
+
+		return temp;
+	}
+    else
+	{
+    	_res = new(std::nothrow) char[_response_content.length() + _body_length];
+		if(!_res)
+    	{
+    		std::cerr << "new Failed" << std::endl;
+       			exit(1);
+    	}
+    	memcpy(_res, _response_content.data(), _response_content.length());
+    	memcpy(_res + _response_content.length(), &_body[0], _body_length);
     return _res;
+	}
+	return NULL;
 }
 
 /* Returns the length of entire reponse ( Headers + Body) */
-size_t Response::getLen() const { return (_response_content.length() + _body_length); }
+size_t Response::getLen() const {
+
+	if(_cgi)
+		return _cgi_response_length;
+	return (_response_content.length() + _body_length);
+
+	}
 
 /* Constructs Status line based on status code. */
 void        Response::setStatusLine()
@@ -301,6 +323,7 @@ void    Response::setRequest(HttpRequest &req)
 void   Response::clearResponse()
 {
     _body_length = 0;
+	_cgi_response_length = 0;
     _response_content.clear();
     _body.clear();
     _code = 0;
@@ -322,8 +345,8 @@ int      Response::getCode() const
 
 void        Response::handleCgi(HttpRequest& req)
 {
-    //CgiHandler obj(_request.getPath());
-    CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py");
-    obj.initEnv(req);
-    obj.execute();
+    // CgiHandler obj(_request.getPath());
+    // // CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py");
+    // obj.initEnv(req);
+    // obj.execute();
 }

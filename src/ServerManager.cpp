@@ -172,7 +172,7 @@ void    ServerManager::closeConnection(int i)
  */
 void    ServerManager::sendResponse(int &i)
 {
-    _clients_map[i].printReq();
+    // _clients_map[i].printReq();
     // if(_clients_map[i].getRequest().getPath().find("cgi-bin") != std::string::npos)
     // {
     //     std::cout << "Found CGI -- " <<  _clients_map[i].getRequest().getPath() << std::endl;
@@ -181,6 +181,7 @@ void    ServerManager::sendResponse(int &i)
     // else
     _clients_map[i].buildResponse();
     send(i, _clients_map[i].getResponse(), _clients_map[i].getResponseLength(), 0);
+	std::cout << "------------" << std::endl;
 
     if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
         closeConnection(i);

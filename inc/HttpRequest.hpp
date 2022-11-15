@@ -70,6 +70,7 @@ class HttpRequest
         std::string &getFragment();
         std::string getHeader(std::string const &);
 		std::map<std::string, std::string> getHeaders() const;
+		std::string getMethodStr();
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);

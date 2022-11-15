@@ -91,19 +91,23 @@ const std::string &CgiHandler::getCgiPath() const
 /* initialization environment variable */
 void CgiHandler::initEnv(HttpRequest& req)
 {
+	int poz;
+
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
+	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type"); //text/plain
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_env["SCRIPT_NAME"] = this->_cgi_path;
-    this->_env["SCRIPT_FILENAME"] = ""; //full path
-    this->_env["PATH_INFO"] = req.getHeader("Path_info"); // decode with ascii
+	poz = findStart(this->_cgi_path, "/cgi-bin");
+	this->_env["SCRIPT_NAME"] = (poz < 0 ? "" : this->_cgi_path.substr(poz, this->_cgi_path.size() - 1)); //  /cgi-bin/name.py || poz + 2 < this->_cgi_path.size()
+    this->_env["SCRIPT_FILENAME"] = this->_cgi_path; //The full path to the CGI script.
+    this->_env["PATH_INFO"] = req.getPath(); // ....upload.py after sgi-bin before ?
     this->_env["PATH_TRANSLATED"] = ""; //root from reguest + '/' + this->_env["PATH_INFO"]
-    this->_env["QUERY_STRING"] = req.getHeader("Query_string");
-    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
-    this->_env["SERVER_NAME"] = req.getHeader("Host");; //getBeforeColon(from request ["Host"], ':'); - will write a funct or check getHeader
-    this->_env["SERVER_PORT"] = "query"; //getAfterColon(from request ["Host"], ':');  - will write a funct or check getHeader
-    this->_env["REQUEST_METHOD"] = req.getHeader("Request");
+    this->_env["QUERY_STRING"] = req.getQuery();
+    this->_env["REMOTE_ADDR"] = req.getHeader("Host"); // 127.0.0.1 The IP address of the remote host making the request. This is useful logging or for authentication.
+	poz = findStart(req.getHeader("Host"), ":");
+    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
+    this->_env["SERVER_PORT"] = (poz > 0  ? req.getHeader("Host").substr(poz, req.getHeader("Host").size()) : ""); // :8080
+    this->_env["REQUEST_METHOD"] = req.getMethodStr();
     this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
@@ -128,20 +132,20 @@ void CgiHandler::initEnv(HttpRequest& req)
 	//this->_argv[2] = NULL;
 
 	//for check//
-	std::string arg1 = "90";
-	std::string arg2 = "+";
-	std::string arg3 = "100";
+	// std::string arg1 = "90";
+	// std::string arg2 = "+";
+	// std::string arg3 = "100";
 
-	this->_argv[0] = strdup(this->_cgi_path.c_str());
-	this->_argv[1] = strdup(arg1.c_str());
-	this->_argv[2] = strdup(arg2.c_str());
-	this->_argv[3] = strdup(arg3.c_str());
-	this->_argv[4] = NULL;
+	this->_argv[0] = strdup("/usr/bin/python3");
+	this->_argv[1] = strdup(this->_cgi_path.c_str());
+	this->_argv[2] = NULL; //strdup(arg2.c_str());
+	// this->_argv[3] = strdup(arg3.c_str());
+	// this->_argv[4] = NULL;
 }
 
 
 /* */
-void CgiHandler::execute()
+void CgiHandler::execute(HttpRequest& req, int &fd)
 {
 	int pipe_in[2], pipe_out[2];
 
@@ -164,7 +168,7 @@ void CgiHandler::execute()
 		dup2(pipe_in[0], STDIN_FILENO);
 		dup2(pipe_out[1], STDOUT_FILENO);
 		//std::cout<< "HERE" << std::endl; //delete
-		// записать в pipe_in[1] "Body"
+		write(pipe_in[1], req.getHeader("Body").c_str(), atoi(this->_env["CONTENT_LENGTH"].c_str()));
 		close(pipe_in[0]);
 		close(pipe_in[1]);
 		close(pipe_out[0]);
@@ -174,6 +178,7 @@ void CgiHandler::execute()
 		// std::cout<< "argv[2]:" << this->_argv[2] << std::endl; //delete
 		// std::cout<< "argv[3]:" << this->_argv[3] << std::endl; //delete
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
+		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
 		exit(this->_exit_status);
 	}
@@ -188,7 +193,7 @@ void CgiHandler::execute()
 			close(pipe_in[0]);
 			return ;
 		}
-		sendHeaderBody(pipe_out[0]); // add fd from responce
+		sendHeaderBody(pipe_out[0], fd); // add fd from responce
 		close(pipe_out[0]);
         close(pipe_in[0]);
 	}
@@ -196,7 +201,7 @@ void CgiHandler::execute()
         std::cout << "Fork failed" << std::endl; // std::cerr <<
 }
 
-void CgiHandler::sendHeaderBody(int &pipe_out) // add fd freom responce
+void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 {
 	char	tmp[4001];
 	int 	res;
@@ -214,14 +219,17 @@ void CgiHandler::sendHeaderBody(int &pipe_out) // add fd freom responce
 		body = header.substr(pos + 4);
 		header.erase(pos + 4);
 	}
-	//send(fd, header.c_str(), header.size(), 0);
+	fd = open("text1.txt", O_RDWR | O_CREAT);
+	send(fd, header.c_str(), header.size(), 0);
 	std::cout << "-----------------HEADER-----------------\n"; //delete
 	std::cout << header << std::endl;
 	std::cout << "------------------BODY------------------\n";
 	std::cout << body << std::endl;
 	//add chunk send
 
-	//send(fd, "0\r\n\r\n", 5, 0);
+	send(fd, body.c_str(), body.size(), 0);
+	send(fd, "\r\n\r\n", 5, 0);
+	std::cout << "fdd =========================== " << fd << std::endl;
 }
 
 void CgiHandler::fixHeader(std::string &header)
@@ -260,9 +268,19 @@ void CgiHandler::splitQuery(std::string &query)
 		this->_name_bin.insert(query.begin(), pos);
 	else
 		return ;
-
-
 }
+
+int CgiHandler::findStart(const std::string path, const std::string delim)
+{
+	if (path.empty())
+		return (-1);
+	size_t poz = path.find(delim);
+	if (poz != std::string::npos)
+		return (poz);
+	else
+		return (-1);
+}
+
 // decode(std::string& path)
 // {
 //     size_t token = path.find("%");
