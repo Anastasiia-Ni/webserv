@@ -92,22 +92,26 @@ const std::string &CgiHandler::getCgiPath() const
 void CgiHandler::initEnv(HttpRequest& req)
 {
 	this->_env["AUTH_TYPE"] = "Basic";
-	this->_env["CONTENT_LENGTH"] = req.getHeader ("Content-Length");
+	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
 	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = this->_cgi_path;
     this->_env["SCRIPT_FILENAME"] = ""; //full path
-    this->_env["PATH_INFO"] = "" ; // Request Uri
-    this->_env["PATH_TRANSLATED"] = ""; //root from reguest + this->_env["PATH_INFO"]
-    this->_env["QUERY_STRING"] = req.getHeader ("Query_string");
-    this->_env["REMOTE_ADDR"] = req.getHeader ("Host");
-    this->_env["SERVER_NAME"] = ""; //getBeforeColon(from request ["Host"], ':'); - will write a funct or check getHeader
+    this->_env["PATH_INFO"] = req.getHeader("Path_info"); // decode with ascii
+    this->_env["PATH_TRANSLATED"] = ""; //root from reguest + '/' + this->_env["PATH_INFO"]
+    this->_env["QUERY_STRING"] = req.getHeader("Query_string");
+    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
+    this->_env["SERVER_NAME"] = req.getHeader("Host");; //getBeforeColon(from request ["Host"], ':'); - will write a funct or check getHeader
     this->_env["SERVER_PORT"] = "query"; //getAfterColon(from request ["Host"], ':');  - will write a funct or check getHeader
     this->_env["REQUEST_METHOD"] = req.getHeader("Request");
     this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
+	// REMOTE_USER
+	// REMOTE_IDENT
+	// REMOTE_HOST
+
 
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();

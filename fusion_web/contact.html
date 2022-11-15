@@ -24,8 +24,26 @@
         </div>
     </header>
     
-<div class="pass__block"> 
-    <div class = "text__pass">
+    
+    <div class="pass__block"> 
+    <form action = "../cgi-bin/get_hello.py" method = "get">
+        First Name: <input type = "text" name = "first_name">  <br />
+        <br>
+        Last Name: <input type = "text" name = "last_name" />
+        <input type = "submit" value = "Submit" /> <br />
+    </form>
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <form action = "../cgi-bin/textarea.py" method = "post" target = "_blank">
+        <textarea name = "textcontent" cols = "40" rows = "4" color="grey">
+Type your text here...
+        </textarea> <br />
+        <input type = "submit" value = "Submit" />
+    </form>
+    <!-- <div class = "text__pass">
         Enter you secret words:
     </div>
     <form action="">
@@ -33,7 +51,7 @@
         <div class="bar_container">
             <div id="password-length"></div>
         </div>
-    </form>
+    </form> -->
     <ul>
         <li>
             <div class="litera">A M A N I X</div>
