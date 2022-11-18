@@ -89,33 +89,43 @@ const std::string &CgiHandler::getCgiPath() const
 }
 
 /* initialization environment variable */
-void CgiHandler::initEnv(HttpRequest& req)
+void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
 	int poz;
 
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type"); //text/plain
+	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	poz = findStart(this->_cgi_path, "/cgi-bin");
-	this->_env["SCRIPT_NAME"] = (poz < 0 ? "" : this->_cgi_path.substr(poz, this->_cgi_path.size() - 1)); //  /cgi-bin/name.py || poz + 2 < this->_cgi_path.size()
-    this->_env["SCRIPT_FILENAME"] = this->_cgi_path; //The full path to the CGI script.
-    this->_env["PATH_INFO"] = req.getPath(); // ....upload.py after sgi-bin before ?
-    this->_env["PATH_TRANSLATED"] = ""; //root from reguest + '/' + this->_env["PATH_INFO"]
+	poz = findStart(this->_cgi_path, "cgi-bin/");
+	this->_env["SCRIPT_NAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
+    this->_env["SCRIPT_FILENAME"] = this->_cgi_path; 
+    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
+    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + "/cgi-bin" + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]); 
     this->_env["QUERY_STRING"] = req.getQuery();
-    this->_env["REMOTE_ADDR"] = req.getHeader("Host"); // 127.0.0.1 The IP address of the remote host making the request. This is useful logging or for authentication.
+    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
 	poz = findStart(req.getHeader("Host"), ":");
     this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
-    this->_env["SERVER_PORT"] = (poz > 0  ? req.getHeader("Host").substr(poz, req.getHeader("Host").size()) : ""); // :8080
+    this->_env["SERVER_PORT"] = (poz > 0  ? req.getHeader("Host").substr(poz, req.getHeader("Host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
     this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
-	// REMOTE_USER
-	// REMOTE_IDENT
-	// REMOTE_HOST
 
+	std::vector<std::string> ext_path = it_loc->getCgiPath();
+	std::string extension;
+
+	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
+	{
+		extension = *it_ext;
+		if (this->_env["PATH_INFO"].find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
+			break ;
+		else if (this->_env["PATH_INFO"].find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
+			break ;
+	}
+
+	std::cout << "extension" << extension << std::endl; // delete
 
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
@@ -125,17 +135,16 @@ void CgiHandler::initEnv(HttpRequest& req)
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	splitQuery(req.getQuery());
-	this->_argv = (char **)malloc(sizeof(char *) * 5);
+	for (int i = 0; this->_ch_env[i]; i++)
+		std::cout << this->_ch_env[i] << std::endl;
+
+	this->_argv = (char **)malloc(sizeof(char *) * 3);
 	// this->_argv[0] = strdup(this->_cgi_path.c_str());
 	// this->_argv[1] = strdup(this->_env["SCRIPT_FILENAME"].c_str());
 	//this->_argv[2] = NULL;
 
-	//for check//
-	// std::string arg1 = "90";
-	// std::string arg2 = "+";
-	// std::string arg3 = "100";
-
+	std::cout << "extension path: " << extension << std::endl; //delete
+	// this->_argv[0] = strdup(extension.c_str());
 	this->_argv[0] = strdup("/usr/bin/python3");
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL; //strdup(arg2.c_str());
@@ -262,16 +271,6 @@ std::string CgiHandler::setCookie(const std::string& str)
 	return cook;
 }
 
-void CgiHandler::splitQuery(std::string &query)
-{
-	std::cout << query << std::endl;
-	size_t pos = query.find("?");
-	if (pos != std::string::npos)
-		this->_name_bin.insert(query.begin(), pos);
-	else
-		return ;
-}
-
 int CgiHandler::findStart(const std::string path, const std::string delim)
 {
 	if (path.empty())
@@ -282,6 +281,40 @@ int CgiHandler::findStart(const std::string path, const std::string delim)
 	else
 		return (-1);
 }
+
+
+std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> extensions)
+{
+	std::string tmp;
+	size_t start, end;
+
+	for (std::vector<std::string>::iterator it_ext = extensions.begin(); it_ext != extensions.end(); it_ext++)
+	{
+		start = path.find(*it_ext);
+		if (start != std::string::npos)
+			break ;
+	}	
+	if (start == std::string::npos)
+		return "";
+	if (start + 3 >= path.size())
+		return "";
+	tmp = path.substr(start + 3, path.size());
+	if (!tmp[0] || tmp[0] != '/')
+		return "";
+	//tmp.erase(0, 1);
+	end = tmp.find("?");
+	return (end == std::string::npos ? tmp : tmp.substr(0, end));	
+}
+
+// Convert from Hex to Dec
+// unsigned int fromHexToDec(const std::string& nb)
+// {
+//     unsigned int x;
+//     std::stringstream ss;
+//     ss << nb;
+//     ss >> std::hex >> x;
+//     return (x);
+// }
 
 // decode(std::string& path)
 // {
@@ -299,12 +332,5 @@ int CgiHandler::findStart(const std::string path, const std::string delim)
 //     return (path);
 // }
 
-// Convert from Hex to Dec
-unsigned int fromHexToDec(const std::string& nb)
-{
-    unsigned int x;
-    std::stringstream ss;
-    ss << nb;
-    ss >> std::hex >> x;
-    return (x);
-}
+
+

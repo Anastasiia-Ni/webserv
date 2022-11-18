@@ -131,7 +131,7 @@ int    Response::handleTarget()
 			_cgi = 1;
             if(pipe(_cgi_fd) < 0)
                 std::cout << "Pipe() fail" << std::endl;
-			obj.initEnv(_request); // + URI
+			obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
 			obj.execute(_request, this->_cgi_fd[1]);
 			return 0;
 		}
