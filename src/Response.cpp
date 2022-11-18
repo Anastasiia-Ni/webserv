@@ -128,10 +128,11 @@ int    Response::handleTarget()
 			// this->_cgi_obj.setPath();
 			_server.getLocationKey(location_key); // give location
 			CgiHandler obj("cgi-bin/get_hello.py"); //
-
 			_cgi = 1;
+            if(pipe(_cgi_fd) < 0)
+                std::cout << "Pipe() fail" << std::endl;
 			obj.initEnv(_request); // + URI
-			obj.execute(_request, this->_cgi_fd);
+			obj.execute(_request, this->_cgi_fd[1]);
 			return 0;
 		}
 
@@ -234,11 +235,8 @@ char  *Response::getRes(){
 	if(_cgi)
 	{
     	char *temp = new(std::nothrow) char[4001];
-		std::cout << "------------getRes" << std::endl;
-		_cgi_response_length = read(_cgi_fd, temp, 4001);
-		std::cout << "Fd from getRest ==" << _cgi_fd << "Response Lenght = "
-		 << _cgi_response_length << " CONTENT = " << temp  << "_______________" << std::endl;
-
+		_cgi_response_length = read(_cgi_fd[0], temp, 4001);
+        close(_cgi_fd[0]);
 		return temp;
 	}
     else
@@ -251,7 +249,7 @@ char  *Response::getRes(){
     	}
     	memcpy(_res, _response_content.data(), _response_content.length());
     	memcpy(_res + _response_content.length(), &_body[0], _body_length);
-    return _res;
+        return _res;
 	}
 	return NULL;
 }

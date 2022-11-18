@@ -180,7 +180,8 @@ void    ServerManager::sendResponse(int &i)
     // }
     // else
     _clients_map[i].buildResponse();
-    send(i, _clients_map[i].getResponse(), _clients_map[i].getResponseLength(), 0);
+    char *resp = _clients_map[i].getResponse();
+    send(i, resp, _clients_map[i].getResponseLength(), 0);
 	std::cout << "------------" << std::endl;
 
     if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())

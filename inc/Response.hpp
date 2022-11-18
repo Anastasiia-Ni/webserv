@@ -44,7 +44,7 @@ class Response
         short           _code;
         char            *_res;
 		int				_cgi;
-		int				_cgi_fd;
+		int				_cgi_fd[2];
 		size_t			_cgi_response_length;
 		// CgiHandler		_cgi_obj;
 

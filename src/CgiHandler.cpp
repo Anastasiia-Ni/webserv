@@ -177,6 +177,10 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 		// std::cout<< "argv[1]:" << this->_argv[1] << std::endl; //delete
 		// std::cout<< "argv[2]:" << this->_argv[2] << std::endl; //delete
 		// std::cout<< "argv[3]:" << this->_argv[3] << std::endl; //delete
+		
+		// if(_req.isBody())
+		// 	write(pipe_in[1], _req.getBody(), _reg.getBodyLength());
+
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
@@ -206,30 +210,28 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 	char	tmp[4001];
 	int 	res;
 
-	res = read(pipe_out, tmp, 4000);
-	tmp[res] = '\0';
-	std::string header(tmp);
-	std::string body;
-	size_t      pos;
+	res = read(pipe_out, tmp, 4000); // make loop 
+	
+	// std::string header(tmp);
+	// std::string body;
+	// size_t      pos;
 
-	fixHeader(header);
-	pos = header.find("\r\n\r\n");
-	if (pos != std::string::npos)
-	{
-		body = header.substr(pos + 4);
-		header.erase(pos + 4);
-	}
-	fd = open("text1.txt", O_RDWR | O_CREAT);
-	send(fd, header.c_str(), header.size(), 0);
-	std::cout << "-----------------HEADER-----------------\n"; //delete
-	std::cout << header << std::endl;
-	std::cout << "------------------BODY------------------\n";
-	std::cout << body << std::endl;
+	// fixHeader(header);
+	// pos = header.find("\r\n\r\n");
+	// if (pos != std::string::npos)
+	// {
+	// 	body = header.substr(pos + 4);
+	// 	header.erase(pos + 4);
+	// }
+	// send(fd, header.c_str(), header.size(), 0);
+	// std::cout << "-----------------HEADER-----------------\n"; //delete
+	// std::cout << header << std::endl;
+	// std::cout << "------------------BODY------------------\n";
+	// std::cout << body << std::endl;
 	//add chunk send
 
-	send(fd, body.c_str(), body.size(), 0);
-	send(fd, "\r\n\r\n", 5, 0);
-	std::cout << "fdd =========================== " << fd << std::endl;
+	write(fd, tmp, res);
+	close(fd);
 }
 
 void CgiHandler::fixHeader(std::string &header)
