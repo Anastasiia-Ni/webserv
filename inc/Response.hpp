@@ -52,6 +52,7 @@ class Response
         size_t  file_size();
         void    setStatusLine();
         void    setHeaders();
+        void    setServerDefaultErrorPages();
         int     readFile();
         void    contentType();
         void    contentLength();
@@ -61,6 +62,7 @@ class Response
         int     handleTarget();
         void    buildErrorBody();
         bool    reqError();
+        void    handleCgi();
 
 
 };

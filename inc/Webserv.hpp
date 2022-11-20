@@ -45,6 +45,9 @@
 # include "CgiHandler.hpp"
 # include "Mime.hpp"
 
-std::string statusCodeString(short statusCode);
+/* Utils.c */
+std::string statusCodeString(short);
+std::string getErrorPage(short);
+
 
 #endif

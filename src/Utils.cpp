@@ -3,8 +3,8 @@
 
 std::string statusCodeString(short statusCode)
 {
-    switch (statusCode)
-    {
+switch (statusCode)
+{
     case 100:
         return "Continue";
     case 101:
@@ -110,4 +110,12 @@ std::string statusCodeString(short statusCode)
     default:
         return "Undefined";
     }
+}
+
+
+std::string getErrorPage(short statusCode)
+{
+    return ("<html>\r\n<head><title>" + std::to_string(statusCode) + " " +
+             statusCodeString(statusCode) + " </title></head>\r\n" + "<body>\r\n" + 
+            "<center><h1>" + std::to_string(statusCode) + " " + statusCodeString(statusCode) + "</h1></center>\r\n");
 }
