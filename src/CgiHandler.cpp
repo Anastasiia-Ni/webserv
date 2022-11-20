@@ -8,7 +8,9 @@ CgiHandler::CgiHandler() {
 
 CgiHandler::CgiHandler(std::string path)
 {
-    this->_cgi_pid = -1;
+    if (path[0] && path[0] == '/') // возможно еще отрезать весь кусок после расширения
+		path.erase(0, 1);	
+	this->_cgi_pid = -1;
 	this->_exit_status = 0;
 	this->_cgi_path = path;
 	this->_ch_env = NULL;
@@ -69,7 +71,7 @@ void CgiHandler::setCgiPid(pid_t cgi_pid)
 
 void CgiHandler::setCgiPath(const std::string &cgi_path)
 {
-    this->_cgi_path = cgi_path;
+	this->_cgi_path = cgi_path;
 }
 
 /* Get functions */
@@ -93,6 +95,11 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 {
 	int poz;
 
+	if (this->_cgi_path == "cgi-bin") // 	проверить после вставки правильного пути из респонса
+		this->_cgi_path += "/" + it_loc->getIndexLocation();
+	else if (this->_cgi_path == "cgi-bin/")
+		this->_cgi_path += it_loc->getIndexLocation();
+
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
 	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
@@ -101,7 +108,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	this->_env["SCRIPT_NAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
     this->_env["SCRIPT_FILENAME"] = this->_cgi_path; 
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
-    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + "/cgi-bin" + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]); 
+    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]); 
     this->_env["QUERY_STRING"] = req.getQuery();
     this->_env["REMOTE_ADDR"] = req.getHeader("Host");
 	poz = findStart(req.getHeader("Host"), ":");
@@ -119,13 +126,13 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
 	{
 		extension = *it_ext;
-		if (this->_env["PATH_INFO"].find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
+		if (this->_cgi_path.find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
 			break ;
-		else if (this->_env["PATH_INFO"].find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
+		else if (this->_cgi_path.find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
 			break ;
 	}
 
-	std::cout << "extension" << extension << std::endl; // delete
+	std::cout << "extension: " << extension << std::endl; // delete
 
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
@@ -135,7 +142,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	for (int i = 0; this->_ch_env[i]; i++)
+	for (int i = 0; this->_ch_env[i]; i++)	//delete
 		std::cout << this->_ch_env[i] << std::endl;
 
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
@@ -143,13 +150,11 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	// this->_argv[1] = strdup(this->_env["SCRIPT_FILENAME"].c_str());
 	//this->_argv[2] = NULL;
 
-	std::cout << "extension path: " << extension << std::endl; //delete
-	// this->_argv[0] = strdup(extension.c_str());
-	this->_argv[0] = strdup("/usr/bin/python3");
+	//std::cout << "extension path: " << extension << std::endl; //delete
+	this->_argv[0] = strdup(extension.c_str());
+	// this->_argv[0] = strdup("/usr/bin/python3");
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
-	this->_argv[2] = NULL; //strdup(arg2.c_str());
-	// this->_argv[3] = strdup(arg3.c_str());
-	// this->_argv[4] = NULL;
+	this->_argv[2] = NULL;
 }
 
 
@@ -172,11 +177,11 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 	}
 	this->_cgi_pid = fork();
 	std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
+	
 	if (this->_cgi_pid == 0)
 	{
 		dup2(pipe_in[0], STDIN_FILENO);
 		dup2(pipe_out[1], STDOUT_FILENO);
-		//std::cout<< "HERE" << std::endl; //delete
 		write(pipe_in[1], req.getHeader("Body").c_str(), atoi(this->_env["CONTENT_LENGTH"].c_str()));
 		close(pipe_in[0]);
 		close(pipe_in[1]);

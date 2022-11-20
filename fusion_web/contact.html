@@ -38,11 +38,14 @@
     <br />
     <br />
     <br />
-    <form action = "../cgi-bin/textarea.py" method = "post" target = "_blank">
-        <textarea name = "textcontent" cols = "40" rows = "4" color="grey">
-Type your text here...
-        </textarea> <br />
-        <input type = "submit" value = "Submit" />
+    <h2> Smart calculator: </h2> <br />
+    <form action = "../cgi-bin/calc.py" method = "get">
+        Number1: <input type = "text" name = "f_num">  <br />
+        <br>
+        Oparator : <input type = "text" name = "oper">  <br />
+        <br>
+        Number2: <input type = "text" name = "s_num" />
+        <input type = "submit" value = "Submit" /> <br />
     </form>
     <!-- <div class = "text__pass">
         Enter you secret words:

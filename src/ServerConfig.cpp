@@ -262,6 +262,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 					if (i + 1 >= parametr.size())
 						throw ErrorException("Token is invalid");
 				}
+				if (parametr[i] != ".py" && parametr[i] != ".sh" && parametr[i] != "*.py" && parametr[i] != "*.sh")
+					throw ErrorException("An extension for CGI is not supported by the AMANIX");
 			}
 			new_location.setCgiExtension(extension);
 		}
@@ -282,6 +284,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 					if (i + 1 >= parametr.size())
 						throw ErrorException("Token is invalid");
 				}
+				if (parametr[i].find("/python") == std::string::npos && parametr[i].find("/bash") == std::string::npos)
+					throw ErrorException("cgi_path is invalid");
 			}
 			new_location.setCgiPath(path);
 		}

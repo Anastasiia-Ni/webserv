@@ -125,9 +125,9 @@ int    Response::handleTarget()
 		if(_server.getLocationKey(location_key)->getPath().find("cgi-bin") != std::string::npos)
 		{
 			std::cout << "CGI FOUND \n";
-			// this->_cgi_obj.setPath();
-			_server.getLocationKey(location_key); // give location
-			CgiHandler obj("cgi-bin/get_hello.py"); //
+			// _server.getLocationKey(location_key); // give location "cgi-bin/get_hello.py"
+			CgiHandler obj(this->_request.getPath());
+            // CgiHandler obj("cgi-bin/get_hello.py");
 			_cgi = 1;
             if(pipe(_cgi_fd) < 0)
                 std::cout << "Pipe() fail" << std::endl;
