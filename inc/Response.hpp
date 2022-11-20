@@ -46,6 +46,7 @@ class Response
 		int				_cgi;
 		int				_cgi_fd[2];
 		size_t			_cgi_response_length;
+        bool            _auto_index;
 		// CgiHandler		_cgi_obj;
 
         int     buildBody();
@@ -63,7 +64,6 @@ class Response
         void    buildErrorBody();
         bool    reqError();
         void    handleCgi();
-
 
 };
 

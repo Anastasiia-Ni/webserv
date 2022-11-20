@@ -33,7 +33,6 @@ class Client
         void                buildResponse();
         void                printReq();
         void                updateTime();
-        void                handleCgi();
 
         char                *getResponse();
         size_t              getResponseLength();

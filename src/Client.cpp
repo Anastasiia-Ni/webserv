@@ -107,9 +107,3 @@ void             Client::updateTime()
 {
     _last_msg_time = time(NULL);
 }
-
-void                Client::handleCgi()
-{
-    _response.setRequest(_request);
-    _response.handleCgi(_request);
-}

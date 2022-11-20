@@ -7,6 +7,7 @@
 # include <cstring>
 # include <string> 
 # include <unistd.h>
+# include <dirent.h>
 # include <sstream>
 // # include <bits/stdc++.h>
 # include <cstdlib>

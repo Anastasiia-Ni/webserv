@@ -2,7 +2,8 @@
 
 Mime Response::_mime;
 
-Response::Response(): _cgi_response_length(0), _code(0), _res(NULL), _target_file(""), _body_length(0),  _cgi(0) {}
+Response::Response(): _cgi_response_length(0), _code(0), _res(NULL), _target_file(""), _body_length(0),
+                      _cgi(0), _auto_index(0){}
 
 Response::~Response()
 {
@@ -10,7 +11,8 @@ Response::~Response()
         delete [] _res;
 }
 
-Response::Response(HttpRequest &req): _cgi_response_length(0), _request(req), _code(0), _res(NULL), _target_file(""), _body_length(0), _cgi(0){}
+Response::Response(HttpRequest &req): _cgi_response_length(0), _request(req), _code(0), _res(NULL)
+                                    , _target_file(""), _body_length(0), _cgi(0),  _auto_index(0){}
 
 
 void   Response::contentType()
@@ -169,6 +171,75 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
     }
 }
 
+static void buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &body_len)
+{
+    struct dirent *entityStruct;
+
+    DIR *directory;
+    directory = opendir(dir_name.c_str());
+    std::string dirListPage;
+
+    if(directory == NULL)
+    {    
+        std::cerr << "opendir failed" << std::endl;
+        return;
+    }
+    dirListPage.append("<html>\n");
+    dirListPage.append("<head>\n");
+    dirListPage.append("<title> Index of");
+    dirListPage.append(dir_name);
+    dirListPage.append("</title>\n");
+    dirListPage.append("</head>\n");
+    dirListPage.append("<body >\n");
+    dirListPage.append("<h1> Index of " + dir_name + "</h1>\n");
+    dirListPage.append("<table style=\"width:80%; font-size: 15px\">\n");
+    dirListPage.append("<hr>\n");
+    dirListPage.append("<th style=\"text-align:left\"> File Name </th>\n");
+    dirListPage.append("<th style=\"text-align:left\"> Last Modification  </th>\n");
+    dirListPage.append("<th style=\"text-align:left\"> File Size </th>\n");
+
+    struct stat file_stat;
+    std::string file_path;
+
+    while((entityStruct = readdir(directory)) != NULL)
+    {
+        if(strcmp(entityStruct->d_name, ".") == 0)
+            continue;
+        file_path = dir_name + entityStruct->d_name;
+        stat(file_path.c_str() , &file_stat);
+        std::cout << entityStruct->d_name << std::endl;
+        dirListPage.append("<tr>\n");
+        dirListPage.append("<td>\n");
+        dirListPage.append("<a href=\"");
+        dirListPage.append(entityStruct->d_name);
+        if(S_ISDIR(file_stat.st_mode))
+            dirListPage.append("/");
+        dirListPage.append("\">");
+        dirListPage.append(entityStruct->d_name);
+        if(S_ISDIR(file_stat.st_mode))
+            dirListPage.append("/");
+        dirListPage.append("</a>\n");
+        dirListPage.append("</td>\n");
+        dirListPage.append("<td>\n");
+        dirListPage.append(ctime(&file_stat.st_mtime));
+        dirListPage.append("</td>\n");
+        dirListPage.append("<td>\n");
+        dirListPage.append(std::to_string(file_stat.st_size));
+        dirListPage.append("</td>\n");
+        dirListPage.append("</tr>\n");
+    }
+
+    dirListPage.append("</table>\n");
+    dirListPage.append("<hr>\n");
+
+    dirListPage.append("</body>\n");
+    dirListPage.append("</html>\n");
+
+    body.insert(body.begin(), dirListPage.begin(), dirListPage.end());
+    body_len = body.size();
+    std::cout << "BODY LEN = " << body_len << "and str len = " << dirListPage.length() << std::endl ;
+}
+
 int    Response::handleTarget()
 {
     std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
@@ -214,12 +285,17 @@ int    Response::handleTarget()
             std::cout << "target after adding index =  " << _target_file << std::endl;;
             if(!fileExists(_target_file))
             {
-                /*
-                if(autoindex == on)
-                    list files in dirctory :D; 
-                 */
-                _code = 403;
-                return (1);
+                if(target_location.getAutoindex())
+                {
+                    _target_file.erase(_target_file.find_last_of('/') + 1);
+                    _auto_index = true;
+                    return (0);
+                }
+                else
+                {
+                    _code = 403;
+                    return (1);
+                }
             }
             if (isDirectory(_target_file))
             {
@@ -348,6 +424,11 @@ void    Response::buildResponse()
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
 	if(_cgi)
 		return;
+    if(_auto_index)
+    {
+        buildHtmlIndex(_target_file, _body, _body_length);
+        _code = 200;
+    }
     setStatusLine();
     setHeaders();
 }
@@ -401,7 +482,7 @@ int    Response::buildBody()
 {
     if (handleTarget())
         return (1);
-	if(_cgi == 1)
+	if(_cgi || _auto_index)
 		return (0);
     if(readFile())
         return (1);
@@ -457,17 +538,10 @@ void   Response::clearResponse()
         _res = NULL;
     }
 	_cgi = 0;
+    _auto_index = 0;
 }
 
 int      Response::getCode() const
 {
     return (_code);
-}
-
-void        Response::handleCgi(HttpRequest& req)
-{
-    // CgiHandler obj(_request.getPath());
-    // // CgiHandler obj("/Users/anifanto/Desktop/ft-server/cgi-bin/env.py");
-    // obj.initEnv(req);
-    // obj.execute();
 }
