@@ -29,6 +29,21 @@
 </header>
 
 <div class="sub_div">
+    <!-- <body> -->
+    <h1 id="header"></h1>
+    <!-- <p>Messege for checking</p> -->
+    <script>
+        function setAction(form, name){
+            //form.action = "../cgi-bin/script.php"; //дописать скрипт 
+            document.cookie = "user=" + name;
+        }
+        const value = `${document.cookie}`;
+        const parts = value.split("=");
+    //    document.getElementById("parts").innerHTML = parts[parts.indexOf("user")]; // delete for checking
+        document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
+    </script>
+    <br> 
+    <!-- </body> -->
     <form enctype="multipart/form-data" method="post" >
         <p><input type="file" name="userfile" size="20" class="form-control">
             <input type="submit" value="SEND" href="#"></p>
@@ -57,20 +72,6 @@
     }
 </style> -->
 <html>
-    <body>
-    <h1 id="header"></h1>
-    <!-- <p>Messege for checking</p> -->
-	<script>
-		function setAction(form, name){
-			//form.action = "../cgi-bin/script.php"; //дописать скрипт 
-			document.cookie = "user=" + name;
-		}
-		const value = `${document.cookie}`;
-		const parts = value.split("=");
-    //    document.getElementById("parts").innerHTML = parts[parts.indexOf("user")]; // delete for checking
-		document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
-	</script>
-    </body>
 </html>
 
     

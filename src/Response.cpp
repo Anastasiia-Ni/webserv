@@ -188,8 +188,8 @@ int    Response::handleTarget()
             return (1);
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
 		{
-            handleCgi();
-			return 0;
+        handleCgi();
+        return 0;
 		}
 
         if(!target_location.getAlias().empty())

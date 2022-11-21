@@ -23,7 +23,7 @@ class CgiHandler {
 		CgiHandler(CgiHandler const &other);
 		CgiHandler &operator=(CgiHandler const &rhs);
 
-		void initEnv(HttpRequest& req);
+		void initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc);
 		void execute(HttpRequest& req, int &fd);
 		void sendHeaderBody(int &pipe_out, int &fd);
 		void fixHeader(std::string &header);
@@ -38,9 +38,8 @@ class CgiHandler {
 
 		std::string	getAfter(const std::string& path, char delim);
 		std::string	getBefore(const std::string& path, char delim);
-		std::string	decode(std::string& path);
+		std::string	getPathInfo(std::string& path, std::vector<std::string> extensions);
 		int	countCookies(const std::string& str);
-		void splitQuery(std::string &query);
 		int findStart(const std::string path, const std::string delim);
 };
 
