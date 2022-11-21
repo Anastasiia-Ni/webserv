@@ -57,7 +57,6 @@ void    ServerManager::runServers()
         {
             // std::cerr << "BIGGEST FD  = " << _biggest_fd << std::endl;
                 // std::cerr << "i write = " << i << std::endl;
-
             if(FD_ISSET(i, &write_set_cpy))
             {
                 // std::cerr << "i write = " << i << std::endl;
@@ -72,9 +71,7 @@ void    ServerManager::runServers()
                 else
                     readRequest(i);
             }
-
         }
-
         checkTimeout();
     }
 }
@@ -165,6 +162,7 @@ void    ServerManager::closeConnection(int i)
     close(i);
     _clients_map.erase(i);
 }
+
 /**
  * Build the response and send it to client.
  * If no error was found in request and Connection header value is keep-alive,
@@ -172,18 +170,10 @@ void    ServerManager::closeConnection(int i)
  */
 void    ServerManager::sendResponse(int &i)
 {
-    // _clients_map[i].printReq();
-    // if(_clients_map[i].getRequest().getPath().find("cgi-bin") != std::string::npos)
-    // {
-    //     std::cout << "Found CGI -- " <<  _clients_map[i].getRequest().getPath() << std::endl;
-    //     _clients_map[i].handleCgi();
-    // }
-    // else
     _clients_map[i].buildResponse();
     char *resp = _clients_map[i].getResponse();
     send(i, resp, _clients_map[i].getResponseLength(), 0);
-	std::cout << "------------" << std::endl;
-
+    
     if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
         closeConnection(i);
     else
@@ -208,10 +198,10 @@ void    ServerManager::readRequest(int &i)
 
     // std::cout << "Message from: " << inet_ntoa(_clients_map[i].getAddress().sin_addr) << " Socket no : " <<
     // i << std::endl;
-
-    bytes_read = read(i, buffer, sizeof(buffer));
-    // std::cout << "REQUEST = --------------------------------------------\n" << buffer << std::endl;
-    // std::cout << "---------------------------------------" << std::endl;
+    
+    bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
+    std::ofstream  file("text.txt", std::ios_base::app);
+    file << buffer << std::endl;
     if(bytes_read == 0)
         closeConnection(i);
     if(bytes_read < 0)
@@ -226,13 +216,6 @@ void    ServerManager::readRequest(int &i)
         _clients_map[i].updateTime();
     }
 
-    // if (_clients_map[i].requestError()) // if error was found in request, send 400 bad_request and close connection after sending.
-    // {
-    //     // std::cout << "Bad Request, Connection Closed !" << std::endl;
-    //     _clients_map[i].setRespError(_clients_map[i].requestError());
-    //     FD_CLR(i, &_recv_fd_pool);
-    //     FD_SET(i, &_write_fd_pool);
-    // }
     if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
     {
         FD_CLR(i, &_recv_fd_pool);

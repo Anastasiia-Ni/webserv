@@ -61,14 +61,14 @@ void ServerConfig::initErrorPages(void)
 	char dir[1024];
 	getcwd(dir, 1024);
 	std::string root = dir;
-	_error_pages[302] = "error_pages/302.html";
-	_error_pages[301] = "error_pages/301.html";
-	_error_pages[400] = "error_pages/400.html";
-	_error_pages[403] = "error_pages/403.html";
-	_error_pages[404] = "error_pages/404.html";
-	_error_pages[405] = "error_pages/405.html";
-	_error_pages[500] = "error_pages/500.html";
-	_error_pages[505] = "error_pages/505.html";
+	_error_pages[301] = "";
+	_error_pages[302] = "";
+	_error_pages[400] = "";
+	_error_pages[403] = "";
+	_error_pages[404] = "";
+	_error_pages[405] = "";
+	_error_pages[500] = "";
+	_error_pages[505] = "";
 	// std::cout << "ERROR 500 = " << _error_pages[500] << std::endl;
 }
 

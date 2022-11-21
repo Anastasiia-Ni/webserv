@@ -46,12 +46,14 @@ class Response
 		int				_cgi;
 		int				_cgi_fd[2];
 		size_t			_cgi_response_length;
+        bool            _auto_index;
 		// CgiHandler		_cgi_obj;
 
         int     buildBody();
         size_t  file_size();
         void    setStatusLine();
         void    setHeaders();
+        void    setServerDefaultErrorPages();
         int     readFile();
         void    contentType();
         void    contentLength();
@@ -61,7 +63,7 @@ class Response
         int     handleTarget();
         void    buildErrorBody();
         bool    reqError();
-
+        void    handleCgi();
 
 };
 

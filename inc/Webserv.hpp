@@ -7,6 +7,7 @@
 # include <cstring>
 # include <string> 
 # include <unistd.h>
+# include <dirent.h>
 # include <sstream>
 // # include <bits/stdc++.h>
 # include <cstdlib>
@@ -45,6 +46,10 @@
 # include "CgiHandler.hpp"
 # include "Mime.hpp"
 
-std::string statusCodeString(short statusCode);
+/* Utils.c */
+std::string statusCodeString(short);
+std::string getErrorPage(short);
+int buildHtmlIndex(std::string &, std::vector<uint8_t> &, size_t &);
+
 
 #endif

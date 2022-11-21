@@ -18,6 +18,7 @@ Mime::Mime()
     _mime_types[".png"] = "image/png";
     _mime_types[".txt"] = "text/plain";
     _mime_types[".mp3"] = "audio/mp3";
+    _mime_types[".pdf"] = "application/pdf";
     _mime_types["default"] = "text/html";
 }
 
