@@ -49,6 +49,7 @@
 /* Utils.c */
 std::string statusCodeString(short);
 std::string getErrorPage(short);
+int buildHtmlIndex(std::string &, std::vector<uint8_t> &, size_t &);
 
 
 #endif

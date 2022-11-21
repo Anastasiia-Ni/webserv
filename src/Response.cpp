@@ -259,9 +259,13 @@ int    Response::handleTarget()
             _target_file += _server.getIndex();
             if(!fileExists(_target_file))
             {
-                /* 
-                if(autoindex == on)
-                    list files in direcort :D
+                /* Uncomment when autoindex is enabled outside location blocks
+                if(_server.getAutoindex())
+                {
+                    _target_file.erase(_target_file.find_last_of('/') + 1);
+                    _auto_index = true;
+                    return (0);
+                } 
                 */
                 std::cout << "FORBIDEN !!!!!!!!!!!!!!!\n";
                 _code = 403;
@@ -279,13 +283,6 @@ int    Response::handleTarget()
         }
 
     }
-    // remove this later, and check while reading file.
-    // if(!fileExists(_target_file))
-    // {
-
-    //     // std::cout << "err targer file = " << _target_file << std::endl;
-    //     _code = 404;
-    // }
     return (0);
 }
 
@@ -357,8 +354,13 @@ void    Response::buildResponse()
 		return;
     if(_auto_index)
     {
-        buildHtmlIndex(_target_file, _body, _body_length);
-        _code = 200;
+        if(buildHtmlIndex(_target_file, _body, _body_length))
+        {
+            _code = 500;
+            buildErrorBody();
+        }
+        else
+            _code = 200;
     }
     setStatusLine();
     setHeaders();

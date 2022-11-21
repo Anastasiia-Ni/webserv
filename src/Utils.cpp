@@ -119,7 +119,7 @@ std::string getErrorPage(short statusCode)
             "<center><h1>" + std::to_string(statusCode) + " " + statusCodeString(statusCode) + "</h1></center>\r\n");
 }
 
-static void buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &body_len)
+int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &body_len)
 {
     struct dirent *entityStruct;
 
@@ -130,7 +130,7 @@ static void buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, si
     if(directory == NULL)
     {    
         std::cerr << "opendir failed" << std::endl;
-        return;
+        return 1;
     }
     dirListPage.append("<html>\n");
     dirListPage.append("<head>\n");
@@ -172,11 +172,11 @@ static void buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, si
         dirListPage.append(ctime(&file_stat.st_mtime));
         dirListPage.append("</td>\n");
         dirListPage.append("<td>\n");
-        dirListPage.append(std::to_string(file_stat.st_size));
+        if(!S_ISDIR(file_stat.st_mode))
+            dirListPage.append(std::to_string(file_stat.st_size));
         dirListPage.append("</td>\n");
         dirListPage.append("</tr>\n");
     }
-
     dirListPage.append("</table>\n");
     dirListPage.append("<hr>\n");
 
@@ -185,5 +185,5 @@ static void buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, si
 
     body.insert(body.begin(), dirListPage.begin(), dirListPage.end());
     body_len = body.size();
-    std::cout << "BODY LEN = " << body_len << "and str len = " << dirListPage.length() << std::endl ;
+    return (0);
 }
