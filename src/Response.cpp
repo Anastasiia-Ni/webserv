@@ -52,7 +52,7 @@ void    Response::location()
     if(_location.length())
         _response_content.append("Location: "+ _location +"\r\n");
 }
-
+// uri ecnoding
 void    Response::setHeaders()
 {
     //date();
@@ -61,6 +61,7 @@ void    Response::setHeaders()
     connection();
     server();
     location();
+
     _response_content.append("\r\n");
 }
 

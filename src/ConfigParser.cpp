@@ -287,11 +287,14 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		server.setRoot("/;");
 	if (server.getHost() == 0)
 		server.setHost("localhost;");
+	if (server.getIndex().empty())
+		server.setIndex("index.html;");
+	// Maybe here check file of index if it is exist and readable?
 	if (server.checkLocaitons())
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
 		throw  ErrorException("Port does not found"); // check sentense
-	server.setErrorPages(error_codes);	
+	server.setErrorPages(error_codes);
 	if (!server.isValidErrorPages())
 		throw ErrorException("Incorrect path for error page or number of error");
 }
