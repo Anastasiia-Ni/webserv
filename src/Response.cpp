@@ -108,10 +108,10 @@ static std::string combinePaths(std::string p1, std::string p2, std::string p3)
         p2.erase(0, 1);
     if(p1.back() != '/' && (!p2.empty() && p2[0] != '/'))
         p1.insert(p1.end(), '/');
-    
+
     if(p2.back() == '/' && (!p3.empty() && p3[0] == '/') )
         p3.erase(0, 1);
-    
+
     if(p2.back() != '/' && (!p3.empty() && p3[0] != '/'))
         p2.insert(p1.end(), '/');
     res = p1 + p2 + p3;
@@ -131,15 +131,15 @@ static void      appendRoot(Location &location, HttpRequest &request, std::strin
     std::cout << "Target_file after appending root is " << target_file << std::endl;
 }
 
-void        Response::handleCgi()
+void        Response::handleCgi(std::string &location_key)
 {
     std::cout << "CGI FOUND \n";
     // this->_cgi_obj.setPath();
-    CgiHandler obj("cgi-bin/get_hello.py"); //
+    CgiHandler obj(this->_request.getPath()); //
     _cgi = 1;
     if(pipe(_cgi_fd) < 0)
         std::cout << "Pipe() fail" << std::endl;
-    obj.initEnv(_request); // + URI
+    obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
     obj.execute(_request, this->_cgi_fd[1]);
 }
 
@@ -179,7 +179,7 @@ int    Response::handleTarget()
 
     // If URI matches with a Location block
     if (location_key.length() > 0)
-    {   
+    {
         Location target_location = *_server.getLocationKey(location_key);
 
         if(isAllowedMethod(_request.getMethod(), target_location, _code))
@@ -188,7 +188,7 @@ int    Response::handleTarget()
             return (1);
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
 		{
-        handleCgi();
+        handleCgi(location_key);
         return 0;
 		}
 
@@ -196,7 +196,7 @@ int    Response::handleTarget()
         {
             replaceAlias(target_location, _request, _target_file);
             _target_file = combinePaths(_server.getRoot(), _target_file, "");
-        }   
+        }
         else
             appendRoot(target_location, _request, _target_file);
         std::cout << "Target file before checking dir is " << _target_file << std::endl;
@@ -237,7 +237,7 @@ int    Response::handleTarget()
                     _location = combinePaths(_request.getPath(), _server.getIndex(), "");
                 if(_location.back() != '/')
                     _location.insert(_location.end(), '/');
-                
+
                 return (1);
             }
         }
@@ -265,7 +265,7 @@ int    Response::handleTarget()
                     _target_file.erase(_target_file.find_last_of('/') + 1);
                     _auto_index = true;
                     return (0);
-                } 
+                }
                 */
                 std::cout << "FORBIDEN !!!!!!!!!!!!!!!\n";
                 _code = 403;
@@ -308,7 +308,7 @@ void    Response::buildErrorBody()
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
         if(_server.getErrorPages().at(_code).empty())
             setServerDefaultErrorPages();
-        else 
+        else
         {
             std::cout << "NON_DEFAULT STRING ERRORS \n";
 

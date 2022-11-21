@@ -63,7 +63,7 @@ class Response
         int     handleTarget();
         void    buildErrorBody();
         bool    reqError();
-        void    handleCgi();
+        void    handleCgi(std::string &);
 
 };
 
