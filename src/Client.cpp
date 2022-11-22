@@ -4,9 +4,42 @@ Client::Client() : _total_bytes_read(0) {}
 
 Client::~Client() {}
 
+/* copy constructor */
+Client::Client(const Client &other)
+{
+	if (this != &other)
+	{
+		this->_client_socket = other._client_socket;
+		this->_client_address = other._client_address;
+		this->_request = other._request;
+		this->_response = other._response;
+		this->_server = other._server;
+		this->_total_bytes_read = other._total_bytes_read;
+		this->_last_msg_time = other._last_msg_time;
+
+	}
+	return ;
+}
+
+/* assinment operator */
+Client &Client::operator=(const Client & rhs)
+{
+	if (this != &rhs)
+	{
+		this->_client_socket = rhs._client_socket;
+		this->_client_address = rhs._client_address;
+		this->_request = rhs._request;
+		this->_response = rhs._response;
+		this->_server = rhs._server;
+		this->_total_bytes_read = rhs._total_bytes_read;
+		this->_last_msg_time = rhs._last_msg_time;
+	}
+	return (*this);
+}
+
 Client::Client(ServerConfig &server): _total_bytes_read(0)
 {
-    _response.setServer(server);
+    setServer(server);
     _request.setMaxBodySize(_server.getClientMaxBodySize());
     _last_msg_time = time(NULL);
 }
@@ -21,6 +54,12 @@ void    Client::setAddress(sockaddr_in &addr)
     _client_address =  addr;
 }
 
+void    Client::setServer(ServerConfig &server)
+{
+    _server = server;
+    _response.setServer(server);
+}
+
 int     Client::getSocket()
 {
     return (_client_socket);
@@ -29,6 +68,26 @@ int     Client::getSocket()
 HttpRequest     &Client::getRequest()
 {
     return (_request);
+}
+
+const in_addr_t       &Client::getHost()
+{
+    return (_server.getHost());
+}
+
+const uint16_t        &Client::getPort()
+{
+    return (_server.getPort());
+}
+
+const std::string    &Client::getServerName()
+{
+    return (_server.getServerName());
+}
+
+std::string    Client::getReqServerName()
+{
+    return (_request.getServerName());
 }
 
 struct sockaddr_in    Client::getAddress()

@@ -35,6 +35,7 @@ class ServerConfig
 		void setServerName(std::string server_name);
 		void setHost(std::string parametr);
 		void setRoot(std::string root);
+		void setFd(int);
 		void setPort(std::string parametr);
 		void setClientMaxBodySize(std::string parametr);
 		void setErrorPages(std::vector<std::string> &parametr);

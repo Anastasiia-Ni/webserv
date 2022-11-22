@@ -14,17 +14,23 @@ class Client
 {
     public:
         Client();
+        Client(const Client &other);
         Client(ServerConfig &);
+		    Client &operator=(const Client & rhs);
         ~Client();
 
         int                 getSocket();
         struct sockaddr_in  getAddress();
         HttpRequest         &getRequest();
         time_t              getLastTime();
+        const std::string &getServerName();
+        const uint16_t &getPort();
+        const in_addr_t &getHost();
+        std::string getReqServerName();
 
         void                setSocket(int &);
         void                setAddress(sockaddr_in &);
-
+        void                setServer(ServerConfig &);
         void                feedData(char *, size_t);
         bool                parsingCompleted();
         short               requestError();
@@ -39,7 +45,6 @@ class Client
         size_t              getTotalBytes();
         void                clearResponse();
         int                 getResponseCode();
-
 
     private:
         int                 _client_socket;

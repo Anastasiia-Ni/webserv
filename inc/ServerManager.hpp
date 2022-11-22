@@ -30,9 +30,10 @@ class ServerManager
         void acceptNewConnection(ServerConfig &);
         void setupSelect();
         void readRequest(int &);
-        void sendResponse(int &i);
+        void sendResponse(int &);
         void checkTimeout();
         void closeConnection(int);
+        void assignServer(int &);
 
 };
 

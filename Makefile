@@ -18,8 +18,9 @@ RM = rm -rf
 RESET = "\033[0m"
 BLACK = "\033[1m\033[37m"
 
-all: $(NAME)
-
+all:
+	@$(MAKE) $(NAME) -j5
+	
 $(NAME) : $(OBJS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled 🌐 $(RESET)

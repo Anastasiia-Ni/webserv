@@ -681,7 +681,6 @@ void        HttpRequest::_handle_headers()
 {
     std::stringstream ss;
 
-    if (_request_headers.count("Referer"))
     if (_request_headers.count("Content-Length"))
     {
         _body_flag = true;
@@ -690,7 +689,6 @@ void        HttpRequest::_handle_headers()
         if (_body_length < 0)
             std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
         std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
-
     }
     if ( _request_headers.count("Transfer-Encoding"))
     {
@@ -700,6 +698,13 @@ void        HttpRequest::_handle_headers()
     }
     else
         _body_flag = false;
+    
+    if (_request_headers.count("Host"))
+    {
+        size_t pos = _request_headers["Host"].find_first_of(':');
+        _server_name = _request_headers["Host"].substr(0, pos);
+        std::cout << "Target Server Name is :" << _server_name << std::endl;
+    }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;
 }
 
@@ -712,10 +717,10 @@ int     HttpRequest::errorCode()
 
 void    HttpRequest::clear()
 {
-    _path = "";
+    _path.clear();
     _error_code = 0;
-    _query = "";
-    _fragment = "";
+    _query.clear();
+    _fragment.clear();
     _method = NONE;
     _method_index = 1;
     _state = Request_Line;
@@ -728,6 +733,7 @@ void    HttpRequest::clear()
     _storage.clear();
     _key_storage.clear();
     _request_headers.clear();
+    _server_name.clear();
 }
 
 /**
@@ -743,4 +749,9 @@ bool        HttpRequest::keepAlive()
             return false;
     }
     return true;
+}
+
+std::string     HttpRequest::getServerName()
+{
+    return (_server_name);
 }

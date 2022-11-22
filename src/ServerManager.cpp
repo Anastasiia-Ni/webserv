@@ -10,10 +10,21 @@ ServerManager::~ServerManager(){}
 void    ServerManager::setupServers(std::vector<ServerConfig> servers)
 {
     _servers = servers;
-
+    bool    serverDub;
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
-        it->setupServer();
-	// std::cout << "fd in server = " << _servers[0].getFd() << std::endl;
+    {
+        serverDub = false;
+        for(std::vector<ServerConfig>::iterator it2 = _servers.begin(); it2 != it; ++it2)
+        {
+            if (it2->getHost() == it->getHost() && it2->getPort() == it->getPort())
+            {
+                it->setFd(it2->getFd());
+                serverDub = true;
+            }
+        }
+        if(!serverDub)
+            it->setupServer();
+    }
 }
 
 /**
@@ -100,6 +111,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     int client_sock;
     Client  new_client(serv);
 
+
     if ( (client_sock = accept(serv.getFd(), (struct sockaddr *)&client_address,
      (socklen_t*)&client_address_size)) == -1)
     {
@@ -121,7 +133,6 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     if(_clients_map.count(client_sock) != 0)
         _clients_map.erase(client_sock);
     _clients_map.insert(std::make_pair(client_sock, new_client));
-    // std::cout << "Connection From: " << inet_ntoa(new_client.getAddress().sin_addr) << std::endl;
 }
 
 /*
@@ -135,12 +146,13 @@ void    ServerManager::setupSelect()
     // adds servers sockets to _recv_fd_pool set
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
+        std::cerr << " LISTEN" << std::endl;
+
         if (listen(it->getFd(), 10) == -1)
         {
             std::cerr << " webserv: listen error: " << strerror(errno) << std::endl;
             exit(EXIT_FAILURE);
         }
-        // std::cout << "Server fd = " << it->getFd() << " is listening" << std::endl;
         if(fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
         {
             std::cerr << " webserv: fcntl error" << strerror(errno) <<std::endl;
@@ -151,8 +163,8 @@ void    ServerManager::setupSelect()
     }
     // at this stage _biggest_fd will belong to the last server created.
     _biggest_fd = _servers.back().getFd();
-
 }
+
 void    ServerManager::closeConnection(int i)
 {
     if(FD_ISSET(i, &_write_fd_pool))
@@ -185,6 +197,23 @@ void    ServerManager::sendResponse(int &i)
     }
 }
 
+void    ServerManager::assignServer(int &i)
+{
+    
+    for (std::vector<ServerConfig>::iterator it = _servers.begin();
+        it != _servers.end(); ++it)
+    {
+        if(_clients_map[i].getHost() == it->getHost() &&
+           _clients_map[i].getPort() == it->getPort() &&
+           _clients_map[i].getReqServerName() == it->getServerName())
+        {
+            _clients_map[i].setServer(*it);
+            return;
+        }
+
+    }
+}
+
 /**
  * - Reads data from client and feed it to the parser.
  * Once parser is done or an error was found in the request,
@@ -195,9 +224,6 @@ void    ServerManager::readRequest(int &i)
 {
     char    buffer[8192];
     int     bytes_read = 0;
-
-    // std::cout << "Message from: " << inet_ntoa(_clients_map[i].getAddress().sin_addr) << " Socket no : " <<
-    // i << std::endl;
     
     bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
     std::ofstream  file("text.txt", std::ios_base::app);
@@ -218,6 +244,7 @@ void    ServerManager::readRequest(int &i)
 
     if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
     {
+        assignServer(i);
         FD_CLR(i, &_recv_fd_pool);
         FD_SET(i, &_write_fd_pool); // move socket i from recive fd_set to write fd_set so response can be sent on next iteration
     }

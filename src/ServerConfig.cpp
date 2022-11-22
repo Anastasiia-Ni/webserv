@@ -42,15 +42,13 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 		this->_server_name = rhs._server_name;
 		this->_root = rhs._root;
 		this->_port = rhs._port;
-		this->_port = rhs._host;
+		this->_host = rhs._host;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_index = rhs._index;
 		this->_error_pages = rhs._error_pages;
 		this->_locations = rhs._locations;
 		this->_listen_fd = rhs._listen_fd;
 		this->_server_address = rhs._server_address;
-
-
 	}
 	return (*this);
 }
@@ -69,7 +67,6 @@ void ServerConfig::initErrorPages(void)
 	_error_pages[405] = "";
 	_error_pages[500] = "";
 	_error_pages[505] = "";
-	// std::cout << "ERROR 500 = " << _error_pages[500] << std::endl;
 }
 
 /* Set functions */
@@ -309,6 +306,11 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	this->_locations.push_back(new_location);
 }
 
+void	ServerConfig::setFd(int fd)
+{
+	this->_listen_fd = fd;
+}
+
 /* validation of parametrs */
 bool ServerConfig::isValidHost(std::string host) const
 {
@@ -481,7 +483,6 @@ void	ServerConfig::setupServer(void)
     _server_address.sin_family = AF_INET;
     _server_address.sin_addr.s_addr = _host;
 	char tmp[512];
-	std::cout << inet_ntop(AF_INET, &_host, tmp, 512) << std::endl;
     _server_address.sin_port = htons(_port);
 
 

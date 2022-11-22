@@ -82,9 +82,10 @@ class HttpRequest
         void        clear();
         int         errorCode();
         bool        keepAlive();
+        std::string getServerName();
 
-        std::string     _path;
     private:
+        std::string     _path;
         std::string     _query;
         std::string     _fragment;
         std::map<std::string, std::string> _request_headers;
@@ -106,6 +107,7 @@ class HttpRequest
         int             _method_index;
         u_int8_t        _ver_major;
         u_int8_t        _ver_minor;
+        std::string     _server_name;
 
         void        _handle_headers();
 };
