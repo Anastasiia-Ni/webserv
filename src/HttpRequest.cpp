@@ -44,8 +44,8 @@ std::map<std::string, std::string> HttpRequest::getHeaders() const
  **/
 bool    allowedCharURI(uint8_t ch)
 {
-    if ((ch >= '&' && ch <= ';') || (ch >= '?' && ch <= '[') || (ch >= 'a' && ch <= 'z') ||
-       ch == '!' || ch == '#' || ch == '$' || ch == '=' || ch == ']' || ch == '_' || ch == '~')
+    if ((ch >= '#' && ch <= ';') || (ch >= '?' && ch <= '[') || (ch >= 'a' && ch <= 'z') ||
+       ch == '!' || ch == '=' || ch == ']' || ch == '_' || ch == '~')
         return (true);
     return (false);
 }

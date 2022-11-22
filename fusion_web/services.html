@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <title>Fusion</title>
     <!-- <script>
-        if (window.history.replaceState) {  
+        if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);  //
         }
     </script> -->
@@ -34,7 +34,7 @@
     <!-- <p>Messege for checking</p> -->
     <script>
         function setAction(form, name){
-            //form.action = "../cgi-bin/script.php"; //дописать скрипт 
+            //form.action = "../cgi-bin/script.php"; //дописать скрипт
             document.cookie = "user=" + name;
         }
         const value = `${document.cookie}`;
@@ -42,13 +42,15 @@
     //    document.getElementById("parts").innerHTML = parts[parts.indexOf("user")]; // delete for checking
         document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
     </script>
-    <br> 
-    <!-- </body> -->
-    <form enctype="multipart/form-data" method="post" >
-        <p><input type="file" name="userfile" size="20" class="form-control">
+    <br>
+
+
+	<form enctype="multipart/form-data" action = "../cgi-bin/upload.py" method="post" >
+        <p>File: <input type="file" name="filename" size="30" class="form-control">
             <input type="submit" value="SEND" href="#"></p>
         </form>
     </title>
+
 
     <form method="POST" onsubmit="return setAction(this, document.getElementById('nameForm').value)">
         Name: <input id="nameForm" type="text" name="user">
@@ -74,5 +76,5 @@
 <html>
 </html>
 
-    
+
 

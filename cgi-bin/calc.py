@@ -20,6 +20,12 @@ print("Content-type: text/html\r\n\r\n")
 for param in os.environ.keys():
     print("<b>%20s</b>: %s<br>" % (param, os.environ[param]))
 
+if not oper or not arg1 or not arg3:
+	print("Parameters are not correct")
+	exit(1)
+
+if len(oper) == 3 and oper[0] == "%":
+	oper = int(oper[1:], 16)
 
 print("<h2>Oper  %s </h2>" % (oper))
 
@@ -39,7 +45,7 @@ if arg3[0] in '-+':
         exit(1)
 elif not arg3.isdigit():
         print("Parameters are not correct")
-        exit(1)  
+        exit(1)
 
 num1 = int(arg1)
 num2 = int(arg3)
