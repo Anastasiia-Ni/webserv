@@ -15,7 +15,7 @@ CgiHandler::CgiHandler(std::string path)
 	this->_cgi_path = path;
 	this->_ch_env = NULL;
 	this->_argv = NULL;
-	std::cout << "CgiHandler: " << this->_cgi_path << std::endl;
+	// std::cout << "CgiHandler: " << this->_cgi_path << std::endl;
 }
 
 CgiHandler::~CgiHandler() {
@@ -34,7 +34,7 @@ CgiHandler::~CgiHandler() {
 	}
 	this->_env.clear();
 
-   	std::cout << "CGI DIED" << std::endl; // delete
+   	// std::cout << "CGI DIED" << std::endl; // delete
 //    std::cout << "Exit status was " << WEXITSTATUS(_exit_status) << std::endl;
 
 }
@@ -132,7 +132,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 			break ;
 	}
 
-	std::cout << "extension: " << extension << std::endl; // delete
+	// std::cout << "extension: " << extension << std::endl; // delete
 
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
@@ -176,7 +176,7 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 		return ;
 	}
 	this->_cgi_pid = fork();
-	std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
+	// std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
 	
 	if (this->_cgi_pid == 0)
 	{
@@ -197,7 +197,7 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
-		std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
+		// std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
 		exit(this->_exit_status);
 	}
 	else if (this->_cgi_pid > 0)

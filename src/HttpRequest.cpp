@@ -686,9 +686,9 @@ void        HttpRequest::_handle_headers()
         _body_flag = true;
         ss << _request_headers["Content-Length"];
         ss >> _body_length;
-        if (_body_length < 0)
-            std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
-        std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
+        // if (_body_length < 0)
+            // std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
+        // std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
     }
     if ( _request_headers.count("Transfer-Encoding"))
     {
@@ -703,7 +703,7 @@ void        HttpRequest::_handle_headers()
     {
         size_t pos = _request_headers["Host"].find_first_of(':');
         _server_name = _request_headers["Host"].substr(0, pos);
-        std::cout << "Target Server Name is :" << _server_name << std::endl;
+        // std::cout << "Target Server Name is :" << _server_name << std::endl;
     }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;
 }

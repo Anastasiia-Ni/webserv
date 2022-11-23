@@ -148,7 +148,7 @@ void    ServerManager::setupSelect()
     {
         std::cerr << " LISTEN" << std::endl;
 
-        if (listen(it->getFd(), 10) == -1)
+        if (listen(it->getFd(), 512) == -1)
         {
             std::cerr << " webserv: listen error: " << strerror(errno) << std::endl;
             exit(EXIT_FAILURE);
@@ -186,7 +186,7 @@ void    ServerManager::sendResponse(int &i)
     char *resp = _clients_map[i].getResponse();
     send(i, resp, _clients_map[i].getResponseLength(), 0);
     
-    if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
+    if(1/* _clients_map[i].keepAlive() == false || _clients_map[i].requestError() */)
         closeConnection(i);
     else
     {
@@ -226,14 +226,15 @@ void    ServerManager::readRequest(int &i)
     int     bytes_read = 0;
     
     bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
-    std::ofstream  file("text.txt", std::ios_base::app);
-    file << buffer << std::endl;
+    std::cout << "FD is " << i << std::endl;
+    // std::ofstream  file("text.txt", std::ios_base::app);
+    // file << buffer << std::endl;
     if(bytes_read == 0)
         closeConnection(i);
     if(bytes_read < 0)
     {
-        std::cerr << " webserv: read error" << strerror(errno) << std::endl;
-        exit(EXIT_FAILURE);
+        std::cerr << "fd= " << i << "- webserv1: read error" << strerror(errno) << std::endl;
+        closeConnection(i);
     }
     else if(bytes_read != 0)
     {

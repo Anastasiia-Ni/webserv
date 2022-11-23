@@ -122,18 +122,18 @@ static std::string combinePaths(std::string p1, std::string p2, std::string p3)
 static void      replaceAlias(Location &location, HttpRequest &request, std::string &target_file)
 {
     target_file = combinePaths(location.getAlias(), request.getPath().substr(location.getPath().length()), "");
-    std::cout << "Target_file after replacing alias is " << target_file << std::endl;
+    // std::cout << "Target_file after replacing alias is " << target_file << std::endl;
 }
 
 static void      appendRoot(Location &location, HttpRequest &request, std::string &target_file)
 {
     target_file = combinePaths(location.getRootLocation(), request.getPath(), "");
-    std::cout << "Target_file after appending root is " << target_file << std::endl;
+    // std::cout << "Target_file after appending root is " << target_file << std::endl;
 }
 
 void        Response::handleCgi(std::string &location_key)
 {
-    std::cout << "CGI FOUND \n";
+    // std::cout << "CGI FOUND \n";
     // this->_cgi_obj.setPath();
     CgiHandler obj(this->_request.getPath()); //
     _cgi = 1;
@@ -156,15 +156,15 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
     {
         if(path.find(it->getPath()) == 0)
         {
-            std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
+            // std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
                if(path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
                {
                     if(it->getPath().length() > biggest_match)
                     {
                         biggest_match = it->getPath().length();
                         location_key = it->getPath();
-                        std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
-                         " and index is = " << it->getIndexLocation() << std::endl;
+                        // std::cerr << "Loc = " << it->getPath() << " and root = " << it->getRootLocation() <<
+                        //  " and index is = " << it->getIndexLocation() << std::endl;
                     }
                }
         }
@@ -173,7 +173,7 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
 
 int    Response::handleTarget()
 {
-    std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
+    // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
 
@@ -199,21 +199,21 @@ int    Response::handleTarget()
         }
         else
             appendRoot(target_location, _request, _target_file);
-        std::cout << "Target file before checking dir is " << _target_file << std::endl;
+        // std::cout << "Target file before checking dir is " << _target_file << std::endl;
         if (isDirectory(_target_file))
         {
             if (_target_file.back() != '/')
             {
                 _code = 301;
                 _location = _request.getPath() + "/";
-                std::cout << "LOCATINO IS = " << _location << std::endl;
+                // std::cout << "LOCATINO IS = " << _location << std::endl;
                 return (1);
             }
             if(!target_location.getIndexLocation().empty())
                 _target_file += target_location.getIndexLocation();
             else
                 _target_file += _server.getIndex();
-            std::cout << "target after adding index =  " << _target_file << std::endl;;
+            // std::cout << "target after adding index =  " << _target_file << std::endl;;
             if(!fileExists(_target_file))
             {
                 if(target_location.getAutoindex())
@@ -253,7 +253,7 @@ int    Response::handleTarget()
             {
                 _code = 301;
                 _location = _request.getPath() + "/";
-                std::cout << "LOCATINO IS = " << _location << std::endl;
+                // std::cout << "LOCATINO IS = " << _location << std::endl;
                 return (1);
             }
             _target_file += _server.getIndex();
@@ -267,7 +267,7 @@ int    Response::handleTarget()
                     return (0);
                 }
                 */
-                std::cout << "FORBIDEN !!!!!!!!!!!!!!!\n";
+                // std::cout << "FORBIDEN !!!!!!!!!!!!!!!\n";
                 _code = 403;
                 return (1);
             }
@@ -277,7 +277,7 @@ int    Response::handleTarget()
                 _location = combinePaths(_request.getPath(), _server.getIndex(), "");
                 if(_location.back() != '/')
                     _location.insert(_location.end(), '/');
-                std::cout << "Location =  " << _location << std::endl;;
+                // std::cout << "Location =  " << _location << std::endl;;
                 return (1);
             }
         }
@@ -298,7 +298,7 @@ void    Response::setServerDefaultErrorPages()
     std::string error_body = getErrorPage(_code);
     _body.insert(_body.begin(), error_body.begin(), error_body.end());
     _body_length = _body.size();
-    std::cout << "DEFAULLT STRING ERRORS \n";
+    // std::cout << "DEFAULLT STRING ERRORS \n";
 }
 
 void    Response::buildErrorBody()
@@ -310,17 +310,17 @@ void    Response::buildErrorBody()
             setServerDefaultErrorPages();
         else
         {
-            std::cout << "NON_DEFAULT STRING ERRORS \n";
+            // std::cout << "NON_DEFAULT STRING ERRORS \n";
 
             if(_code >= 400 && _code < 500)
             {
                 _location = _server.getErrorPages().at(_code);
-                std::cout << "Error Location is  " << _location << std::endl;
+                // std::cout << "Error Location is  " << _location << std::endl;
                 _code = 302;
             }
 
             _target_file = _server.getRoot() +_server.getErrorPages().at(_code);
-            std::cout << "Non Default ErrorPath is " << _target_file << std::endl;
+            // std::cout << "Non Default ErrorPath is " << _target_file << std::endl;
             short old_code = _code;
             if(readFile())
             {
