@@ -9,7 +9,7 @@ CgiHandler::CgiHandler() {
 CgiHandler::CgiHandler(std::string path)
 {
     if (path[0] && path[0] == '/') // возможно еще отрезать весь кусок после расширения
-		path.erase(0, 1);	
+		path.erase(0, 1);
 	this->_cgi_pid = -1;
 	this->_exit_status = 0;
 	this->_cgi_path = path;
@@ -106,10 +106,10 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
-    this->_env["SCRIPT_FILENAME"] = this->_cgi_path; 
+    this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
-    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]); 
-    this->_env["QUERY_STRING"] = req.getQuery();
+    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
+    this->_env["QUERY_STRING"] = decode(req.getQuery());
     this->_env["REMOTE_ADDR"] = req.getHeader("Host");
 	poz = findStart(req.getHeader("Host"), ":");
     this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
@@ -152,7 +152,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 
 	//std::cout << "extension path: " << extension << std::endl; //delete
 	this->_argv[0] = strdup(extension.c_str());
-	// this->_argv[0] = strdup("/usr/bin/python3");
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
 }
@@ -177,7 +176,7 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 	}
 	this->_cgi_pid = fork();
 	// std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
-	
+
 	if (this->_cgi_pid == 0)
 	{
 		dup2(pipe_in[0], STDIN_FILENO);
@@ -187,17 +186,14 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 		close(pipe_in[1]);
 		close(pipe_out[0]);
 		close(pipe_out[1]);
-		// std::cout<< "argv[0]:" << this->_argv[0] << std::endl; //delete
-		// std::cout<< "argv[1]:" << this->_argv[1] << std::endl; //delete
-		// std::cout<< "argv[2]:" << this->_argv[2] << std::endl; //delete
-		// std::cout<< "argv[3]:" << this->_argv[3] << std::endl; //delete
-		
+
 		// if(_req.isBody())
 		// 	write(pipe_in[1], _req.getBody(), _reg.getBodyLength());
 
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		// std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
+
 		exit(this->_exit_status);
 	}
 	else if (this->_cgi_pid > 0)
@@ -224,10 +220,20 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 	char	tmp[4001];
 	int 	res;
 
-	res = read(pipe_out, tmp, 4000); // make loop 
-	
+	res = read(pipe_out, tmp, 4000); // make loop
+	tmp[res] = '\0';
+	std::string body;
+	while (res > 0)
+	{
+		// std::string chunk;
+		write(fd, tmp, res);
+		std::cout << "CHUNK" << std::endl; // delete
+		res = read(pipe_out, tmp, 4000);
+		tmp[res] = '\0';
+	}
+
+
 	// std::string header(tmp);
-	// std::string body;
 	// size_t      pos;
 
 	// fixHeader(header);
@@ -244,7 +250,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 	// std::cout << body << std::endl;
 	//add chunk send
 
-	write(fd, tmp, res);
+	// write(fd, tmp, res);
 	close(fd);
 }
 
@@ -298,7 +304,7 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 		start = path.find(*it_ext);
 		if (start != std::string::npos)
 			break ;
-	}	
+	}
 	if (start == std::string::npos)
 		return "";
 	if (start + 3 >= path.size())
@@ -308,34 +314,40 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 		return "";
 	//tmp.erase(0, 1);
 	end = tmp.find("?");
-	return (end == std::string::npos ? tmp : tmp.substr(0, end));	
+	return (end == std::string::npos ? tmp : tmp.substr(0, end));
 }
 
-// Convert from Hex to Dec
-// unsigned int fromHexToDec(const std::string& nb)
-// {
-//     unsigned int x;
-//     std::stringstream ss;
-//     ss << nb;
-//     ss >> std::hex >> x;
-//     return (x);
-// }
 
-// decode(std::string& path)
-// {
-//     size_t token = path.find("%");
-//     while (token != std::string::npos)
-//     {
-//         //replace token with ASCII
-//         //check if there are at least 2 symbols after %
-//         if (path.length() < token + 2)
-//             break ;
-//         char decimal = fromHexToDec(path.substr(token + 1, 2));
-//         path.replace(token, 3, ft::to_string(decimal));
-//         token = path.find("%");
-//     }
-//     return (path);
-// }
+//move function in the utils
 
+template<typename T>
+std::string toString(const T &arr)
+{
+	std::ostringstream str;
+	str << arr;
+	return str.str();
+}
 
+unsigned int fromHexToDec(const std::string& nb)
+{
+	unsigned int x;
+	std::stringstream ss;
+	ss << nb;
+	ss >> std::hex >> x;
+	return (x);
+}
+
+std::string CgiHandler::decode(std::string &path)
+{
+	size_t token = path.find("%");
+	while (token != std::string::npos)
+	{
+		if (path.length() < token + 2)
+			break ;
+		char decimal = fromHexToDec(path.substr(token + 1, 2));
+		path.replace(token, 3, toString(decimal));
+		token = path.find("%");
+	}
+	return (path);
+}
 

@@ -7,7 +7,7 @@ ServerConfig::ServerConfig()
 	this->_server_name = "";
 	this->_root = "";
 	this->_client_max_body_size = 0;
-	this->_index = "index.html";
+	this->_index = "";
 	this->_listen_fd = 0;
 	this->initErrorPages();
 }
@@ -83,7 +83,7 @@ void ServerConfig::setHost(std::string parametr)
 		parametr = "127.0.0.1";
 	if (!isValidHost(parametr))
 		throw ErrorException("Wrong syntax: host");
-	this->_host = inet_addr(parametr.data()); // check with select 
+	this->_host = inet_addr(parametr.data()); // check with select
 	// if (this->_host != INADDR_NONE);
 }
 
@@ -294,6 +294,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 				throw ErrorException("Parametr in a location is invalid"); // chenge sentence
 		}
 	}
+	if (new_location.getPath() != "/cgi-bin" && new_location.getIndexLocation().empty())
+		new_location.setIndexLocation(this->_index);
 	valid = isValidLocation(new_location);
 	if (valid == 1)
 		throw ErrorException("Failed CGI validation");
@@ -372,7 +374,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		}
 		if (!location.getReturn().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getReturn()) != 1)
 			return (3);
-		if (!location.getAlias().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getAlias()) != 2)
+		if (!location.getAlias().empty() && ConfigFile::getTypePath(location.getAlias()) != 2 && ConfigFile::getTypePath(location.getRootLocation() + location.getAlias()) != 2)
 			return (4);
 		//надо ли проверять сам файл?
 	}
@@ -477,7 +479,7 @@ void	ServerConfig::setupServer(void)
 
     int option_value = 1;
     setsockopt(_listen_fd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
-    
+
     memset(&_server_address, 0, sizeof(_server_address));
 
     _server_address.sin_family = AF_INET;

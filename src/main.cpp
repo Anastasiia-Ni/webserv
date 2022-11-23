@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 			std::string		config;
 			ConfigParser	cluster;
         	ServerManager 	master;
-			
+
 
 			/* configuration file as argument or default path */
 			config = (argc == 1 ? "default.conf" : argv[1]);

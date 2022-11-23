@@ -41,6 +41,7 @@ class CgiHandler {
 		std::string	getPathInfo(std::string& path, std::vector<std::string> extensions);
 		int	countCookies(const std::string& str);
 		int findStart(const std::string path, const std::string delim);
+		std::string decode(std::string &path);
 };
 
 
