@@ -24,12 +24,15 @@ if not oper or not arg1 or not arg3:
 	print("Parameters are not correct")
 	exit(1)
 
-if len(oper) == 3 and oper[0] == "%":
-	oper = int(oper[1:], 16)
+if ord(oper) == 32:
+	oper = '+'
 
-print("<h2>Oper  %s </h2>" % (oper))
+# if len(oper) == 3 and oper[0] == "%":
+# 	oper = int(oper[1:], 16)
 
-if oper not in "+-/*^&" or not len(oper) == 1:
+# print("<h4>Oper  '%s' </h4>" % (oper))
+
+if oper not in "+-/*^r" or not len(oper) == 1:
     print("Parameters are not correct")
     exit(1)
 if arg1[0] in '-+':
@@ -59,7 +62,7 @@ elif oper == '-': result = num1 - num2
 elif oper == '/' and num2 != 0: result = round(num1 / num2, 2)
 elif oper == '*': result = round(num1 * num2, 2)
 elif oper == '^': result = round(pow(num1, num2), 2)
-elif oper == '&': result = round(pow(num1, 1 / num2), 2)
+elif oper == 'r': result = round(pow(num1, 1 / num2), 2)
 else: result = "not determined"
 
 try:
