@@ -185,8 +185,10 @@ void    ServerManager::sendResponse(int &i)
     _clients_map[i].buildResponse();
     char *resp = _clients_map[i].getResponse();
     send(i, resp, _clients_map[i].getResponseLength(), 0);
+    std::ofstream  file("text_response.txt", std::ios_base::app);
+    file << resp << std::endl;
     
-    if(1/* _clients_map[i].keepAlive() == false || _clients_map[i].requestError() */)
+    if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
         closeConnection(i);
     else
     {
@@ -227,8 +229,8 @@ void    ServerManager::readRequest(int &i)
     
     bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
     std::cout << "FD is " << i << std::endl;
-    // std::ofstream  file("text.txt", std::ios_base::app);
-    // file << buffer << std::endl;
+    std::ofstream  file("text.txt", std::ios_base::app);
+    file << buffer << std::endl;
     if(bytes_read == 0)
         closeConnection(i);
     if(bytes_read < 0)

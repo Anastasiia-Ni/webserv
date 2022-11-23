@@ -96,8 +96,9 @@ void    HttpRequest::feed(char *data, size_t size)
                     _method = DELETE;
                 else
                 {
+    
                     _error_code = 400; // Method not implemented (501)
-                    std::cout << "Method Error Request_Line" << std::endl;
+                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return;
                 }
                 _state = Request_Line_Method;

@@ -9,6 +9,7 @@ ServerConfig::ServerConfig()
 	this->_client_max_body_size = 0;
 	this->_index = "";
 	this->_listen_fd = 0;
+	this->_autoindex = false;
 	this->initErrorPages();
 }
 
@@ -28,6 +29,7 @@ ServerConfig::ServerConfig(const ServerConfig &other)
 		this->_error_pages = other._error_pages;
 		this->_locations = other._locations;
 		this->_listen_fd = other._listen_fd;
+		this->_autoindex = other._autoindex;
 		this->_server_address = other._server_address;
 
 	}
@@ -48,6 +50,7 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 		this->_error_pages = rhs._error_pages;
 		this->_locations = rhs._locations;
 		this->_listen_fd = rhs._listen_fd;
+		this->_autoindex = rhs._autoindex;
 		this->_server_address = rhs._server_address;
 	}
 	return (*this);
@@ -140,6 +143,15 @@ void ServerConfig::setIndex(std::string index)
 {
 	checkToken(index);
 	this->_index = index;
+}
+
+void ServerConfig::setAutoindex(std::string autoindex)
+{
+	checkToken(autoindex);
+	if (autoindex != "on" && autoindex != "off")
+		throw ErrorException("Wrong syntax: autoindex");
+	if (autoindex == "on")
+		this->_index = true;
 }
 
 /* checks if there is such a default error code. If there is, it overwrites the path to the file,
@@ -390,6 +402,11 @@ const std::string &ServerConfig::getServerName()
 const std::string &ServerConfig::getRoot()
 {
 	return (this->_root);
+}
+
+const bool &ServerConfig::getAutoindex()
+{
+	return (this->_autoindex);
 }
 
 const in_addr_t &ServerConfig::getHost()

@@ -16,6 +16,7 @@ class ServerConfig
 		std::string						_root;
 		unsigned long					_client_max_body_size;
 		std::string						_index;
+		bool							_autoindex;
 		std::map<short, std::string>	_error_pages;
 		std::vector<Location> 			_locations;
 
@@ -41,6 +42,7 @@ class ServerConfig
 		void setErrorPages(std::vector<std::string> &parametr);
 		void setIndex(std::string index);
 		void setLocation(std::string nameLocation, std::vector<std::string> parametr);
+		void setAutoindex(std::string autoindex);
 
 		bool isValidHost(std::string host) const;
 		bool isValidErrorPages();
@@ -54,6 +56,7 @@ class ServerConfig
 		const std::string &getRoot();
 		const std::map<short, std::string> &getErrorPages();
 		const std::string &getIndex();
+		const bool &getAutoindex();
 		const std::string &getPathErrorPage(short key);
 		const std::vector<Location>::iterator getLocationKey(std::string key);
 

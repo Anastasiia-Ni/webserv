@@ -10,7 +10,7 @@ form = cgi.FieldStorage()
 fileitem = form['filename']
 
 print("HTTP/1.1 200 OK")
-print("Content-type:text/html\r\n\r\n")		#multipart/form-data
+print("Content-type:text/html\r\n\r\n")	
 
 # Test if the file was uploaded
 if fileitem.filename:

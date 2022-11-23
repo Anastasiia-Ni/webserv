@@ -275,6 +275,12 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 				throw  ErrorException("Index is duplicated");
 			server.setIndex(parametrs[++i]);
 		}
+		else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			// if (!server.getIndex().empty())
+			// 	throw  ErrorException("Index is duplicated");
+			server.setAutoindex(parametrs[++i]);
+		}
 		else if (parametrs[i] != "}" && parametrs[i] != "{")
 		{
 			if (!flag_loc)
