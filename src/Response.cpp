@@ -322,7 +322,6 @@ int    Response::handleTarget()
                 return (1);
             }
         }
-
     }
     return (0);
 }
@@ -330,7 +329,10 @@ int    Response::handleTarget()
 bool    Response::reqError()
 {
     if(_request.errorCode())
+    {
+        _code = _request.errorCode();
         return (1);
+    }        
     return (0);
 }
 
@@ -486,7 +488,6 @@ int     Response::readFile()
     std::string temp_str = ss.str();
     _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
     _body_length = _body.size();
-    // _code = 200;
     return (0);
 }
 
