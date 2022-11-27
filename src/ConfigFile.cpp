@@ -28,9 +28,9 @@ int ConfigFile::getTypePath(std::string const path)
 }
 
 /* checks is the file exists and accessable */
-int	ConfigFile::checkFile(std::string const path)
+int	ConfigFile::checkFile(std::string const path, int mode)
 {
-	return (access(path.c_str(), 0));
+	return (access(path.c_str(), mode)); // переписать функцию и добавитьь второе значение http://www.c-cpp.ru/content/access
 }
 
 /* reading from file to string */

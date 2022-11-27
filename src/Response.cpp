@@ -132,16 +132,57 @@ static void      appendRoot(Location &location, HttpRequest &request, std::strin
     // std::cout << "Target_file after appending root is " << target_file << std::endl;
 }
 
-void        Response::handleCgi(std::string &location_key)
+/* check a file for CGI (the extension is supported, the file exists and is executable) and run the CGI */
+int        Response::handleCgi(std::string &location_key)
 {
-    // std::cout << "CGI FOUND \n";
-    // this->_cgi_obj.setPath();
-    CgiHandler obj(this->_request.getPath()); //
+    std::string path;
+    std::string exten;
+    size_t      pos;
+    
+    path = this->_request.getPath();
+    if (path[0] && path[0] == '/') // возможно еще отрезать весь кусок после расширения
+        path.erase(0, 1);
+    if (path == "cgi-bin")
+        path += "/" + _server.getLocationKey(location_key)->getIndexLocation();
+    else if (path == "cgi-bin/")
+        path.append(_server.getLocationKey(location_key)->getIndexLocation());
+    
+    std::cout << "PATH: " << path << std::endl; // delete
+    pos = path.find(".");
+    if (pos == std::string::npos)
+    {
+        std::cout << "Extension is not supported" << std::endl;
+        _code = 501; // 501 Not Implemented seems suitable error code for wrong extenisons
+        return (1);
+    }
+    exten = path.substr(pos);
+    if (exten != ".py" && exten != ".sh")
+    {
+        std::cout << "Extension " << exten << " is not supported" << std::endl;
+        _code = 501; // 501 Not Implemented seems suitable error code for wrong extenisons
+        return (1);
+    }
+    if (ConfigFile::getTypePath(path) != 1) 
+    {
+        std::cout << "CGI " << path << " is not exist" << std::endl;
+        _code = 404;
+        return (1);
+    }
+    if (ConfigFile::checkFile(path, 1) == -1 || ConfigFile::checkFile(path, 3) == -1)
+    {
+        std::cout << "CGI file is not executable or unreadable" << std::endl;
+        _code = 403;
+        return (1);
+    }
+    if (isAllowedMethod(_request.getMethod(), *_server.getLocationKey(location_key), _code))
+        return (1); // проверить еще, после 1 сайт висит
+    CgiHandler obj(path);
     _cgi = 1;
     if(pipe(_cgi_fd) < 0)
         std::cout << "Pipe() fail" << std::endl;
     obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
     obj.execute(_request, this->_cgi_fd[1]);
+    return (0);
 }
 
 /*
@@ -189,8 +230,7 @@ int    Response::handleTarget()
             return (1);
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
 		{
-        handleCgi(location_key);
-        return 0;
+            return(handleCgi(location_key)); // If CGI will handle the resoponse --> return 0, If Error found Return 1;
 		}
 
         if(!target_location.getAlias().empty())
@@ -370,11 +410,14 @@ void    Response::buildResponse()
 /* Returns the entire reponse ( Headers + Body)*/
 char  *Response::getRes(){
 
-	// if(_cgi)
-	// 	return(_cgi_obj.getResponse());
 	if(_cgi)
 	{
     	char *temp = new(std::nothrow) char[4001];
+        if(!temp)
+        {
+    		std::cerr << "new Failed" << std::endl;
+            exit(EXIT_FAILURE);
+        }
 		_cgi_response_length = read(_cgi_fd[0], temp, 4001);
         close(_cgi_fd[0]);
 		return temp;
@@ -385,13 +428,12 @@ char  *Response::getRes(){
 		if(!_res)
     	{
     		std::cerr << "new Failed" << std::endl;
-       			exit(1);
+            exit(EXIT_FAILURE);
     	}
     	memcpy(_res, _response_content.data(), _response_content.length());
     	memcpy(_res + _response_content.length(), &_body[0], _body_length);
         return _res;
 	}
-	return NULL;
 }
 
 /* Returns the length of entire reponse ( Headers + Body) */
@@ -460,18 +502,19 @@ void    Response::setRequest(HttpRequest &req)
 
 void   Response::clearResponse()
 {
-    _body_length = 0;
-	_cgi_response_length = 0;
-    _response_content.clear();
+    _target_file.clear();
     _body.clear();
+    _body_length = 0;
+    _response_content.clear();
+    _location.clear();
     _code = 0;
-    _location = "";
     if(_res)
     {
         delete [] _res;
         _res = NULL;
     }
-	_cgi = 0;
+    _cgi = 0;
+    _cgi_response_length = 0;
     _auto_index = 0;
 }
 

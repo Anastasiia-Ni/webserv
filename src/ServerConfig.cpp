@@ -65,10 +65,17 @@ void ServerConfig::initErrorPages(void)
 	_error_pages[301] = "";
 	_error_pages[302] = "";
 	_error_pages[400] = "";
+	_error_pages[401] = "";
+	_error_pages[402] = "";
 	_error_pages[403] = "";
 	_error_pages[404] = "";
 	_error_pages[405] = "";
+	_error_pages[406] = "";
 	_error_pages[500] = "";
+	_error_pages[501] = "";
+	_error_pages[502] = "";
+	_error_pages[503] = "";
+	_error_pages[505] = "";
 	_error_pages[505] = "";
 }
 
@@ -166,7 +173,7 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 	{
 		if (ConfigFile::getTypePath(this->_root + path) != 1)
 			throw ErrorException ("incorrect path for error page file: " + this->_root + path);
-		if (ConfigFile::checkFile(this->_root + path) == -1)
+		if (ConfigFile::checkFile(this->_root + path, 0) == -1 || ConfigFile::checkFile(this->_root + path, 2) == -1)
 			throw ErrorException ("error page file :" + this->_root + path + " is not accessible");
 	}
 	for (size_t i = 0; i < parametr.size() - 1; i++)
@@ -341,7 +348,7 @@ bool ServerConfig::isValidErrorPages()
 	{
 		if (it->first < 100 || it->first > 599)
 			return (false);
-		if (ConfigFile::checkFile(getRoot() + it->second) < 0)
+		if (ConfigFile::checkFile(getRoot() + it->second, 0) < 0 || ConfigFile::checkFile(getRoot() + it->second, 2) < 0)
 			return (false);
 	}
 	return (true);
@@ -358,7 +365,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
 			return (1);
 		std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
-		if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path) < 0)
+		if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path, 2) < 0)
 			return 1;
 		std::vector<std::string>::const_iterator it;
 		for (it = location.getCgiPath().begin(); it != location.getCgiPath().end(); ++it)

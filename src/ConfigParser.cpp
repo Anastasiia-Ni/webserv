@@ -64,7 +64,7 @@ int ConfigParser::createCluster(const std::string &config_file)
 
 	if (file.getTypePath(file.getPath()) != 1)
 		throw ErrorException("File is invalid");
-	if (file.checkFile(file.getPath()) == -1)
+	if (file.checkFile(file.getPath(), 2) == -1)
 		throw ErrorException("File is not accessible");
 	content = file.readFile(config_file);
 	if (content.empty())
