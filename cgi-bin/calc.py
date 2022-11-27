@@ -13,7 +13,7 @@ arg3 = form.getvalue('s_num')
 
 print(os.environ["QUERY_STRING"], file=sys.stderr)
 print("HTTP/1.1 200 OK")
-print("Content-type: text/html\r\n\r\n")
+print("Content-type: text/html\r\n")
 # print("<font size=+10>op</font><br>")
 
 

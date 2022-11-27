@@ -1,5 +1,46 @@
 #include "../inc/CgiHandler.hpp"
 
+//move function in the utils
+
+template<typename T>
+std::string toString(const T &arr)
+{
+	std::ostringstream str;
+	str << arr;
+	return str.str();
+}
+
+unsigned int fromHexToDec(const std::string& nb)
+{
+	unsigned int x;
+	std::stringstream ss;
+	ss << nb;
+	ss >> std::hex >> x;
+	return (x);
+}
+
+std::string    fromDecToHex(int num)
+{
+    std::stringstream sstream;
+    sstream << std::hex << num;
+    std::string res = sstream.str();
+    return res;
+}
+
+std::string CgiHandler::decode(std::string &path)
+{
+	size_t token = path.find("%");
+	while (token != std::string::npos)
+	{
+		if (path.length() < token + 2)
+			break ;
+		char decimal = fromHexToDec(path.substr(token + 1, 2));
+		path.replace(token, 3, toString(decimal));
+		token = path.find("%");
+	}
+	return (path);
+}
+
 /* Constructor */
 
 CgiHandler::CgiHandler() {
@@ -8,8 +49,6 @@ CgiHandler::CgiHandler() {
 
 CgiHandler::CgiHandler(std::string path)
 {
-    if (path[0] && path[0] == '/') // возможно еще отрезать весь кусок после расширения
-		path.erase(0, 1);
 	this->_cgi_pid = -1;
 	this->_exit_status = 0;
 	this->_cgi_path = path;
@@ -95,11 +134,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 {
 	int poz;
 
-	if (this->_cgi_path == "cgi-bin") // 	проверить после вставки правильного пути из респонса
-		this->_cgi_path += "/" + it_loc->getIndexLocation();
-	else if (this->_cgi_path == "cgi-bin/")
-		this->_cgi_path += it_loc->getIndexLocation();
-
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
 	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
@@ -142,8 +176,8 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	for (int i = 0; this->_ch_env[i]; i++)	//delete
-		std::cout << this->_ch_env[i] << std::endl;
+	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
+	// 	std::cout << this->_ch_env[i] << std::endl;
 
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
 	// this->_argv[0] = strdup(this->_cgi_path.c_str());
@@ -217,40 +251,59 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 
 void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 {
-	char	tmp[4001];
+	char	tmp[401];
 	int 	res;
+	size_t	pos;
 
-	res = read(pipe_out, tmp, 4000); // make loop
+	res = read(pipe_out, tmp, 400); // make loop
 	tmp[res] = '\0';
+	std::string header(tmp);
 	std::string body;
+
+	fixHeader(header);
+	pos = header.find("\r\n\r\n");
+    if (pos != std::string::npos){
+        body = header.substr(pos + 4);
+        header.erase(pos + 4);
+    }
+
+
+	write(fd, header.c_str(), header.size());
+
+	std::cout << "-----------------HEADER-----------------\n"; //delete
+	std::cout << header << std::endl;
+	std::cout << "------------------BODY------------------\n";
+	// std::cout << body << std::endl;
+	size_t num_ch = 0; //delete
+	
+
 	while (res > 0)
 	{
-		// std::string chunk;
-		write(fd, tmp, res);
-		std::cout << "CHUNK" << std::endl; // delete
-		res = read(pipe_out, tmp, 4000);
-		tmp[res] = '\0';
-	}
+		
+		// res = read(pipe_out, tmp, 4000);
+		// tmp[res] = '\0';
+		// body.append(tmp);
+		
+		std::string chunk;
+        chunk = toString(fromDecToHex(body.length()));
+        chunk += "\r\n";
+        chunk += body;
+        chunk += "\r\n";
+        // std::cout << chunk << std::endl;
+		num_ch++; // delete
+        write(fd, chunk.c_str(), chunk.length());
+		// std::cout << "CHUNK" << std::endl; // delete
+        if (res <= 0)
+            break;
+        res = read(pipe_out, tmp, 400);
+        tmp[res] = '\0';
+        body = toString(tmp);
+	} 
 
+	std::cout << "Number of chunks = " << num_ch << std::endl;
 
-	// std::string header(tmp);
-	// size_t      pos;
-
-	// fixHeader(header);
-	// pos = header.find("\r\n\r\n");
-	// if (pos != std::string::npos)
-	// {
-	// 	body = header.substr(pos + 4);
-	// 	header.erase(pos + 4);
-	// }
-	// send(fd, header.c_str(), header.size(), 0);
-	// std::cout << "-----------------HEADER-----------------\n"; //delete
-	// std::cout << header << std::endl;
-	// std::cout << "------------------BODY------------------\n";
-	// std::cout << body << std::endl;
-	//add chunk send
-
-	// write(fd, tmp, res);
+	write(fd, tmp, res);
+	write(fd, "0\r\n\r\n", 5);
 	close(fd);
 }
 
@@ -262,16 +315,22 @@ void CgiHandler::fixHeader(std::string &header)
 	if (header.find("HTTP/1.1") == std::string::npos)
 		header.insert(0, "HTTP/1.1 200 OK\r\n");
 	if (header.find("Content-type:") == std::string::npos)
-        tmp += "Content-type: text/html\r\n";
+        tmp.append("Content-type: text/html\r\n");
+	if (header.find("Transfer-Encoding:") == std::string::npos)
+		tmp.append("Transfer-Encoding: chunked\r\n");
+    if (header.find("Connection:") == std::string::npos)
+        tmp.append("Connection: keep-alive\r\n");
 	if (_env.count("HTTP_COOKIE") && header.find("Set-cookie") == std::string::npos)
-		tmp += setCookie(_env["HTTP_COOKIE"]);
+		tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
 	if ((pos = header.find("\r\n\r\n")) == std::string::npos)
     {
-        tmp += "\r\n\r\n";
+        tmp.append("\r\n\r\n");
         pos = header.find("\r\n") + 2;
     }
 	else
 		tmp.insert(0, "\r\n");
+
+	std::cout << "TMP: " << tmp << std::cout; // delete
 	header.insert(pos, tmp);
 }
 
@@ -316,38 +375,3 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 	end = tmp.find("?");
 	return (end == std::string::npos ? tmp : tmp.substr(0, end));
 }
-
-
-//move function in the utils
-
-template<typename T>
-std::string toString(const T &arr)
-{
-	std::ostringstream str;
-	str << arr;
-	return str.str();
-}
-
-unsigned int fromHexToDec(const std::string& nb)
-{
-	unsigned int x;
-	std::stringstream ss;
-	ss << nb;
-	ss >> std::hex >> x;
-	return (x);
-}
-
-std::string CgiHandler::decode(std::string &path)
-{
-	size_t token = path.find("%");
-	while (token != std::string::npos)
-	{
-		if (path.length() < token + 2)
-			break ;
-		char decimal = fromHexToDec(path.substr(token + 1, 2));
-		path.replace(token, 3, toString(decimal));
-		token = path.find("%");
-	}
-	return (path);
-}
-

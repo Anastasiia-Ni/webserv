@@ -1,12 +1,12 @@
 #!/bin/bash
 
+printf "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\n\r\n"
 
-echo 'HTTP/1.1 200 OK'
-echo 'Content-Type: text/html'
 echo ''
-echo '<h2>Calendar</h2>'
-echo '<pre>'
-cal
+echo 'Calendar:'
 echo ''
+# # cal
+echo ''
+
+echo 'Date: '
 date
-echo '</pre>'

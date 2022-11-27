@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo 'HTTP/1.1 200 OK'
-echo 'Content-Type: text/plain'
-echo ''
+printf "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\n\r\n"
 
-cat /home/vscode/src/Cursus/main_branch/cgi-bin/a1.png
+# echo 'работай плиз: image/jpeg'
+# echo ''
+cat /Users/anastasiianifantova/Desktop/ft-server/awebsite/img/apple.jpeg
