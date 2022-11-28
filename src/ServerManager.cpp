@@ -191,11 +191,14 @@ void    ServerManager::sendResponse(int &i)
     {
         long index = 0;
         long bytes_sent;
+        long buffer;
         while(resp_len > 0)
         {
-            long buffer = resp_len > 4096 ? 4096 : resp_len;
-            bytes_sent = send(i, &resp[index],buffer , 0);
-
+            // std::cout << "send -> resp_len = " << resp_len << "|bytes sent =  " << bytes_sent << std::endl;
+            buffer = resp_len > 4096 ? 4096 : resp_len;
+            bytes_sent = send(i, &resp[index],buffer , MSG_NOSIGNAL);
+            if(bytes_sent == -1)
+                break;
             resp_len -= bytes_sent;
             index += bytes_sent;
         }

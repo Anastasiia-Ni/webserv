@@ -330,7 +330,7 @@ void CgiHandler::fixHeader(std::string &header)
 	else
 		tmp.insert(0, "\r\n");
 
-	std::cout << "TMP: " << tmp << std::cout; // delete
+	std::cout << "TMP: " << tmp << std::endl; // delete
 	header.insert(pos, tmp);
 }
 
