@@ -3,6 +3,9 @@
 
 #include "Webserv.hpp"
 
+#define MAX_URI_LENGTH 4096
+#define MAX_CONTENT_LENGTH 30000000
+
 enum HttpMethod
 {
     GET,
@@ -16,9 +19,6 @@ enum ParsingState
     Request_Line,
     Request_Line_Method,
     Request_Line_First_Space,
-    Request_Line_Path_First_Char,
-    Request_Line_Before_URI,
-    Request_Line_URI,
     Request_Line_URI_Path_Slash,
     Request_Line_URI_Path,
     Request_Line_URI_Query,

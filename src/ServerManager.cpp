@@ -48,16 +48,17 @@ void    ServerManager::runServers()
     setupSelect();
 
     struct timeval      timer;
-    timer.tv_sec = 0;
-    timer.tv_usec = 0;
     while(true)
     {
+        timer.tv_sec = 1;
+        timer.tv_usec = 0;
         recv_set_cpy = _recv_fd_pool;
         write_set_cpy = _write_fd_pool;
-        if( select(FD_SETSIZE, &recv_set_cpy, &write_set_cpy, NULL, &timer) < 0 )
+        std::cout << "Biggest FD is " << _biggest_fd << std::endl;
+        if( select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer) < 0 )
         {
             std::cerr << " webserv: select error " << strerror(errno) << std::endl;
-            exit(EXIT_FAILURE);
+            continue;
         }
         if(_clients_map.empty())
             _biggest_fd = _servers.back().getFd();
@@ -116,7 +117,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
      (socklen_t*)&client_address_size)) == -1)
     {
         std::cerr << " webserv: accept error " << strerror(errno) <<std::endl;
-        exit(EXIT_FAILURE);
+        return ;
     }
 
     //Assgin Client to Server here
@@ -147,7 +148,7 @@ void    ServerManager::setupSelect()
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
         std::cerr << " LISTEN" << std::endl;
-
+        //Now it calles listen() twice on even if two servers have the same host:port
         if (listen(it->getFd(), 512) == -1)
         {
             std::cerr << " webserv: listen error: " << strerror(errno) << std::endl;
@@ -155,7 +156,7 @@ void    ServerManager::setupSelect()
         }
         if(fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
         {
-            std::cerr << " webserv: fcntl error" << strerror(errno) <<std::endl;
+            std::cerr << " webserv: fcntl error: " << strerror(errno) <<std::endl;
             exit(EXIT_FAILURE);
         }
         FD_SET(it->getFd(), &_recv_fd_pool);
@@ -185,22 +186,27 @@ void    ServerManager::sendResponse(int &i)
     _clients_map[i].buildResponse();
     char *resp = _clients_map[i].getResponse();
     long  resp_len = _clients_map[i].getResponseLength();
-    if(resp_len < 4096)
-        send(i, resp, resp_len, 0);
+    if(!resp)
+        send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
     else
     {
-        long index = 0;
-        long bytes_sent;
-        long buffer;
-        while(resp_len > 0)
+        if(resp_len < 4096)
+            send(i, resp, resp_len, 0);
+        else
         {
-            // std::cout << "send -> resp_len = " << resp_len << "|bytes sent =  " << bytes_sent << std::endl;
-            buffer = resp_len > 4096 ? 4096 : resp_len;
-            bytes_sent = send(i, &resp[index],buffer , MSG_NOSIGNAL);
-            if(bytes_sent == -1)
-                break;
-            resp_len -= bytes_sent;
-            index += bytes_sent;
+            long index = 0;
+            long bytes_sent;
+            long buffer;
+            while(resp_len > 0)
+            {
+                // std::cout << "send -> resp_len = " << resp_len << "|bytes sent =  " << bytes_sent << std::endl;
+                buffer = resp_len > 4096 ? 4096 : resp_len;
+                bytes_sent = send(i, &resp[index],buffer , MSG_NOSIGNAL);
+                if(bytes_sent == -1)
+                    break;
+                resp_len -= bytes_sent;
+                index += bytes_sent;
+            }
         }
     }
     // std::ofstream  file("text_response.txt", std::ios_base::app);

@@ -8,7 +8,7 @@ HEADERS	= inc/Webserv.hpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-CXX = c++
+CXX = clang++ # Change to c++ before submit
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 CXXFLAGS = -g3 

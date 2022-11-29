@@ -5,6 +5,17 @@
 #include "Client.hpp"
 #include "Response.hpp"
 
+
+static char internal_server_error[] =
+"HTTP/1.1 500 Internal Server Error\r\n"
+"Content-Length = 124\r\n"
+"Content-Type = text/plain\r\n\r\n"
+"<html>\r\n"
+"<head><title>500 Internal Server Error</title></head>\r\n"
+"<body>\r\n"
+"<center><h1>500 Internal Server Error</h1></center>\r\n"
+;
+
 /**
  * ServerManager
  * * operates the webserver and is responsible for

@@ -97,7 +97,7 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
     
-                    _error_code = 400; // Method not implemented (501)
+                    _error_code = 501; // Method not implemented (501)
                     std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return;
                 }
@@ -107,9 +107,7 @@ void    HttpRequest::feed(char *data, size_t size)
             case Request_Line_Method:
             {
                 if(character == _method_str[_method][_method_index])
-                {
                     _method_index++;
-                }
                 else
                 {
                     _error_code = 501; // Method not implemented
@@ -118,9 +116,7 @@ void    HttpRequest::feed(char *data, size_t size)
                 }
 
                 if(_method_index == _method_str[_method].length())
-                {
                     _state = Request_Line_First_Space;
-                }
                 break;
             }
             case Request_Line_First_Space:
@@ -160,7 +156,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 }
                 else if (character == '?')
                 {
-                    std::cout << "Queryfound\n";
                     _state = Request_Line_URI_Query;
                     _path.append(_storage);
                     _storage.clear();
@@ -177,6 +172,12 @@ void    HttpRequest::feed(char *data, size_t size)
                 {
                     _error_code = 400;
                     std::cout << "Bad Character (Request_Line_URI_Path)" << std::endl;
+                    return;
+                }
+                else if ( i > MAX_URI_LENGTH)
+                {
+                    _error_code = 414;
+                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
                     return;
                 }
                 break;
@@ -203,6 +204,12 @@ void    HttpRequest::feed(char *data, size_t size)
                     std::cout << "Bad Character (Request_Line_URI_Query)" << std::endl;
                     return;
                 }
+                else if ( i > MAX_URI_LENGTH)
+                {
+                    _error_code = 414;
+                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
+                    return;
+                }
                 break;
             }
             case Request_Line_URI_Fragment:
@@ -218,6 +225,12 @@ void    HttpRequest::feed(char *data, size_t size)
                 {
                     _error_code = 400;
                     std::cout << "Bad Character (Request_Line_URI_Fragment)" << std::endl;
+                    return;
+                }
+                else if ( i > MAX_URI_LENGTH)
+                {
+                    _error_code = 414;
+                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
                     return;
                 }
                 break;

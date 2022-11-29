@@ -349,7 +349,7 @@ void    Response::buildErrorBody()
         // if(_code == 301)
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
-        if(_server.getErrorPages().at(_code).empty())
+        if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty())
             setServerDefaultErrorPages();
         else
         {
@@ -409,7 +409,7 @@ void    Response::buildResponse()
     setHeaders();
 }
 
-/* Returns the entire reponse ( Headers + Body)*/
+/* Returns the entire reponse ( Headers + Body )*/
 char  *Response::getRes(){
 
 	if(_cgi)
@@ -418,7 +418,7 @@ char  *Response::getRes(){
         if(!temp)
         {
     		std::cerr << "new Failed" << std::endl;
-            exit(EXIT_FAILURE);
+            return (NULL);
         }
 		_cgi_response_length = read(_cgi_fd[0], temp, 4001);
         close(_cgi_fd[0]);
@@ -430,7 +430,7 @@ char  *Response::getRes(){
 		if(!_res)
     	{
     		std::cerr << "new Failed" << std::endl;
-            exit(EXIT_FAILURE);
+            return NULL;
     	}
     	memcpy(_res, _response_content.data(), _response_content.length());
     	memcpy(_res + _response_content.length(), &_body[0], _body_length);
@@ -450,7 +450,7 @@ size_t Response::getLen() const {
 /* Constructs Status line based on status code. */
 void        Response::setStatusLine()
 {
-    _response_content.append("HTTP/1.1 " + std::to_string(_code));
+    _response_content.append("HTTP/1.1 " + std::to_string(_code) + " ");
     _response_content.append(statusCodeString(_code));
     _response_content.append("\r\n");
 
@@ -485,6 +485,8 @@ int     Response::readFile()
         _code = 404;
         return (1);
     }
+    std::cout << "FILE READ Succeed, PATH is: " + _target_file << std::endl;
+
     std::string temp_str = ss.str();
     _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
     _body_length = _body.size();
