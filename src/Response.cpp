@@ -179,7 +179,11 @@ int        Response::handleCgi(std::string &location_key)
     CgiHandler obj(path);
     _cgi = 1;
     if(pipe(_cgi_fd) < 0)
+    {
         std::cout << "Pipe() fail" << std::endl;
+        _code = 500;
+        return (1);
+    }
     obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
     obj.execute(_request, this->_cgi_fd[1]);
     return (0);
@@ -375,7 +379,26 @@ void    Response::buildErrorBody()
         }
 
 }
-
+int    Response::constructCgiResp()
+{
+    char buf[4096];
+    int  recvd = 0;
+    while(( recvd = read(_cgi_fd[0], buf, 4096)) > 0)
+    {
+        _response_content.append(buf, recvd);
+        memset(buf, 0, sizeof(buf));
+    }
+    close(_cgi_fd[0]);
+    // if(recvd == 0)
+    //     return 0;
+    if(recvd < 0)
+    {
+        _code = 500;
+        return 1;
+    }
+    return (0);
+        
+}
 void    Response::buildResponse()
 {
 /*  if(checkReqError() || buildBody())
@@ -394,8 +417,12 @@ void    Response::buildResponse()
         buildErrorBody();
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
 	if(_cgi)
-		return;
-    if(_auto_index)
+	{
+        if(!constructCgiResp())
+            return;
+        buildErrorBody();
+    }
+    else if(_auto_index)
     {
         if(buildHtmlIndex(_target_file, _body, _body_length))
         {

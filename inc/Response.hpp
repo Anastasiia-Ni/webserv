@@ -65,6 +65,8 @@ class Response
         void    buildErrorBody();
         bool    reqError();
         int     handleCgi(std::string &);
+        int    constructCgiResp();
+
 
 };
 
