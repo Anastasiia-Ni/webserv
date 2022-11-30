@@ -141,7 +141,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
     this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
-    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
+    this->_env["PATH_INFO"] = "/cgi-bin/tmp"; //getPathInfo(req.getPath(), it_loc->getCgiExtension());
     this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
     this->_env["QUERY_STRING"] = decode(req.getQuery());
     this->_env["REMOTE_ADDR"] = req.getHeader("Host");
@@ -275,15 +275,17 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
 	std::cout << "------------------BODY------------------\n";
 	// std::cout << body << std::endl;
 	size_t num_ch = 0; //delete
-	
+
+	std::cout << "PATH INFO   " << this->_env["PATH_INFO"] << std::endl;
+    std::cout << "PATH TTANSLATED   " <<this->_env["PATH_TRANSLATED"] << std::endl;
 
 	while (res > 0)
 	{
-		
+
 		// res = read(pipe_out, tmp, 4000);
 		// tmp[res] = '\0';
 		// body.append(tmp);
-		
+
 		std::string chunk;
         chunk = toString(fromDecToHex(body.length()));
         chunk += "\r\n";
@@ -298,7 +300,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
         res = read(pipe_out, tmp, 400);
         tmp[res] = '\0';
         body = toString(tmp);
-	} 
+	}
 
 	std::cout << "Number of chunks = " << num_ch << std::endl;
 
@@ -330,7 +332,7 @@ void CgiHandler::fixHeader(std::string &header)
 	else
 		tmp.insert(0, "\r\n");
 
-	std::cout << "TMP: " << tmp << std::endl; // delete
+	std::cout << "TMP: " << tmp << std::cout; // delete
 	header.insert(pos, tmp);
 }
 
