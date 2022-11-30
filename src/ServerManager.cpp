@@ -210,8 +210,7 @@ void    ServerManager::sendResponse(int &i)
         {
             FD_CLR(i, &_write_fd_pool);
             FD_SET(i, &_recv_fd_pool);
-            _clients_map[i].clearRequest();
-            _clients_map[i].clearResponse();
+            _clients_map[i].clearClient();
         }
     }
     else
