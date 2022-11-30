@@ -82,8 +82,8 @@ static bool    isDirectory(std::string path)
 static bool    isAllowedMethod(HttpMethod &method, Location &location, short &code)
 {
     std::vector<short> methods = location.getMethods();
-    if(method == GET && !methods[0] || method == POST && !methods[1] ||
-       method == DELETE && !methods[3])
+    if((method == GET && !methods[0]) || (method == POST && !methods[1]) ||
+       (method == DELETE && !methods[3]))
     {
         code = 405;
         return (1);

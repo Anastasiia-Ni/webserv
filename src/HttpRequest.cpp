@@ -4,9 +4,9 @@
 
 HttpRequest::HttpRequest()
 {
-    _method_str[HttpMethod::GET] = "GET";
-    _method_str[HttpMethod::POST] = "POST";
-    _method_str[HttpMethod::DELETE] = "DELETE";
+    _method_str[::GET] = "GET";
+    _method_str[::POST] = "POST";
+    _method_str[::DELETE] = "DELETE";
     _path = "";
     _query = "";
     _fragment = "";
