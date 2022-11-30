@@ -108,7 +108,6 @@ class HttpRequest
         u_int8_t        _ver_major;
         u_int8_t        _ver_minor;
         std::string     _server_name;
-
         void        _handle_headers();
 };
 

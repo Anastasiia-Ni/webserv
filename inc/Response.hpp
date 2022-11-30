@@ -19,8 +19,8 @@ class Response
         ~Response();
 
 
-        char  *getRes();
-        size_t getLen() const;
+        std::string     getRes();
+        size_t      getLen() const;
         int         getCode() const;
 
         void        setRequest(HttpRequest &);
@@ -29,7 +29,7 @@ class Response
         void        buildResponse();
         void        clearResponse();
         void        handleCgi(HttpRequest&);
-
+        void        cutRes(size_t);
 
 
 
@@ -40,6 +40,7 @@ class Response
         std::vector<uint8_t> _body;
         size_t          _body_length;
         std::string     _response_content;
+        std::string     _response_body;
         std::string     _location;
         short           _code;
         char            *_res;

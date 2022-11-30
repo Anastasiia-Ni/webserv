@@ -7,8 +7,8 @@ Response::Response(): _cgi_response_length(0), _code(0), _res(NULL), _target_fil
 
 Response::~Response()
 {
-    if(_res)
-        delete [] _res;
+    // if(_res)
+    //     delete [] _res;
 }
 
 Response::Response(HttpRequest &req): _cgi_response_length(0), _request(req), _code(0), _res(NULL)
@@ -29,7 +29,7 @@ void   Response::contentType()
 void   Response::contentLength()
 {
     std::stringstream ss;
-    ss << _body_length;
+    ss << _response_body.length();
     _response_content.append("Content-Length: ");
     _response_content.append(ss.str());
     _response_content.append("\r\n");
@@ -338,9 +338,9 @@ bool    Response::reqError()
 
 void    Response::setServerDefaultErrorPages()
 {
-    std::string error_body = getErrorPage(_code);
-    _body.insert(_body.begin(), error_body.begin(), error_body.end());
-    _body_length = _body.size();
+    _response_body = getErrorPage(_code);
+    // _body.insert(_body.begin(), error_body.begin(), error_body.end());
+    // _body_length = _body.size();
     // std::cout << "DEFAULLT STRING ERRORS \n";
 }
 
@@ -368,9 +368,9 @@ void    Response::buildErrorBody()
             if(readFile())
             {
                 _code = old_code;
-                std::string error_body = getErrorPage(_code);
-                _body.insert(_body.begin(), error_body.begin(), error_body.end());
-                _body_length = _body.size();
+                _response_body = getErrorPage(_code);
+                // _body.insert(_body.begin(), error_body.begin(), error_body.end());
+                // _body_length = _body.size();
             }
         }
 
@@ -407,35 +407,28 @@ void    Response::buildResponse()
     }
     setStatusLine();
     setHeaders();
+    _response_content.append(_response_body);
 }
 
 /* Returns the entire reponse ( Headers + Body )*/
-char  *Response::getRes(){
+std::string     Response::getRes(){
 
-	if(_cgi)
-	{
-    	char *temp = new(std::nothrow) char[4001];
-        if(!temp)
-        {
-    		std::cerr << "new Failed" << std::endl;
-            return (NULL);
-        }
-		_cgi_response_length = read(_cgi_fd[0], temp, 4001);
-        close(_cgi_fd[0]);
-		return temp;
-	}
-    else
-	{
-    	_res = new(std::nothrow) char[_response_content.length() + _body_length];
-		if(!_res)
-    	{
-    		std::cerr << "new Failed" << std::endl;
-            return NULL;
-    	}
-    	memcpy(_res, _response_content.data(), _response_content.length());
-    	memcpy(_res + _response_content.length(), &_body[0], _body_length);
-        return _res;
-	}
+	// if(_cgi)
+	// {
+    // 	char *temp = new(std::nothrow) char[4001];
+    //     if(!temp)
+    //     {
+    // 		std::cerr << "new Failed" << std::endl;
+    //         return (NULL);
+    //     }
+	// 	_cgi_response_length = read(_cgi_fd[0], temp, 4001);
+    //     close(_cgi_fd[0]);
+	// 	return temp;
+	// }
+    // else
+	// {
+        return (_response_content);
+	// }
 }
 
 /* Returns the length of entire reponse ( Headers + Body) */
@@ -474,22 +467,23 @@ int     Response::readFile()
 
     if (file.fail())
     {
-        std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
+        // std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
     std::ostringstream ss;
 	if(!(ss << file.rdbuf()))
     {
-        std::cout << "FILE READ FAILED2, PATH is: " + _target_file << std::endl;
+        // std::cout << "FILE READ FAILED2, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
-    std::cout << "FILE READ Succeed, PATH is: " + _target_file << std::endl;
+    // std::cout << "FILE READ Succeed, PATH is: " + _target_file << std::endl;
 
-    std::string temp_str = ss.str();
-    _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
-    _body_length = _body.size();
+    _response_body = ss.str();
+    // _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
+    // _body_length = _body.size();
+
     return (0);
 }
 
@@ -502,20 +496,24 @@ void    Response::setRequest(HttpRequest &req)
 {
     _request = req;
 }
-
+void        Response::cutRes(size_t i)
+{
+    _response_content = _response_content.substr(i);
+}
 void   Response::clearResponse()
 {
     _target_file.clear();
     _body.clear();
     _body_length = 0;
     _response_content.clear();
+    _response_body.clear();
     _location.clear();
     _code = 0;
-    if(_res)
-    {
-        delete [] _res;
-        _res = NULL;
-    }
+    // if(_res)
+    // {
+    //     delete [] _res;
+    //     _res = NULL;
+    // }
     _cgi = 0;
     _cgi_response_length = 0;
     _auto_index = 0;

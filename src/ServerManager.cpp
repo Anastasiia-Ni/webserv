@@ -54,7 +54,7 @@ void    ServerManager::runServers()
         timer.tv_usec = 0;
         recv_set_cpy = _recv_fd_pool;
         write_set_cpy = _write_fd_pool;
-        std::cout << "Biggest FD is " << _biggest_fd << std::endl;
+        // std::cout << "Biggest FD is " << _biggest_fd << std::endl;
         if( select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer) < 0 )
         {
             std::cerr << " webserv: select error " << strerror(errno) << std::endl;
@@ -69,12 +69,7 @@ void    ServerManager::runServers()
         {
             // std::cerr << "BIGGEST FD  = " << _biggest_fd << std::endl;
                 // std::cerr << "i write = " << i << std::endl;
-            if(FD_ISSET(i, &write_set_cpy))
-            {
-                // std::cerr << "i write = " << i << std::endl;
-                sendResponse(i);
-            }
-            else if(FD_ISSET(i, &recv_set_cpy))
+            if(FD_ISSET(i, &recv_set_cpy))
             {
                 // std::cerr << "i read = " << i << std::endl;
 
@@ -82,6 +77,11 @@ void    ServerManager::runServers()
                     acceptNewConnection(_servers_map.find(i)->second);
                 else
                     readRequest(i);
+            }
+            else if(FD_ISSET(i, &write_set_cpy))
+            {
+                // std::cerr << "i write = " << i << std::endl;
+                sendResponse(i);
             }
         }
         checkTimeout();
@@ -183,44 +183,49 @@ void    ServerManager::closeConnection(int i)
  */
 void    ServerManager::sendResponse(int &i)
 {
-    _clients_map[i].buildResponse();
-    char *resp = _clients_map[i].getResponse();
-    long  resp_len = _clients_map[i].getResponseLength();
-    if(!resp)
-        send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
+    int bytes_sent;
+    std::string response = _clients_map[i].getResponse();
+    // std::cout << "RESPONSE IS = |" << response << std::endl;
+    // if(!resp)
+    //     send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
+    if(response.length() >= 8192)
+        bytes_sent = write(i, response.c_str(), 8192);
     else
+        bytes_sent = write(i, response.c_str(), response.length());
+    
+    if(bytes_sent < 0)
     {
-        if(resp_len < 4096)
-            send(i, resp, resp_len, 0);
+        // std::cout << "ERROR SENDING () :" << strerror(errno) << std::endl;
+        closeConnection(i);
+    }
+    else if(bytes_sent == 0 || bytes_sent == response.length())
+    {
+        // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
+        if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
+        {
+            std::cout << "Connection Closed !" << std::endl;
+            closeConnection(i);
+        }
         else
         {
-            long index = 0;
-            long bytes_sent;
-            long buffer;
-            while(resp_len > 0)
-            {
-                // std::cout << "send -> resp_len = " << resp_len << "|bytes sent =  " << bytes_sent << std::endl;
-                buffer = resp_len > 4096 ? 4096 : resp_len;
-                bytes_sent = send(i, &resp[index],buffer , MSG_NOSIGNAL);
-                if(bytes_sent == -1)
-                    break;
-                resp_len -= bytes_sent;
-                index += bytes_sent;
-            }
+            FD_CLR(i, &_write_fd_pool);
+            FD_SET(i, &_recv_fd_pool);
+            _clients_map[i].clearRequest();
+            _clients_map[i].clearResponse();
         }
     }
+    else
+    {
+        // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
+        // std::cout << "Bytes sent are : " << bytes_sent << std::endl;
+        _clients_map[i].updateTime();
+        _clients_map[i]._response.cutRes(bytes_sent);
+    }
+        
     // std::ofstream  file("text_response.txt", std::ios_base::app);
     // file << resp << std::endl;
     
-    if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
-        closeConnection(i);
-    else
-    {
-        FD_CLR(i, &_write_fd_pool);
-        FD_SET(i, &_recv_fd_pool);
-        _clients_map[i].clearRequest();
-        _clients_map[i].clearResponse();
-    }
+
 }
 
 void    ServerManager::assignServer(int &i)
@@ -277,6 +282,7 @@ void    ServerManager::readRequest(int &i)
     if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
     {
         assignServer(i);
+        _clients_map[i].buildResponse();
         FD_CLR(i, &_recv_fd_pool);
         FD_SET(i, &_write_fd_pool); // move socket i from recive fd_set to write fd_set so response can be sent on next iteration
     }

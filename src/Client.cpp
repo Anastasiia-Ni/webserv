@@ -1,6 +1,14 @@
 # include "../inc/Client.hpp"
 
-Client::Client() : _total_bytes_read(0) {}
+Client::Client()
+{
+    _last_msg_time = time(NULL);
+    _total_bytes_read = 0;
+    bytes_to_send = 0;
+    total_bytes_sent = 0;
+    _total_bytes_read = 0;
+}
+
 
 Client::~Client() {}
 
@@ -37,11 +45,15 @@ Client &Client::operator=(const Client & rhs)
 	return (*this);
 }
 
-Client::Client(ServerConfig &server): _total_bytes_read(0)
+Client::Client(ServerConfig &server)
 {
     setServer(server);
     _request.setMaxBodySize(_server.getClientMaxBodySize());
     _last_msg_time = time(NULL);
+    _total_bytes_read = 0;
+    bytes_to_send = 0;
+    total_bytes_sent = 0;
+    _total_bytes_read = 0;
 }
 
 void    Client::setSocket(int &sock)
@@ -136,7 +148,7 @@ void        Client::buildResponse()
     _response.buildResponse();
 }
 
-char     *Client::getResponse()
+std::string     Client::getResponse()
 {
     return (_response.getRes());
 }
@@ -166,3 +178,28 @@ void             Client::updateTime()
 {
     _last_msg_time = time(NULL);
 }
+
+void             Client::clearClient()
+{
+    _response.clearResponse();
+    _request.clear();
+    _total_bytes_read = 0;
+    bytes_to_send = 0;
+    total_bytes_sent = 0;
+}
+// size_t             Client::getPacketSize()
+// {
+//     if ( total_bytes_sent < _response.getLen())
+//     {
+//         if (_response.getLen() - total_bytes_sent > 8192)
+//         {
+//             total_bytes_sent += 8192;
+//             return (8192);
+//         }
+//         else
+//         {
+         
+//             return (_response.getLen() - total_bytes_sent > 8192);
+//         }
+//     }
+// }

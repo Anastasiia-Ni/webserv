@@ -39,20 +39,24 @@ class Client
         void                buildResponse();
         void                printReq();
         void                updateTime();
+        size_t              getPacketSize();
 
-        char                *getResponse();
+        std::string         getResponse();
         size_t              getResponseLength();
         size_t              getTotalBytes();
         void                clearResponse();
         int                 getResponseCode();
+        void                clearClient();
 
+        Response            _response;
     private:
         int                 _client_socket;
         struct sockaddr_in  _client_address;
         HttpRequest         _request;
-        Response            _response;
         ServerConfig        _server;
         size_t              _total_bytes_read;
+        size_t              bytes_to_send;
+        size_t              total_bytes_sent;
         time_t              _last_msg_time;
 };
 

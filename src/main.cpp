@@ -1,6 +1,8 @@
 #include "../inc/Webserv.hpp"
 #include "../inc/ServerManager.hpp"
 
+void sigpipeHandle(int sig) {}
+
 int main(int argc, char **argv) {
 	if (argc == 1 || argc == 2) {
 		try {
@@ -9,6 +11,7 @@ int main(int argc, char **argv) {
         	ServerManager 	master;
 
 
+			signal(SIGPIPE, sigpipeHandle);
 			/* configuration file as argument or default path */
 			config = (argc == 1 ? "default.conf" : argv[1]);
 			cluster.createCluster(config);
@@ -28,3 +31,4 @@ int main(int argc, char **argv) {
 	}
     return (0);
 }
+
