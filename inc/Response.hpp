@@ -61,6 +61,7 @@ class Response
         void    connection();
         void    server();
         void    location();
+        void    date();
         int     handleTarget();
         void    buildErrorBody();
         bool    reqError();

@@ -52,15 +52,27 @@ void    Response::location()
     if(_location.length())
         _response_content.append("Location: "+ _location +"\r\n");
 }
+
+void    Response::date()
+{
+    char date[1000];
+    time_t now = time(0);
+    struct tm tm = *gmtime(&now);
+    strftime(date, sizeof(date), "%a, %d %b %Y %H:%M:%S %Z", &tm);
+    _response_content.append("Date: ");
+    _response_content.append(date);
+    _response_content.append("\r\n");
+
+}
 // uri ecnoding
 void    Response::setHeaders()
 {
-    //date();
     contentType();
     contentLength();
     connection();
     server();
     location();
+    date();
 
     _response_content.append("\r\n");
 }
