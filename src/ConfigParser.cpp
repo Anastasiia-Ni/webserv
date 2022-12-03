@@ -64,7 +64,7 @@ int ConfigParser::createCluster(const std::string &config_file)
 
 	if (file.getTypePath(file.getPath()) != 1)
 		throw ErrorException("File is invalid");
-	if (file.checkFile(file.getPath(), 2) == -1)
+	if (file.checkFile(file.getPath(), 4) == -1)
 		throw ErrorException("File is not accessible");
 	content = file.readFile(config_file);
 	if (content.empty())
@@ -204,10 +204,13 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
 	std::vector<std::string>parametrs;
-	int flag_loc = 1;
 	std::vector<std::string> error_codes;
+	int		flag_loc = 1;
+	bool	flag_autoindex = false;
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
+	if (parametrs.size() < 3)
+		throw  ErrorException("Failed server validation");
 	for (size_t i = 0; i < parametrs.size(); i++)
 	{
 		if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
@@ -277,9 +280,10 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		}
 		else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
 		{
-			// if (!server.getIndex().empty())
-			// 	throw  ErrorException("Index is duplicated");
+			if (flag_autoindex)
+				throw ErrorException("Autoindex of server is duplicated");
 			server.setAutoindex(parametrs[++i]);
+			flag_autoindex = true;
 		}
 		else if (parametrs[i] != "}" && parametrs[i] != "{")
 		{
@@ -295,11 +299,12 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		server.setHost("localhost;");
 	if (server.getIndex().empty())
 		server.setIndex("index.html;");
-	// Maybe here check file of index if it is exist and readable?
+	if (ConfigFile::isFileExistAndReadable(server.getRoot(), server.getIndex()))
+		throw  ErrorException("Index from config file not found or unreadable");
 	if (server.checkLocaitons())
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
-		throw  ErrorException("Port does not found"); // check sentense
+		throw  ErrorException("Port not found"); // check sentense
 	server.setErrorPages(error_codes);
 	if (!server.isValidErrorPages())
 		throw ErrorException("Incorrect path for error page or number of error");
