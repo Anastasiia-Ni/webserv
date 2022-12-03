@@ -167,22 +167,27 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
 	if(parametr.empty())
 		return;
-	std::string path = parametr[parametr.size() - 1];
-	checkToken(path);
-	if (ConfigFile::getTypePath(path) != 2)
-	{
-		if (ConfigFile::getTypePath(this->_root + path) != 1)
-			throw ErrorException ("incorrect path for error page file: " + this->_root + path);
-		if (ConfigFile::checkFile(this->_root + path, 0) == -1 || ConfigFile::checkFile(this->_root + path, 2) == -1)
-			throw ErrorException ("error page file :" + this->_root + path + " is not accessible");
-	}
+	if (parametr.size() % 2 != 0)
+		throw ErrorException ("error page initialization faled");
 	for (size_t i = 0; i < parametr.size() - 1; i++)
 	{
 		for (size_t j = 0; j < parametr[i].size(); j++) {
 			if (!std::isdigit(parametr[i][j]))
 				throw ErrorException("Error code is invalid");
 		}
+		if (parametr[i].size() != 3)
+			throw ErrorException("Error code is invalid");
 		short code_error = std::stoi(parametr[i]);
+		i++;
+		std::string path = parametr[i];
+		checkToken(path);
+		if (ConfigFile::getTypePath(path) != 2)
+		{
+			if (ConfigFile::getTypePath(this->_root + path) != 1)
+				throw ErrorException ("incorrect path for error page file: " + this->_root + path);
+			if (ConfigFile::checkFile(this->_root + path, 0) == -1 || ConfigFile::checkFile(this->_root + path, 4) == -1)
+				throw ErrorException ("error page file :" + this->_root + path + " is not accessible");
+		}
 		std::map<short, std::string>::iterator it = this->_error_pages.find(code_error);
 		if (it != _error_pages.end())
 			this->_error_pages[code_error] = path;
@@ -253,11 +258,15 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		}
 		else if (parametr[i] == "return" && (i + 1) < parametr.size())
 		{
+			if (!new_location.getReturn().empty())
+				throw ErrorException("Return of location is duplicated");
 			checkToken(parametr[++i]);
 			new_location.setReturn(parametr[i]);
 		}
 		else if (parametr[i] == "alias" && (i + 1) < parametr.size())
 		{
+			if (!new_location.getAlias().empty())
+				throw ErrorException("Alias of location is duplicated");
 			checkToken(parametr[++i]);
 			new_location.setAlias(parametr[i]);
 		}
@@ -324,6 +333,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		throw ErrorException("Failed redirection file in locaition validation");
 	else if (valid == 4)
 		throw ErrorException("Failed alias file in locaition validation");
+	else if (valid == 5)
+		throw ErrorException("Failed Index from location not found or unreadable");
 	this->_locations.push_back(new_location);
 }
 
@@ -348,7 +359,7 @@ bool ServerConfig::isValidErrorPages()
 	{
 		if (it->first < 100 || it->first > 599)
 			return (false);
-		if (ConfigFile::checkFile(getRoot() + it->second, 0) < 0 || ConfigFile::checkFile(getRoot() + it->second, 2) < 0)
+		if (ConfigFile::checkFile(getRoot() + it->second, 0) < 0 || ConfigFile::checkFile(getRoot() + it->second, 4) < 0)
 			return (false);
 	}
 	return (true);
@@ -365,7 +376,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
 			return (1);
 		std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
-		if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path, 2) < 0)
+		if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path, 4) < 0)
 			return 1;
 		std::vector<std::string>::const_iterator it;
 		for (it = location.getCgiPath().begin(); it != location.getCgiPath().end(); ++it)
@@ -376,12 +387,8 @@ int ServerConfig::isValidLocation(Location &location) const
 		for (it = location.getCgiExtension().begin(); it != location.getCgiExtension().end(); ++it)
 		{
 			std::string tmp = *it;
-			if (tmp.size() < 3 || tmp.size() > 10)
-				return (1);
-			if (tmp[0] != '.' && tmp[0] != '*')
-				return (1);
-			if (tmp[0] == '*' && tmp[1] != '.')
-				return (1);
+			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh")
+				return(1);
 		}
 	}
 	else
@@ -391,11 +398,18 @@ int ServerConfig::isValidLocation(Location &location) const
 		if (location.getRootLocation().empty()) {
 			location.setRootLocation(this->_root);
 		}
-		if (!location.getReturn().empty() && ConfigFile::getTypePath(location.getRootLocation() + location.getReturn()) != 1)
-			return (3);
-		if (!location.getAlias().empty() && ConfigFile::getTypePath(location.getAlias()) != 2 && ConfigFile::getTypePath(location.getRootLocation() + location.getAlias()) != 2)
-			return (4);
-		//надо ли проверять сам файл?
+		if (ConfigFile::isFileExistAndReadable(location.getRootLocation() + location.getPath() + "/", location.getIndexLocation()))
+			return (5);
+		if (!location.getReturn().empty())
+		{
+			if (ConfigFile::isFileExistAndReadable(location.getRootLocation(), location.getReturn()))
+				return (3);
+		}
+		if (!location.getAlias().empty())
+		{
+			if (ConfigFile::isFileExistAndReadable(location.getRootLocation(), location.getAlias()))
+			 	return (4);
+		}
 	}
 	return (0);
 }

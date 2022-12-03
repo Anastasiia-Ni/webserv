@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import cgi, os
 # import cgitb; cgitb.enable()
 f = open('/tmp/log.moa' ,'w')
@@ -24,3 +25,4 @@ else:
 print("Content-Type: text/html;charset=utf-8")
 print ("Content-type:text/html\r\n")
 print("<H1> File "+ message + " </H1>")
+

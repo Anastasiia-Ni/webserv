@@ -133,30 +133,9 @@ const std::string &CgiHandler::getCgiPath() const
 void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
 	int poz;
-
-	this->_env["AUTH_TYPE"] = "Basic";
-	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
-    this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	poz = findStart(this->_cgi_path, "cgi-bin/");
-	this->_env["SCRIPT_NAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
-    this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
-    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
-    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
-    this->_env["QUERY_STRING"] = decode(req.getQuery());
-    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
-	poz = findStart(req.getHeader("Host"), ":");
-    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
-    this->_env["SERVER_PORT"] = (poz > 0  ? req.getHeader("Host").substr(poz, req.getHeader("Host").size()) : "");
-    this->_env["REQUEST_METHOD"] = req.getMethodStr();
-    this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
-    this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-    this->_env["REDIRECT_STATUS"] = "200";
-	this->_env["SERVER_SOFTWARE"] = "AMANIX";
-
-	std::vector<std::string> ext_path = it_loc->getCgiPath();
 	std::string extension;
 
+	std::vector<std::string> ext_path = it_loc->getCgiPath();
 	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
 	{
 		extension = *it_ext;
@@ -166,7 +145,26 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 			break ;
 	}
 
-	// std::cout << "extension: " << extension << std::endl; // delete
+	this->_env["AUTH_TYPE"] = "Basic";
+	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
+	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
+    this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	poz = findStart(this->_cgi_path, "cgi-bin/");
+	this->_env["SCRIPT_NAME"] = this->_cgi_path;
+    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
+    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
+    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
+    this->_env["QUERY_STRING"] = decode(req.getQuery());
+    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
+	poz = findStart(req.getHeader("Host"), ":");
+    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
+    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("Host").substr(poz + 1, req.getHeader("Host").size()) : "");
+    this->_env["REQUEST_METHOD"] = req.getMethodStr();
+    this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
+	// this->_env["PATH"] = extension; - This thing breaks everything
+    this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    this->_env["REDIRECT_STATUS"] = "200";
+	this->_env["SERVER_SOFTWARE"] = "AMANIX";
 
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
@@ -180,14 +178,12 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	// 	std::cout << this->_ch_env[i] << std::endl;
 
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
-	// this->_argv[0] = strdup(this->_cgi_path.c_str());
-	// this->_argv[1] = strdup(this->_env["SCRIPT_FILENAME"].c_str());
-	//this->_argv[2] = NULL;
-
-	//std::cout << "extension path: " << extension << std::endl; //delete
 	this->_argv[0] = strdup(extension.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
+
+	// std::cout << "ARGV0     " << this->_argv[0] << std::endl;
+
 }
 
 
@@ -195,6 +191,16 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content)
 {
 	int pipe_in[2], pipe_out[2];
+	int out_file;
+
+	//check argv[0] argv[1]
+
+	// if (req.getMethodStr() == "POST")
+	// {		
+	// 	pipe_in[0] = open(file_name.c_str(), O_RDWR, 0777); // pipe?
+	// 	if (pipe_in[0] < 0)
+	// 		return ; // with error
+	// }
 
 	if (pipe(pipe_in) < 0)
 	{
@@ -282,7 +288,6 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_co
     //     header.erase(pos + 4);
     // }
 
-
 	// write(fd, header.c_str(), header.size());
 
 	// std::cout << "-----------------HEADER-----------------\n"; //delete
@@ -333,7 +338,7 @@ void CgiHandler::fixHeader(std::string &header)
 
 	if (header.find("HTTP/1.1") == std::string::npos)
 		header.insert(0, "HTTP/1.1 200 OK\r\n");
-	if (header.find("Content-type:") == std::string::npos)
+	if (header.find("Content-Type:") == std::string::npos)
         tmp.append("Content-type: text/html\r\n");
 	if (header.find("Transfer-Encoding:") == std::string::npos)
 		tmp.append("Transfer-Encoding: chunked\r\n");
@@ -341,15 +346,16 @@ void CgiHandler::fixHeader(std::string &header)
         tmp.append("Connection: keep-alive\r\n");
 	if (_env.count("HTTP_COOKIE") && header.find("Set-cookie") == std::string::npos)
 		tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
-	if ((pos = header.find("\r\n\r\n")) == std::string::npos)
+	pos = header.find("\r\n\r\n", 10);
+	if (pos  == std::string::npos)
     {
-        tmp.append("\r\n\r\n");
+		tmp.append("\r\n\r\n");
         pos = header.find("\r\n") + 2;
     }
 	else
 		tmp.insert(0, "\r\n");
 
-	std::cout << "TMP: " << tmp << std::endl; // delete
+	// std::cout << "НОМЕР ПОЗИЦИИ: " << pos << "			"<< std::cout; // delete
 	header.insert(pos, tmp);
 }
 

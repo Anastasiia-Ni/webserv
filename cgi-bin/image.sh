@@ -8,3 +8,9 @@ printf "\r\n\r\n"
 # # echo 'работай плиз: image/jpeg'
 # # echo ''
 cat /home/vscode/src/Cursus/test_temp/cgi-bin/Stray.png
+###################
+#echo -e 'HTTP/1.1 200 OK'
+#echo -e 'Content-Type: image/jpeg\r\n'
+
+#cat /Users/anastasiianifantova/Desktop/ft-server/awebsite/img/apple.jpeg
+
