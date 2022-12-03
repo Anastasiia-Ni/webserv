@@ -46,11 +46,10 @@
 
 
 	<form enctype="multipart/form-data" action = "../cgi-bin/upload.py" method="post" >
-        <p>File: <input type="file" name="filename" size="30" class="form-control">
+        <p>File: <input type="file" name="filename" id="fileid" class="form-control">
             <input type="submit" value="SEND" href="#"></p>
-        </form>
+    </form>
     </title>
-
 
     <form method="POST" onsubmit="return setAction(this, document.getElementById('nameForm').value)">
         Name: <input id="nameForm" type="text" name="user">

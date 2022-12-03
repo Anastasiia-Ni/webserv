@@ -1,14 +1,19 @@
 #!/bin/bash
 
-printf "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\n\r\n"
+echo -e 'HTTP/1.1 200 OK'
+echo -e 'Content-Type: text/plain\r\n\r\n'
 
+echo '<h3>'
 echo 'Environment:'
+echo '</h3>'
 echo ''
-env
+echo '<pre>' 
+env 
+echo '</pre>'
 
-# echo 'HTTP/1.1 200 OK\r\n'
-# echo 'Content-Type: text/plain\r\n\r\n'
-# echo ''
-# echo 'Environment:'
-# echo ''
-# env
+echo '<h3>'
+echo 'Hostname'
+echo '</h3>'
+echo '<pre>' 
+hostname
+echo '</pre>'
