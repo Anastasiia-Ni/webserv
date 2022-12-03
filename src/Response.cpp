@@ -197,7 +197,7 @@ int        Response::handleCgi(std::string &location_key)
         return (1);
     }
     obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
-    obj.execute(_request, this->_cgi_fd[1]);
+    obj.execute(_request, this->_cgi_fd[1], _response_content);
     return (0);
 }
 
@@ -393,21 +393,21 @@ void    Response::buildErrorBody()
 }
 int    Response::constructCgiResp()
 {
-    char buf[4096];
-    int  recvd = 0;
-    while(( recvd = read(_cgi_fd[0], buf, 4096)) > 0)
-    {
-        _response_content.append(buf, recvd);
-        memset(buf, 0, sizeof(buf));
-    }
-    close(_cgi_fd[0]);
-    // if(recvd == 0)
-    //     return 0;
-    if(recvd < 0)
-    {
-        _code = 500;
-        return 1;
-    }
+    // char buf[4096];
+    // int  recvd = 0;
+    // while(( recvd = read(_cgi_fd[0], buf, 4096)) > 0)
+    // {
+    //     _response_content.append(buf, recvd);
+    //     memset(buf, 0, sizeof(buf));
+    // }
+    // close(_cgi_fd[0]);
+    // // if(recvd == 0)
+    // //     return 0;
+    // if(recvd < 0)
+    // {
+    //     _code = 500;
+    //     return 1;
+    // }
     return (0);
         
 }

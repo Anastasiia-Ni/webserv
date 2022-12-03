@@ -487,8 +487,8 @@ void    HttpRequest::feed(char *data, size_t size)
                     s >> std::hex >> temp_len;
                     _chunk_length *= 16;
                     _chunk_length += temp_len; // check overflow here
-                    std::cout << "temp len IN DOING = " << temp_len << std::endl;
-                    std::cout << "CHUNK LENGTH IN DOING = " << _chunk_length << std::endl;
+                    // std::cout << "temp len IN DOING = " << temp_len << std::endl;
+                    // std::cout << "CHUNK LENGTH IN DOING = " << _chunk_length << std::endl;
                 }
                 else if (character == '\r')
                     _state = Chunked_Length_LF;
@@ -595,14 +595,15 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Message_Body:
             {
-
                 if(_body.size() < _body_length )
                     _body.push_back(character);
-                else
+                if(_body.size() == _body_length )
                 {
+                    // std::cout << "BODY READ DONE !" << std::endl;
+                    // std::cout << "BODY supposed to be " << _body_length << std::endl;
+                    // std::cout << "Actual BODY is " << _body.size() << std::endl;
+
                     _body_done_flag = true;
-
-
                     _state = Parsing_Done;
                 }
                 break;
@@ -653,7 +654,13 @@ std::string HttpRequest::getMethodStr()
 	return _method_str[_method];
 }
 
-
+std::string HttpRequest::getBody()
+{
+    if(!_body.size())
+        return "";
+    std::string body((char*)_body.data(), _body.size());
+    return body;
+}
 void    HttpRequest::setMethod(HttpMethod & method)
 {
     _method = method;
@@ -710,8 +717,6 @@ void        HttpRequest::_handle_headers()
             _chunked_flag = true;
         _body_flag = true;
     }
-    else
-        _body_flag = false;
     
     if (_request_headers.count("Host"))
     {
