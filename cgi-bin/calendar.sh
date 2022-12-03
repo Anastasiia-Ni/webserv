@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo -e 'HTTP/1.1 200 OK'
-echo -e 'Content-Type: text/plain\r\n\r\n'
+echo -e 'Content-Type: text/html\r\n\r\n'
 
 echo '<h3>'
 echo 'Calendar:'

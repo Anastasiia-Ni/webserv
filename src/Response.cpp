@@ -198,6 +198,7 @@ int        Response::handleCgi(std::string &location_key)
     }
     obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
     obj.execute(_request, this->_cgi_fd[1], _response_content);
+
     return (0);
 }
 

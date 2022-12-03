@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo -e 'HTTP/1.1 200 OK'
-echo -e 'Content-Type: text/plain\r\n\r\n'
-
+echo -e 'Content-Type: text/html\r\n'
+echo '<html>'
 echo '<h3>'
 echo 'Environment:'
 echo '</h3>'
@@ -17,3 +17,4 @@ echo '</h3>'
 echo '<pre>' 
 hostname
 echo '</pre>'
+echo '</html>'
