@@ -30,8 +30,8 @@ class CgiHandler {
 		CgiHandler &operator=(CgiHandler const &rhs);
 
 		void initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc);
-		void execute(HttpRequest& req, int &fd);
-		void sendHeaderBody(int &pipe_out, int &fd);
+		void execute(HttpRequest& req, int &fd, std::string &);
+		void sendHeaderBody(int &pipe_out, int &fd, std::string &);
 		void fixHeader(std::string &header);
 		std::string setCookie(const std::string& str);
 

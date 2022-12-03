@@ -71,6 +71,7 @@ class HttpRequest
         std::string getHeader(std::string const &);
 		std::map<std::string, std::string> getHeaders() const;
 		std::string getMethodStr();
+        std::string getBody();
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);

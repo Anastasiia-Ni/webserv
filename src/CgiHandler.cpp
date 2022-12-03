@@ -188,7 +188,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 
 
 /* */
-void CgiHandler::execute(HttpRequest& req, int &fd)
+void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content)
 {
 	int pipe_in[2], pipe_out[2];
 	int out_file;
@@ -221,13 +221,16 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 	{
 		dup2(pipe_in[0], STDIN_FILENO);
 		dup2(pipe_out[1], STDOUT_FILENO);
-		write(pipe_in[1], req.getHeader("Body").c_str(), atoi(this->_env["CONTENT_LENGTH"].c_str()));
 		close(pipe_in[0]);
 		close(pipe_in[1]);
 		close(pipe_out[0]);
 		close(pipe_out[1]);
+	
+		// if(_req.isBody())
+		// 	write(pipe_in[1], _req.getBody(), _reg.getBodyLength());
 
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
+		// std::cout << "EXECVE FAILED \n" << std::endl;
 		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		// std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
 
@@ -235,16 +238,24 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
 	}
 	else if (this->_cgi_pid > 0)
 	{
+		std::string body = req.getBody();
+		std::cout << "NO OF BYTES SENT TO CHILD --> " << atoi(this->_env["CONTENT_LENGTH"].c_str()) << std::endl;
+		int sent_bytes;
+		// while( (sent_bytes = write(pipe_in[1], body.c_str(), 8192)) > 0 )
+		// 	body = body.substr(sent_bytes);
+		write(pipe_in[1], body.c_str(), body.length());
 		close(pipe_in[1]);
-		waitpid(this->_cgi_pid, &this->_exit_status, 0);
 		close(pipe_out[1]);
+		std::cout << "Waiting" << std::endl;
+		
+		waitpid(this->_cgi_pid, &this->_exit_status, WNOHANG);// maybe wait after finish reading from child
 		if (this->_exit_status < 0)
 		{
 			close(pipe_out[0]);
 			close(pipe_in[0]);
 			return ;
 		}
-		sendHeaderBody(pipe_out[0], fd); // add fd from responce
+		sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
 		close(pipe_out[0]);
         close(pipe_in[0]);
 	}
@@ -252,73 +263,71 @@ void CgiHandler::execute(HttpRequest& req, int &fd)
         std::cout << "Fork failed" << std::endl; // std::cerr <<
 }
 
-void CgiHandler::sendHeaderBody(int &pipe_out, int &fd) // add fd freom responce
-{
-	char	tmp[4001];
+void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_content) // add fd freom responce
+{				
+	char	tmp[8192];
 	int 	res;
-	size_t	pos;
-
-	res = read(pipe_out, tmp, 4000); // make loop
-	tmp[res] = '\0';
-	std::string header(tmp);
-	std::string body;
-
-
-	std::cout << "-----------------HEADER BEFORE---------\n"; //delete
-	std::cout << header << std::endl;
-
-
-	fixHeader(header);
-	pos = header.find("\r\n\r\n");
-    if (pos != std::string::npos){
-        body = header.substr(pos + 4);
-        header.erase(pos + 4);
-    }
-
-
-	write(fd, header.c_str(), header.size());
-
-	std::cout << "-----------------HEADER-----------------\n"; //delete
-	std::cout << header << std::endl;
-	std::cout << "------------------BODY------------------\n";
-	// std::cout << body << std::endl;
-	size_t num_ch = 0; //delete
-
-	// std::cout << "PATH INFO   " << this->_env["PATH_INFO"] << std::endl;
-    // std::cout << "PATH TRANSLATED   " <<this->_env["PATH_TRANSLATED"] << std::endl;
-
-	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
-	// 	std::cout << this->_ch_env[i] << std::endl;
-
-	do
+	// size_t	pos;
+	while( (res = read(pipe_out, tmp, 8192) ) > 0)
 	{
+		std::cout << res << " bytes read succesfully !" << std::endl;
+		response_content.append(tmp, res);
+		memset(tmp, 0, sizeof(tmp));
+	}
+	std::cout << "READ DONE !" << std::endl;
 
-		// res = read(pipe_out, tmp, 4000);
-		// tmp[res] = '\0';
-		// body.append(tmp);
+	// std::cout << "RESPONSE FROM BINARY IS = " << res << std::endl;
+	// tmp[res] = '\0';
+	// std::string header(tmp);
+	// std::string body;
 
-		std::string chunk;
-        chunk = toString(fromDecToHex(body.length()));
-        chunk += "\r\n";
-        chunk += body;
-        chunk += "\r\n";
-        std::cout << chunk << std::endl;
-		num_ch++; // delete
-        write(fd, chunk.c_str(), chunk.length());
-		// std::cout << "CHUNK" << std::endl; // delete
-        if (res <= 0)
-            break;
-        res = read(pipe_out, tmp, 4000);
-        tmp[res] = '\0';
-        body = toString(tmp);
-	}while (res > 0);
+	// fixHeader(header);
+	// pos = header.find("\r\n\r\n");
+    // if (pos != std::string::npos){
+    //     body = header.substr(pos + 4);
+    //     header.erase(pos + 4);
+    // }
 
-	std::cout << "Number of chunks = " << num_ch << std::endl;
-	std::cout << "CONTENT_TYPE   " << this->_env["CONTENT_TYPE"] << std::endl;
-	std::cout << "CONTENT_LENGTH   " << this->_env["CONTENT_LENGTH"] << std::endl;
+	// write(fd, header.c_str(), header.size());
 
-	write(fd, tmp, res);
-	write(fd, "0\r\n\r\n", 5);
+	// std::cout << "-----------------HEADER-----------------\n"; //delete
+	// std::cout << header << std::endl;
+	// std::cout << "------------------BODY------------------\n";
+	// // std::cout << body << std::endl;
+	// size_t num_ch = 0; //delete
+	
+
+	// while (res > 0)
+	// {
+		
+	// 	// res = read(pipe_out, tmp, 4000);
+	// 	// tmp[res] = '\0';
+	// 	// body.append(tmp);
+		
+	// 	std::string chunk;
+    //     chunk = toString(fromDecToHex(body.length()));
+    //     chunk += "\r\n";
+    //     chunk += body;
+    //     chunk += "\r\n";
+    //     // std::cout << chunk << std::endl;
+	// 	num_ch++; // delete
+    //     write(fd, chunk.c_str(), chunk.length());
+	// 	// std::cout << "CHUNK" << std::endl; // delete
+    //     if (res <= 0)
+    //         break;
+    //     res = read(pipe_out, tmp, 400);
+    //     tmp[res] = '\0';
+    //     body = toString(tmp);
+	// } 
+
+	// std::cout << "Number of chunks = " << num_ch << std::endl;
+	if (response_content.find("HTTP/1.1") == std::string::npos)
+		response_content.insert(0, "HTTP/1.1 200 OK\r\n");
+	std::cout << "LENGTH OF RESPONSE IS = " << response_content.length() << std::endl;
+	// std::cout << "Response Content IS  " << response_content << std::endl;
+	// write(fd, response_content.c_str(), response_content.length());
+	// std::cout << "LENGTH OF RESPONSE IS = " << response_content.length() << std::endl;
+	// write(fd, "0\r\n\r\n", 5);
 	close(fd);
 }
 

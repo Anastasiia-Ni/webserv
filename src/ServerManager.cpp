@@ -261,12 +261,12 @@ void    ServerManager::readRequest(int &i)
     // file << buffer << std::endl;
     if(bytes_read == 0)
     {
-        std::cerr << "fd = " << i << " - webserv1: Client Closed Connection" << strerror(errno) << std::endl;
+        std::cerr << "fd= " << i << " - webserv1: Client Closed Connection" << strerror(errno) << std::endl;
         closeConnection(i);
         return;
     }
     if(bytes_read < 0)
-    {
+    { 
         std::cerr << "fd= " << i << " - webserv1: read error" << strerror(errno) << std::endl;
         closeConnection(i);
         return;
