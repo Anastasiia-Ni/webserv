@@ -1,7 +1,6 @@
 #include "../inc/CgiHandler.hpp"
 
-//move function in the utils
-
+/* Converetor functions */
 template<typename T>
 std::string toString(const T &arr)
 {
@@ -27,6 +26,7 @@ std::string    fromDecToHex(int num)
     return res;
 }
 
+/* Translation of parameters for QUERY_STRING environment variable */
 std::string CgiHandler::decode(std::string &path)
 {
 	size_t token = path.find("%");
@@ -54,14 +54,13 @@ CgiHandler::CgiHandler(std::string path)
 	this->_cgi_path = path;
 	this->_ch_env = NULL;
 	this->_argv = NULL;
-	// std::cout << "CgiHandler: " << this->_cgi_path << std::endl;
 }
 
 CgiHandler::~CgiHandler() {
 
 	if (this->_ch_env)
 	{
-		for (int i = 0; this->_ch_env[i]; i++) // dobavit proverku
+		for (int i = 0; this->_ch_env[i]; i++)
 			free(this->_ch_env[i]);
 		free(this->_ch_env);
 	}
@@ -187,24 +186,21 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 }
 
 
-/* */
-void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content)
+/* Pipe and execute CGI */
+void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content, short &error_code)
 {
 	int pipe_in[2], pipe_out[2];
 	int out_file;
 
-	//check argv[0] argv[1]
-
-	// if (req.getMethodStr() == "POST")
-	// {		
-	// 	pipe_in[0] = open(file_name.c_str(), O_RDWR, 0777); // pipe?
-	// 	if (pipe_in[0] < 0)
-	// 		return ; // with error
-	// }
-
+	if (this->_argv[0] == NULL || this->_argv[1] == NULL)
+	{
+		error_code = 500;
+		return ;
+	}
 	if (pipe(pipe_in) < 0)
 	{
 		std::cout << "pipe failed" << std::endl; // properly exit
+		error_code = 500;
 		return ;
 	}
 	if (pipe(pipe_out) < 0)
@@ -212,6 +208,7 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 		std::cout << "pipe failed" << std::endl; // properly exit
 		close(pipe_in[0]);
 		close(pipe_in[1]);
+		error_code = 500;
 		return ;
 	}
 	this->_cgi_pid = fork();
@@ -260,7 +257,10 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
         close(pipe_in[0]);
 	}
 	else
+	{
         std::cout << "Fork failed" << std::endl; // std::cerr <<
+		error_code = 500;
+	}
 }
 
 void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_content) // add fd freom responce
@@ -354,16 +354,13 @@ void CgiHandler::fixHeader(std::string &header)
     }
 	else
 		tmp.insert(0, "\r\n");
-
-	// std::cout << "НОМЕР ПОЗИЦИИ: " << pos << "			"<< std::cout; // delete
 	header.insert(pos, tmp);
 }
 
 std::string CgiHandler::setCookie(const std::string& str)
 {
 	std::string cook = str;
-	//size_t		pos;
-	return cook;
+	return (cook);
 }
 
 int CgiHandler::findStart(const std::string path, const std::string delim)
@@ -377,7 +374,7 @@ int CgiHandler::findStart(const std::string path, const std::string delim)
 		return (-1);
 }
 
-
+/* Isolation PATH_INFO environment variable */
 std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> extensions)
 {
 	std::string tmp;
@@ -396,7 +393,6 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 	tmp = path.substr(start + 3, path.size());
 	if (!tmp[0] || tmp[0] != '/')
 		return "";
-	//tmp.erase(0, 1);
 	end = tmp.find("?");
 	return (end == std::string::npos ? tmp : tmp.substr(0, end));
 }
