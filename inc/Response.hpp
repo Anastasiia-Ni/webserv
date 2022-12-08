@@ -30,6 +30,7 @@ class Response
         void        clearResponse();
         void        handleCgi(HttpRequest&);
         void        cutRes(size_t);
+        bool        isCgi();
 
 
 

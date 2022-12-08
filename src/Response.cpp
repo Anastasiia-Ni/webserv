@@ -563,3 +563,8 @@ int      Response::getCode() const
 {
     return (_code);
 }
+
+bool    Response::isCgi()
+{
+    return (_cgi);
+}

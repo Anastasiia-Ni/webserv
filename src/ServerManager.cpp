@@ -201,7 +201,7 @@ void    ServerManager::sendResponse(int &i)
     else if(bytes_sent == 0 || bytes_sent == response.length())
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
-        if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError())
+        if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError() || _clients_map[i].isCgi())
         {
             std::cout << "Connection Closed !" << std::endl;
             closeConnection(i);

@@ -1,9 +1,20 @@
 #! /usr/bin/python3
 
 import os
+from http import cookies
+# Import modules for CGI handling 
+import cgi, cgitb 
 
-print("Content-type: text/html\r\n\r\n")
-print("<font size=+10>Environment</font><br>")
+# Create instance of FieldStorage 
+form = cgi.FieldStorage() 
 
-for param in os.environ.keys():
-    print("<b>%20s</b>: %s<br>" % (param, os.environ[param]))
+# Get data from fields
+key = form.getvalue('key')
+value  = form.getvalue('value')
+cookie = cookies.SimpleCookie()
+cookie[key] = value
+print("HTTP/1.1 204 OK")
+print("Content-Type: text/plain")
+print(cookie.output())
+print("\r\n")
+print("Cookies Set Successfuly !")

@@ -47,7 +47,7 @@ class Client
         void                clearResponse();
         int                 getResponseCode();
         void                clearClient();
-
+        bool                isCgi();
         Response            _response;
     private:
         int                 _client_socket;

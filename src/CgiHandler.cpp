@@ -248,13 +248,13 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 		close(pipe_out[1]);
 		std::cout << "Waiting" << std::endl;
 		
-		waitpid(this->_cgi_pid, &this->_exit_status, WNOHANG);// maybe wait after finish reading from child
-		if (this->_exit_status < 0)
-		{
-			close(pipe_out[0]);
-			close(pipe_in[0]);
-			return ;
-		}
+		// waitpid(this->_cgi_pid, &this->_exit_status, WNOHANG);// maybe wait after finish reading from child
+		// if (this->_exit_status < 0)
+		// {
+		// 	close(pipe_out[0]);
+		// 	close(pipe_in[0]);
+		// 	return ;
+		// }
 		sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
 		close(pipe_out[0]);
         close(pipe_in[0]);
@@ -274,7 +274,13 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_co
 		response_content.append(tmp, res);
 		memset(tmp, 0, sizeof(tmp));
 	}
-	std::cout << "READ DONE !" << std::endl;
+	if(res == 0)
+		std::cout << "READ DONE !" << std::endl;
+	else if(res < 0)
+	{
+		std::cout << "Error Reading From CGI Script" << std::endl;
+		// Set Error to 500 here .
+	}
 
 	// std::cout << "RESPONSE FROM BINARY IS = " << res << std::endl;
 	// tmp[res] = '\0';
@@ -344,7 +350,7 @@ void CgiHandler::fixHeader(std::string &header)
 		tmp.append("Transfer-Encoding: chunked\r\n");
     if (header.find("Connection:") == std::string::npos)
         tmp.append("Connection: keep-alive\r\n");
-	if (_env.count("HTTP_COOKIE") && header.find("Set-cookie") == std::string::npos)
+	if (_env.count("HTTP_COOKIE") && header.find("Cookie") == std::string::npos)
 		tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
 	pos = header.find("\r\n\r\n", 10);
 	if (pos  == std::string::npos)
