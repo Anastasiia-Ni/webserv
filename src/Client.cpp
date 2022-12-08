@@ -203,3 +203,8 @@ void             Client::clearClient()
 //         }
 //     }
 // }
+
+bool      Client::isCgi()
+{
+    return (_response.isCgi());
+}
