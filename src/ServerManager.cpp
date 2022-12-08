@@ -257,8 +257,8 @@ void    ServerManager::readRequest(int &i)
     
     bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
     // std::cout << "FD is " << i << std::endl;
-    // std::ofstream  file("text.txt", std::ios_base::app);
-    // file << buffer << std::endl;
+    std::ofstream  file("text.txt", std::ios_base::app);
+    file << buffer << std::endl;
     if(bytes_read == 0)
     {
         std::cerr << "fd= " << i << " - webserv1: Client Closed Connection" << strerror(errno) << std::endl;

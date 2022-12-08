@@ -599,6 +599,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _body.push_back(character);
                 if(_body.size() == _body_length )
                 {
+                    std::cout << "BODY SIZE IS " << _body.size() << std::cout;;
                     // std::cout << "BODY READ DONE !" << std::endl;
                     // std::cout << "BODY supposed to be " << _body_length << std::endl;
                     // std::cout << "Actual BODY is " << _body.size() << std::endl;
@@ -706,6 +707,15 @@ void        HttpRequest::_handle_headers()
     {
         _body_flag = true;
         ss << _request_headers["Content-Length"];
+        ss >> _body_length;
+        // if (_body_length < 0)
+            // std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
+        // std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
+    }
+    else if (_request_headers.count("content-length"))
+    {
+        _body_flag = true;
+        ss << _request_headers["content-length"];
         ss >> _body_length;
         // if (_body_length < 0)
             // std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;

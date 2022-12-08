@@ -2,10 +2,10 @@
 
 import cgi, os
 # import cgitb; cgitb.enable()
-f = open('/tmp/log.moa' ,'w')
-f.write("Test\n")
+# f = open('/tmp/log.moa' ,'w')
+# f.write("Test\n")
 form = cgi.FieldStorage()
-f.write(str(form))
+# f.write(str(form))
 
 # Get filename here.
 
@@ -13,7 +13,7 @@ fileitem = form['filename']
 
 # Test if the file was uploaded
 if fileitem.filename:
-   open('/Users/anastasiianifantova/Desktop/server-main/cgi-bin/tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
+   open('/Users/mal-guna/Documents/ws_main/cgi-bin/tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
    message = 'The file "' + os.path.basename(fileitem.filename) + '" was uploaded successfully'
 else:
    message = 'Uploading Failed'

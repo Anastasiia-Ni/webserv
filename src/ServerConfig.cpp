@@ -333,8 +333,8 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		throw ErrorException("Failed redirection file in locaition validation");
 	else if (valid == 4)
 		throw ErrorException("Failed alias file in locaition validation");
-	else if (valid == 5)
-		throw ErrorException("Failed Index from location not found or unreadable");
+	// else if (valid == 5)
+	// 	throw ErrorException("Failed Index from location not found or unreadable");
 	this->_locations.push_back(new_location);
 }
 

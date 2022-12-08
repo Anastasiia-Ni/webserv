@@ -95,7 +95,7 @@ static bool    isAllowedMethod(HttpMethod &method, Location &location, short &co
 {
     std::vector<short> methods = location.getMethods();
     if((method == GET && !methods[0]) || (method == POST && !methods[1]) ||
-       (method == DELETE && !methods[3]))
+       (method == DELETE && !methods[2]))
     {
         code = 405;
         return (1);
@@ -215,9 +215,10 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
     {
         if(path.find(it->getPath()) == 0)
         {
-            // std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
-               if(path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
+            std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
+               if( it->getPath() == "/" || path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
                {
+                std::cout << "LOCATION = " << it->getPath() << std::endl;
                     if(it->getPath().length() > biggest_match)
                     {
                         biggest_match = it->getPath().length();
@@ -236,12 +237,14 @@ int    Response::handleTarget()
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
     // If URI matches with a Location block
+    std::cout << "METHOD IS " <<  _request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
     if (location_key.length() > 0)
     {
         Location target_location = *_server.getLocationKey(location_key);
 
         if(isAllowedMethod(_request.getMethod(), target_location, _code))
             return (1);
+        std::cout << "after allwoed\n" ;
         if (checkReturn(target_location, _code, _location))
             return (1);
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
@@ -302,10 +305,12 @@ int    Response::handleTarget()
     }
     else
     {
+        // if(_request.getMethod() == POST || _request.getMethod() == DELETE)
+        //     _target_file = combinePaths(_server.getRoot(), "upload" , _request.getPath());
+        // else    
         _target_file = combinePaths(_server.getRoot(), _request.getPath(), "");
         if(isDirectory(_target_file))
         {
-
             if (_target_file.back() != '/')
             {
                 _code = 301;
@@ -494,8 +499,42 @@ int    Response::buildBody()
         return (1);
 	if(_cgi || _auto_index)
 		return (0);
-    if(readFile())
-        return (1);
+    if(_code)
+        return (0);
+    // std::cout << _target_file << "ERROR " << std::endl;
+    if(_request.getMethod() == GET)
+    {
+        if(readFile())
+            return (1);
+    }
+    else if(_request.getMethod() == POST)
+    {
+        std::ofstream file(_target_file.c_str(), std::ios::binary);
+        if (file.fail())
+        {
+            // std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
+            _code = 404;
+            return (1);
+        }
+        std::cout << "TARGET FILE IS :" << _target_file << "and file size is " << _request.getBody().length() << std::endl;
+        file.write(_request.getBody().c_str(), _request.getBody().length());
+
+        // _target_file
+    }
+    else if (_request.getMethod() == DELETE)
+    {
+        if( remove( _target_file.c_str() ) != 0 )
+        {
+            perror( "Error deleting file" );
+            _code = 500;
+            return(1);
+        }
+        else
+        {
+            puts( "File successfully deleted" );
+        }
+        
+    }
     _code = 200;
     return (0);
 }
