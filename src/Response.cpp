@@ -197,7 +197,7 @@ int        Response::handleCgi(std::string &location_key)
         return (1);
     }
     obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
-    obj.execute(_request, this->_cgi_fd[1], _response_content);
+    obj.execute(_request, this->_cgi_fd[1], _response_content, this->_code);
 
     return (0);
 }
@@ -235,7 +235,6 @@ int    Response::handleTarget()
     // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
-
     // If URI matches with a Location block
     if (location_key.length() > 0)
     {

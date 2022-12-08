@@ -14,25 +14,22 @@ arg3 = form.getvalue('s_num')
 print(os.environ["QUERY_STRING"], file=sys.stderr)
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")
-# print("<font size=+10>op</font><br>")
 
-
-for param in os.environ.keys():
-    print("<b>%20s</b>: %s<br>" % (param, os.environ[param]))
+# for param in os.environ.keys():
+#     print("<b>%20s</b>: %s<br>" % (param, os.environ[param]))
 
 if not oper or not arg1 or not arg3:
 	print("Parameters are not correct")
 	exit(1)
 
+if len(oper) != 1:
+    print("Parameters are not correct")
+    exit(1)
+
 if ord(oper) == 32:
 	oper = '+'
 
-# if len(oper) == 3 and oper[0] == "%":
-# 	oper = int(oper[1:], 16)
-
-# print("<h4>Oper  '%s' </h4>" % (oper))
-
-if oper not in "+-/*^r" or not len(oper) == 1:
+if oper not in "+-/*^r":
     print("Parameters are not correct")
     exit(1)
 if arg1[0] in '-+':

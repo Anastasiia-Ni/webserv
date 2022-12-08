@@ -12,15 +12,7 @@ class CgiHandler {
 		char**								_argv;
 		std::string							_cgi_path;
 		pid_t								_cgi_pid;
-		int									_exit_status;
-
-
-		std::map<std::string, std::string>	_var; // add
-		std::string							_name_bin; //add
-		
-		int _fd_input;
-		std::string _outputfile;
-  		const char *_file;
+		int								_exit_status;
 
 	public:
 		CgiHandler();
@@ -30,7 +22,7 @@ class CgiHandler {
 		CgiHandler &operator=(CgiHandler const &rhs);
 
 		void initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc);
-		void execute(HttpRequest& req, int &fd, std::string &);
+		void execute(HttpRequest& req, int &fd, std::string &, short &error_code);
 		void sendHeaderBody(int &pipe_out, int &fd, std::string &);
 		void fixHeader(std::string &header);
 		std::string setCookie(const std::string& str);
