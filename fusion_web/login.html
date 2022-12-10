@@ -6,7 +6,7 @@
 <style> 
 Body {
   font-family: Calibri, Helvetica, sans-serif;
-  background-color: pink;
+  background-color: white;
 }
 button { 
        background-color: #4CAF50; 
@@ -45,17 +45,15 @@ button {
 </style> 
 </head>  
 <body>  
-    <center> <h1> Student Login Form </h1> </center> 
-    <form>
+    <center> <h1> Amanix Login Form </h1> </center> 
+    <form action = "../cgi-bin/acc.py" method = "get">
         <div class="container"> 
             <label>Username : </label> 
             <input type="text" placeholder="Enter Username" name="username" required>
             <label>Password : </label> 
             <input type="password" placeholder="Enter Password" name="password" required>
             <button type="submit">Login</button> 
-            <input type="checkbox" checked="checked"> Remember me 
-            <button type="button" class="cancelbtn"> Cancel</button> 
-            Forgot <a href="#"> password? </a> 
+            No Account?<a href="/register.html"> Register Here </a> 
         </div> 
     </form>   
 </body>   

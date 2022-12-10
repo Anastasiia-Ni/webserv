@@ -599,7 +599,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _body.push_back(character);
                 if(_body.size() == _body_length )
                 {
-                    std::cout << "BODY SIZE IS " << _body.size() << std::cout;;
+                    std::cout << "BODY SIZE IS " << _body.size() << std::endl;
                     // std::cout << "BODY READ DONE !" << std::endl;
                     // std::cout << "BODY supposed to be " << _body_length << std::endl;
                     // std::cout << "Actual BODY is " << _body.size() << std::endl;

@@ -159,7 +159,7 @@ int        Response::handleCgi(std::string &location_key)
     else if (path == "cgi-bin/")
         path.append(_server.getLocationKey(location_key)->getIndexLocation());
     
-    std::cout << "PATH: " << path << std::endl; // delete
+    // std::cout << "PATH: " << path << std::endl; // delete
     pos = path.find(".");
     if (pos == std::string::npos)
     {
@@ -215,10 +215,10 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
     {
         if(path.find(it->getPath()) == 0)
         {
-            std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
+            // std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
                if( it->getPath() == "/" || path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
                {
-                std::cout << "LOCATION = " << it->getPath() << std::endl;
+                // std::cout << "LOCATION = " << it->getPath() << std::endl;
                     if(it->getPath().length() > biggest_match)
                     {
                         biggest_match = it->getPath().length();
@@ -237,14 +237,14 @@ int    Response::handleTarget()
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
     // If URI matches with a Location block
-    std::cout << "METHOD IS " <<  _request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
+    // std::cout << "METHOD IS " <<  _request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
     if (location_key.length() > 0)
     {
         Location target_location = *_server.getLocationKey(location_key);
 
         if(isAllowedMethod(_request.getMethod(), target_location, _code))
             return (1);
-        std::cout << "after allwoed\n" ;
+        // std::cout << "after allwoed\n" ;
         if (checkReturn(target_location, _code, _location))
             return (1);
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
