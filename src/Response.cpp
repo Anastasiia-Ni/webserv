@@ -518,21 +518,17 @@ int    Response::buildBody()
         }
 
 
-
-        if (_request.getMultiformFlag())
+        if (_request.getMultiformFlag()) 
         {
             std::string body = _request.getBody();
             body = removeBoundary(body, _request.getBoundary());
             file.write(body.c_str(), _request.getBody().length());
         }
-
         else
         {
             std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << _request.getBody().length() << std::endl;
             file.write(_request.getBody().c_str(), _request.getBody().length());
         }
-
-
 
         // _target_file
     }
@@ -627,13 +623,11 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
     std::string buffer;
     std::string new_body;
     std::string filename;
-    // std::vector<std::string> for_filename;
     bool is_boundary = false;
     bool is_content = false;
 
     if (body.find("--" + boundary) != std::string::npos && body.find("--" + boundary + "--") != std::string::npos)
     {
-        // std::cout << "BODY:" << body << std::endl;
         for (size_t i = 0; i < body.size(); i++)
         {
             buffer.clear();
@@ -655,9 +649,13 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
             {
                 if (!buffer.compare(0, 31, "Content-Disposition: form-data;"))
                 {
-                    filename = "test";
-                // _target_file написать имя файла 
-
+                    size_t start = buffer.find("filename=\"");
+                    if (start != std::string::npos)
+                    {
+                        size_t end = buffer.find("\"", start + 10);
+                        if (end != std::string::npos)
+                            filename = buffer.substr(start + 10, end);
+                    }
                 }
                 else if(!buffer.compare(0, 1, "\r") && !filename.empty())
                 {
@@ -684,8 +682,10 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
 
         }
     }
-    std::cout << "NEW BODY:" << new_body << std::endl;
-    return new_body;
     // else
-    //    _error_code = 400; // download error
+    //    _error_code = 400; // if download error
+   
+    // std::cout << "NEW NAME: " << filename << std::endl;
+    body.clear();
+    return (new_body);
 }

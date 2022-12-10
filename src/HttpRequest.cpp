@@ -599,7 +599,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _body.push_back(character);
                 if(_body.size() == _body_length )
                 {
-                    std::cout << "BODY SIZE IS " << _body.size() << std::cout;;
+                    std::cout << "BODY SIZE IS " << _body.size() << std::endl;
                     // std::cout << "BODY READ DONE !" << std::endl;
                     // std::cout << "BODY supposed to be " << _body_length << std::endl;
                     // std::cout << "Actual BODY is " << _body.size() << std::endl;
@@ -739,15 +739,7 @@ void        HttpRequest::_handle_headers()
     {
         size_t pos = _request_headers["Content-Type"].find("boundary=", 0);
         if (pos != std::string::npos)
-        {
-            std::cout << "I FOUND BOUNDARY1  = " << pos << std::endl; // delete
             this->_boundary = _request_headers["Content-Type"].substr(pos + 9, _request_headers["Content-Type"].size());
-            // size_t pos2 = _request_headers["boundary"].find('\r');
-            std::cout << "I FOUND BOUNDARY2  = " << this->_boundary << std::endl; //delete
-            //дописать эту хрень ниже по удалению баундари в хэде
-            //_request_headers["boundary"].erase(_request_headers["boundary"].begin() + _request_headers["boundary"].find('\r'));
-            // std::cout << "BOUNDARY IS = " << _request_headers["boundary"] << std::endl; // delete
-        }
         this->_multiform_flag = true;
     }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;
