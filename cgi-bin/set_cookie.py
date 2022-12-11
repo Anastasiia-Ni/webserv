@@ -14,7 +14,5 @@ value  = form.getvalue('value')
 cookie = cookies.SimpleCookie()
 cookie[key] = value
 print("HTTP/1.1 204 OK")
-print("Content-Type: text/plain")
 print(cookie.output())
 print("\r\n")
-print("Cookies Set Successfuly !")

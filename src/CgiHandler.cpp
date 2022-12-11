@@ -160,6 +160,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("Host").substr(poz + 1, req.getHeader("Host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
     this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
+    this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
 	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
