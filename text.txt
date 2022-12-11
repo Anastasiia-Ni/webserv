@@ -1,1355 +1,0 @@
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 2dea6f14-f41e-4f7c-983e-362d951e195f
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------892706683935606314189652
-Content-Length: 9036
-
-----------------------------892706683935606314189652
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: d8fb5c44-e442-4863-a24a-cc303acf0fd2
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------289467920822115141131785
-Content-Length: 9036
-
-----------------------------289467920822115141131785
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: b4fc3026-e9df-4dec-a714-b479e6c51813
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------531275707914563758848344
-Content-Length: 9036
-
-----------------------------531275707914563758848344
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 421ed610-1d9a-4464-8c5f-9ae5420204ff
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------481682748271784269406439
-Content-Length: 9036
-
-----------------------------481682748271784269406439
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------364697545472189673669783
-Content-Length: 9036
-
-----------------------------364697545472189673669783
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-GET /upload/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/test.png
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cec341a1-c32f-4965-b402-d62f6b69cbc7
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------893902254199358511382115
-Content-Length: 9036
-
-----------------------------893902254199358511382115
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-GET /upload/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/test.png
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-GET /upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 79c581a6-2eaf-4b12-bfd5-da6cac821b14
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://127.0.0.1:8001/upload/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/error_pages/404.html
-Host: 127.0.0.1:8001
-
-
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 3f5e748a-5e62-4b1a-9f01-84f113d9a51a
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------664992259324608348022058
-Content-Length: 9036
-
-----------------------------664992259324608348022058
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: ad13e843-9cfa-4062-aaab-cf009bf404e1
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------849627268769858009387533
-Content-Length: 9036
-
-----------------------------849627268769858009387533
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cc1169c2-4267-4666-bcb6-a1a7ce989c9d
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------490629179201575442910289
-Content-Length: 9036
-
-----------------------------490629179201575442910289
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-POST / HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: c2e74497-1df3-4f3a-805f-6740150d8c26
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------014566499367664240441913
-Content-Length: 9036
-
-----------------------------014566499367664240441913
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST / HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 1a9dce2a-c71f-4fb9-a84e-bfdbea23e3f1
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------689368302159676425749180
-Content-Length: 9036
-
-----------------------------689368302159676425749180
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 7d60e029-c368-4da3-86e9-891ad69a3359
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------966444592800161442679444
-Content-Length: 9036
-
-----------------------------966444592800161442679444
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: b2ed3309-e349-441a-a483-4cc63d31bf9a
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------182508239685354846663288
-Content-Length: 9036
-
-----------------------------182508239685354846663288
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: bc124bda-b73b-4632-80e9-a68e5e4ba718
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------438549752214638826493029
-Content-Length: 9036
-
-----------------------------438549752214638826493029
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 1cf0458f-7785-4fe6-88fd-b11d55aaf807
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------481668708656480585602925
-Content-Length: 9036
-
-----------------------------481668708656480585602925
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 088bc11f-fc9d-4e2a-88e6-cc0e64d389d6
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------749933278021070078761587
-Content-Length: 9036
-
-----------------------------749933278021070078761587
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 601ff204-a4b8-47f5-bacb-53ed798bab04
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------968498719957186980670764
-Content-Length: 9036
-
-----------------------------968498719957186980670764
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 4247c890-5bc4-44e8-996d-35dfbb7622e2
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------681712302781369855350536
-Content-Length: 9036
-
-----------------------------681712302781369855350536
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 9ad0cb58-2ed7-4b2b-9ff6-fdf03e8edea0
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------485852379580318343365677
-Content-Length: 9036
-
-----------------------------485852379580318343365677
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: cc829189-c2b6-49c5-b416-7548d20127f5
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------459110907025762765090722
-Content-Length: 9036
-
-----------------------------459110907025762765090722
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /tours/tours.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/css/style.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /tours/t.js HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: */*
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: script
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/abu-dhabi02.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/park.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-Ú»÷
-GET /assets/images/beach.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-»÷
-GET /assets/images/fontan.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/mount.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /tours/tours.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/css/style.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /tours/t.js HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: */*
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: script
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/abu-dhabi02.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/fontan.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/beach.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/mount.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/park.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /index.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/tours/tours.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/css/style.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/Desert_UAE.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/assets/css/style.css
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 388caf0f-ae18-4bab-b344-8930f0902845
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------078420047819421165509292
-Content-Length: 9036
-
-----------------------------078420047819421165509292
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-Îpßîðôï½|ÿÙØØøïÎ„ˆäã[¶CÕ\0íNrõ°GÕœenh¤¦
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 44463526-3f8e-433c-a0b7-0a11059f542f
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------072805980112595455229407
-Content-Length: 9036
-
-----------------------------072805980112595455229407
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-
-‰PNG
-
-
-GET /index.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-è
-GET /assets/css/style.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/images/Desert_UAE.jpeg HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/assets/css/style.css
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /services.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/index.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/css/style.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /assets/css/serv.css HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: text/css,*/*;q=0.1
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: style
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-POST /cgi-bin/upload.py HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-Content-Length: 9018
-Cache-Control: max-age=0
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: "macOS"
-Upgrade-Insecure-Requests: 1
-Origin: http://127.0.0.1:8001
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMQNU3iPKByAnUmuo
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: http://127.0.0.1:8001/services.html
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-------WebKitFormBoundaryMQNU3iPKByAnUmuo
-Content-Disposition: form-data; name="filename"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-GET /favicon.ico HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/cgi-bin/upload.py
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-GET /error_pages/404.html HTTP/1.1
-Host: 127.0.0.1:8001
-Connection: keep-alive
-sec-ch-ua: "Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
-sec-ch-ua-mobile: ?0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
-sec-ch-ua-platform: "macOS"
-Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Dest: image
-Referer: http://127.0.0.1:8001/cgi-bin/upload.py
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cookie: user=Dragon
-
-
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 5c422e1a-0658-44b0-bbd1-c1e9a697c530
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------026428674479467686500655
-Content-Length: 9036
-
-----------------------------026428674479467686500655
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-DELETE /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: f2ff7df1-15ef-4783-a374-d60965fef0e0
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------323725022318350085262381
-Content-Length: 9036
-
-----------------------------323725022318350085262381
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-÷¨[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
-POST /upload/test.png HTTP/1.1
-User-Agent: PostmanRuntime/7.29.2
-Accept: */*
-Postman-Token: 72290c00-171b-4e37-84b2-1dd03d6b5d02
-Host: 127.0.0.1:8001
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------667078906028754043593047
-Content-Length: 9036
-
-----------------------------667078906028754043593047
-Content-Disposition: form-data; name="ff"; filename="image.png"
-Content-Type: image/png
-
-‰PNG
-
-
-[KûŸM†çmÞ­âku»€1c»†^ÙÖDßcpçÀÉèÎvÕ‡ÙÄCÛJðü‡qr°¶‚µ–žµ™éÎÒ©‚“ËßêŽÛ¬®	x÷ä2sÛma­Å)Û±;ï¤Ý¦›YÞÓÒÞØë\¬•0Æ`ŒÁ¹:¥Õ­¬lÙ™ÙÐfÕWdZ]G=3ÕnHÖQkÂânfpá…«¼eXñ=ÒC ÓŽ]X{ÇfLŒ1ŽõmFååYêˆôdªy“–ÒhÒ‡’ciÏ™v4F™üqIŽ?Î;ös¦=ë¼ž3í§ž×¬Ÿ±Ì>Ô»ï±¶Ô9=²{7eðÞÞQ@r2ÛF×Æû'·Åùð-_î‡%lÙÍ%¸ÿwÝ÷ør3ŒÓN68ŸN n£;ùþÃñ{M—°X¡aNI6´ƒ;Ž>Âý_÷mƒ3ê…ð	ðÍÃn§½CË­…†<*E¼±÷ÃÜÞÕ/O.³
