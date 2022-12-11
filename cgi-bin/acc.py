@@ -54,8 +54,30 @@ def printUserMsg(msg):
     print("</html>")
 
 def printLogin():
-    print("HTTP/1.1 301 OK")
-    print("Location: /login.html\r\n")
+    print("Content-Type: text/html\r\n")
+    print("<html> ")
+    print("<head>")
+    print("<meta charset=\"UTF-8\" name=\"viewport\" content=\"width=device-width, initial-scale=1\">")
+    print("<link rel=\"stylesheet\" href=\"/assets/css/accstyle.css\">")
+    print("<title> Login Page </title>")
+    print("</head>")
+    print("<body>  ")
+    print("<center> <h1> Amanix Login Form </h1> </center> ")
+    print("<form action = \"../cgi-bin/acc.py\" method = \"get\">")
+    print("<div class=\"container\"> ")
+    print("<label>Username : </label> ")
+    print("<input type=\"text\" placeholder=\"Enter Username\" name=\"username\" required>")
+    print("<label>Password : </label> ")
+    print("<input type=\"password\" placeholder=\"Enter Password\" name=\"password\" required>")
+    print("<button type=\"submit\">Login</button> ")
+    print("No Account?<a href=\"/register.html\"> Register Here </a> ")
+    print("</div> ")
+    print("</form>   ")
+    print("</body>   ")
+    print("</html>")
+
+
+
 
 def authUser(name, password):
     print("name is",name,"and password is", password, file=sys.stderr)
