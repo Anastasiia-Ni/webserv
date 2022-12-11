@@ -237,7 +237,7 @@ int    Response::handleTarget()
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
     // If URI matches with a Location block
-    std::cout << "METHOD IS " <<  _request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
+    // std::cout << "METHOD IS " <<  _request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
     if (location_key.length() > 0)
     {
         Location target_location = *_server.getLocationKey(location_key);
@@ -516,8 +516,19 @@ int    Response::buildBody()
             _code = 404;
             return (1);
         }
-        std::cout << "TARGET FILE IS :" << _target_file << "and file size is " << _request.getBody().length() << std::endl;
-        file.write(_request.getBody().c_str(), _request.getBody().length());
+
+
+        if (_request.getMultiformFlag()) 
+        {
+            std::string body = _request.getBody();
+            body = removeBoundary(body, _request.getBoundary());
+            file.write(body.c_str(), _request.getBody().length());
+        }
+        else
+        {
+            std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << _request.getBody().length() << std::endl;
+            file.write(_request.getBody().c_str(), _request.getBody().length());
+        }
 
         // _target_file
     }
@@ -605,4 +616,76 @@ int      Response::getCode() const
 bool    Response::isCgi()
 {
     return (_cgi);
+}
+
+std::string Response::removeBoundary(std::string &body, std::string &boundary)
+{
+    std::string buffer;
+    std::string new_body;
+    std::string filename;
+    bool is_boundary = false;
+    bool is_content = false;
+
+    if (body.find("--" + boundary) != std::string::npos && body.find("--" + boundary + "--") != std::string::npos)
+    {
+        for (size_t i = 0; i < body.size(); i++)
+        {
+            buffer.clear();
+            while(body[i] != '\n')
+            {
+                buffer += body[i];
+                i++;
+            }
+            if (!buffer.compare(("--" + boundary + "--\r")))
+            {
+                is_content = true;
+                is_boundary = false;
+            }
+            if (!buffer.compare(("--" + boundary + "\r")))
+            {
+                is_boundary = true;
+            }
+            if (is_boundary)
+            {
+                if (!buffer.compare(0, 31, "Content-Disposition: form-data;"))
+                {
+                    size_t start = buffer.find("filename=\"");
+                    if (start != std::string::npos)
+                    {
+                        size_t end = buffer.find("\"", start + 10);
+                        if (end != std::string::npos)
+                            filename = buffer.substr(start + 10, end);
+                    }
+                }
+                else if(!buffer.compare(0, 1, "\r") && !filename.empty())
+                {
+                    is_boundary = false;
+                    is_content = true;
+                }
+                
+            }
+            else if (is_content)
+            {
+                if (!buffer.compare(("--" + boundary + "\r")))
+                {
+                    is_boundary = true;
+                }
+                else if (!buffer.compare(("--" + boundary + "--\r")))
+                {
+                    // _target_file = "upload/"+ filename;
+                    new_body.erase(new_body.end() - 1);
+                    break;
+                }
+                else
+                    new_body += (buffer + "\n");
+            }
+
+        }
+    }
+    // else
+    //    _error_code = 400; // if download error
+   
+    // std::cout << "NEW NAME: " << filename << std::endl;
+    body.clear();
+    return (new_body);
 }
