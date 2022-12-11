@@ -142,7 +142,7 @@ void ServerConfig::setClientMaxBodySize(std::string parametr)
 	}
 	if (!std::stoi(parametr))
 		throw ErrorException("Wrong syntax: client_max_body_size");
-	body_size = std::stoi(parametr) * 1000000; //value is given in mb
+	body_size = std::stoi(parametr);
 	this->_client_max_body_size = body_size;
 }
 

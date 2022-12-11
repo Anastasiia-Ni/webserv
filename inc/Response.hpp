@@ -32,7 +32,7 @@ class Response
         void        cutRes(size_t);
         bool        isCgi();
 
-
+        std::string removeBoundary(std::string &body, std::string &boundary);
 
     private:
         HttpRequest     _request;
@@ -68,7 +68,6 @@ class Response
         bool    reqError();
         int     handleCgi(std::string &);
         int    constructCgiResp();
-
 
 };
 

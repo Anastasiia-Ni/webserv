@@ -1,7 +1,5 @@
 #include "../inc/HttpRequest.hpp"
 
-
-
 HttpRequest::HttpRequest()
 {
     _method_str[::GET] = "GET";
@@ -22,6 +20,8 @@ HttpRequest::HttpRequest()
     _body_length = 0;
     _storage = "";
     _key_storage = "";
+    _multiform_flag = false;
+    _boundary = "";
 }
 
 HttpRequest::~HttpRequest() {}
@@ -734,6 +734,14 @@ void        HttpRequest::_handle_headers()
         _server_name = _request_headers["Host"].substr(0, pos);
         // std::cout << "Target Server Name is :" << _server_name << std::endl;
     }
+
+    if (_request_headers["Content-Type"].find("multipart/form-data") != std::string::npos)
+    {
+        size_t pos = _request_headers["Content-Type"].find("boundary=", 0);
+        if (pos != std::string::npos)
+            this->_boundary = _request_headers["Content-Type"].substr(pos + 9, _request_headers["Content-Type"].size());
+        this->_multiform_flag = true;
+    }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;
 }
 
@@ -763,6 +771,9 @@ void    HttpRequest::clear()
     _key_storage.clear();
     _request_headers.clear();
     _server_name.clear();
+
+    _multiform_flag = false;
+    _boundary.clear();
 }
 
 /**
@@ -783,4 +794,14 @@ bool        HttpRequest::keepAlive()
 std::string     HttpRequest::getServerName()
 {
     return (_server_name);
+}
+
+bool    HttpRequest::getMultiformFlag()
+{
+    return (this->_multiform_flag);
+}
+
+std::string     &HttpRequest::getBoundary()
+{
+    return (this->_boundary);
 }
