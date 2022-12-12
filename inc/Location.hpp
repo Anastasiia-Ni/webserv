@@ -10,7 +10,7 @@ class Location
 		std::string					_root;
 		bool						_autoindex;
 		std::string					_index;
-		std::vector<short>			_methods; // GET+ POST- DELETE-
+		std::vector<short>			_methods; // GET+ POST- DELETE- PUT- HEAD-
 		std::string					_return;
 		std::string					_alias;
 		std::vector<std::string>	_cgi_path;

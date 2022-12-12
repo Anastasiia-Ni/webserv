@@ -8,8 +8,10 @@ Location::Location()
 	this->_index = "";
 	this->_return = "";
 	this->_alias = "";
-	this->_methods.reserve(3);
+	this->_methods.reserve(5);
 	this->_methods.push_back(1);
+	this->_methods.push_back(0);
+	this->_methods.push_back(0);
 	this->_methods.push_back(0);
 	this->_methods.push_back(0);
 }
@@ -64,6 +66,8 @@ void Location::setMethods(std::vector<std::string> methods)
 	this->_methods[0] = 0;
 	this->_methods[1] = 0;
 	this->_methods[2] = 0;
+	this->_methods[3] = 0;
+	this->_methods[4] = 0;
 
 	for (size_t i = 0; i < methods.size(); i++)
 	{
@@ -73,6 +77,10 @@ void Location::setMethods(std::vector<std::string> methods)
 			this->_methods[1] = 1;
 		else if (methods[i] == "DELETE")
 			this->_methods[2] = 1;
+		else if (methods[i] == "PUT")
+			this->_methods[3] = 1;
+		else if (methods[i] == "HEAD")
+			this->_methods[4] = 1;
 		else
 			throw ServerConfig::ErrorException("Allow method not supported " + methods[i]);
 	}
@@ -161,8 +169,20 @@ const std::string &Location::getAlias() const
 std::string Location::getPrintMethods() const
 {
 	std::string res;
+	if (_methods[4])
+		res.insert(0, "HEAD");
+	if (_methods[3])
+	{
+		if (!res.empty())
+			res.insert(0, ", ");
+		res.insert(0, "PUT");
+	}
 	if (_methods[2])
+	{
+		if (!res.empty())
+			res.insert(0, ", ");
 		res.insert(0, "DELETE");
+	}
 	if (_methods[1])
 	{
 		if (!res.empty())
