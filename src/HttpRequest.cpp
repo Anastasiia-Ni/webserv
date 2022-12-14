@@ -76,6 +76,26 @@ void    trimStr(std::string &str)
     str.erase(str.find_last_not_of(spaces) + 1); // Trim trailing  spaces
 }
 
+bool    checkUriPos(std::string path)
+{
+    std::string tmp(path);
+    char *res = strtok((char*)tmp.c_str(), "/");
+    int pos = 0;
+    while(res != NULL)
+    {
+        std::cout << "res:" << res << "|" << std::endl;
+        if(!strcmp(res, ".."))
+            pos--;
+        else
+            pos++;
+        if(pos < 0)
+            return 1;
+        res = strtok(NULL, "/");
+        // std::cout << path << std::endl;
+    }
+    return 0;
+}
+
 void    HttpRequest::feed(char *data, size_t size)
 {
     u_int8_t character;
@@ -237,10 +257,10 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Request_Line_Ver:
             {
-                if (_path.find("/../") != std::string::npos)
+                if(checkUriPos(_path))
                 {
                     _error_code = 400;
-                    std::cout << "Bad URI (Request_Line_Ver)" << std::endl;
+                    std::cout << "Request URI ERROR: goes before root !!" << std::endl;
                     return;
                 }
                 if (character != 'H')

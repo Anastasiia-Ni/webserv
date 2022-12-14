@@ -103,6 +103,11 @@ static bool    isAllowedMethod(HttpMethod &method, Location &location, short &co
     return (0);
 }
 
+static bool    isAllowedSize(HttpMethod &method, Location &location, short &code)
+{
+    return (0);
+}
+
 static bool    checkReturn(Location &loc, short &code, std::string &location)
 {
     if(!loc.getReturn().empty())
@@ -244,6 +249,9 @@ int    Response::handleTarget()
 
         if(isAllowedMethod(_request.getMethod(), target_location, _code))
             return (1);
+        // Uncomment and fix if we should allow max size for locations
+        // if(isAllowedSize(_request.getMethod(), target_location, _code))
+        //     return (1);
         // std::cout << "after allwoed\n" ;
         if (checkReturn(target_location, _code, _location))
             return (1);
@@ -371,15 +379,18 @@ void    Response::buildErrorBody()
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
         if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty())
+        {   
+            std::cout << "USED DEFAULT ERROR PAGE";
             setServerDefaultErrorPages();
+        }
         else
         {
             // std::cout << "NON_DEFAULT STRING ERRORS \n";
-
             if(_code >= 400 && _code < 500)
             {
                 _location = _server.getErrorPages().at(_code);
-                // std::cout << "Error Location is  " << _location << std::endl;
+                std::cout << "Error Location is  " << _location << std::endl;
+                _location.insert(_location.begin(), '/');
                 _code = 302;
             }
 

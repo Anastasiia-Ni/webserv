@@ -92,7 +92,7 @@ void    ServerManager::checkTimeout()
 {
         for(std::map<int, Client>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
         {
-            if(time(NULL) - it->second.getLastTime() > 10)
+            if(time(NULL) - it->second.getLastTime() > CONNECTION_TIMEOUT)
             {
                 closeConnection(it->first);
                 return;
