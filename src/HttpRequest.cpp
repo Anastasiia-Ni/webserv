@@ -18,6 +18,7 @@ HttpRequest::HttpRequest()
     _body_done_flag = false;
     _chunked_flag = false;
     _body_length = 0;
+    _body.clear();
     _storage = "";
     _key_storage = "";
     _multiform_flag = false;
@@ -791,7 +792,7 @@ void    HttpRequest::clear()
     _key_storage.clear();
     _request_headers.clear();
     _server_name.clear();
-
+    _body.clear();
     _multiform_flag = false;
     _boundary.clear();
 }

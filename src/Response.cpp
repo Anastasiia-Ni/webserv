@@ -506,6 +506,12 @@ void        Response::setStatusLine()
 
 int    Response::buildBody()
 {
+    if(_request.getBody().length() > _server.getClientMaxBodySize())
+    {
+        std::cout << "REQUET BODY SIZE IS " << _request.getBody().length() << "AND BVODY IS " << _request.getBody() << std::endl;
+        _code = 413;
+        return (1);
+    }
     if (handleTarget())
         return (1);
 	if(_cgi || _auto_index)
