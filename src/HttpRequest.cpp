@@ -84,7 +84,7 @@ bool    checkUriPos(std::string path)
     int pos = 0;
     while(res != NULL)
     {
-        std::cout << "res:" << res << "|" << std::endl;
+        // std::cout << "res:" << res << "|" << std::endl;
         if(!strcmp(res, ".."))
             pos--;
         else

@@ -45,7 +45,10 @@ class ServerManager
         void checkTimeout();
         void closeConnection(int);
         void assignServer(int &);
-
+        void sendCgiBody(int &, int &);
+        void readCgiResponse(int &, int &);
+        void addToSet(int , fd_set &);
+        void removeFromSet(int , fd_set &);
 };
 
 

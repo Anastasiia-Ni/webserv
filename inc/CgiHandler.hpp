@@ -15,6 +15,9 @@ class CgiHandler {
 		int								_exit_status;
 
 	public:
+		int	pipe_in[2];
+		int	pipe_out[2];
+		
 		CgiHandler();
 		CgiHandler(std::string path);
 		~CgiHandler();
@@ -25,6 +28,7 @@ class CgiHandler {
 		void execute(HttpRequest& req, int &fd, std::string &, short &error_code);
 		void sendHeaderBody(int &pipe_out, int &fd, std::string &);
 		void fixHeader(std::string &header);
+		void clear();
 		std::string setCookie(const std::string& str);
 
 		void setCgiPid(pid_t cgi_pid);

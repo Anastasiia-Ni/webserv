@@ -44,7 +44,12 @@ std::string CgiHandler::decode(std::string &path)
 /* Constructor */
 
 CgiHandler::CgiHandler() {
-    std::cout << "CgiHandler constructor" << std::endl;
+	this->_cgi_pid = -1;
+	this->_exit_status = 0;
+	this->_cgi_path = "";
+	this->_ch_env = NULL;
+	this->_argv = NULL;
+    // std::cout << "CgiHandler constructor" << std::endl;
 }
 
 CgiHandler::CgiHandler(std::string path)
@@ -100,6 +105,7 @@ CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
 	}
 	return (*this);
 }
+
 
 /*Set functions */
 void CgiHandler::setCgiPid(pid_t cgi_pid)
@@ -190,8 +196,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 /* Pipe and execute CGI */
 void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content, short &error_code)
 {
-	int pipe_in[2], pipe_out[2];
-	int out_file;
 
 	if (this->_argv[0] == NULL || this->_argv[1] == NULL)
 	{
@@ -236,20 +240,20 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 	}
 	else if (this->_cgi_pid > 0)
 	{
-		std::string body = req.getBody();
-		std::cout << "NO OF BYTES SENT TO CHILD --> " << atoi(this->_env["CONTENT_LENGTH"].c_str()) << std::endl;
-		int sent_bytes;
-		// while( (sent_bytes = write(pipe_in[1], body.c_str(), 8192)) > 0 )
-		// 	body = body.substr(sent_bytes);
-		write(pipe_in[1], body.c_str(), body.length());
-		close(pipe_in[1]);
-		close(pipe_out[1]);
-		std::cout << "Waiting" << std::endl;
+		// std::string body = req.getBody();
+		// std::cout << "NO OF BYTES SENT TO CHILD --> " << atoi(this->_env["CONTENT_LENGTH"].c_str()) << std::endl;
+		// int sent_bytes;
+		// // while( (sent_bytes = write(pipe_in[1], body.c_str(), 8192)) > 0 )
+		// // 	body = body.substr(sent_bytes);
+		// write(pipe_in[1], body.c_str(), body.length());
+		// close(pipe_in[1]);
+		// close(pipe_out[1]);
+		// std::cout << "Waiting" << std::endl;
 		
 
-		sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
-		close(pipe_out[0]);
-        close(pipe_in[0]);
+		// // sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
+		// close(pipe_out[0]);
+        // close(pipe_in[0]);
 	}
 	else
 	{
@@ -308,7 +312,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_co
 	// 	std::string chunk;
     //     chunk = toString(fromDecToHex(body.length()));
     //     chunk += "\r\n";
-    //     chunk += body;
+	
     //     chunk += "\r\n";
     //     // std::cout << chunk << std::endl;
 	// 	num_ch++; // delete
@@ -404,4 +408,14 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 		return "";
 	end = tmp.find("?");
 	return (end == std::string::npos ? tmp : tmp.substr(0, end));
+}
+
+void		CgiHandler::clear()
+{
+	this->_cgi_pid = -1;
+	this->_exit_status = 0;
+	this->_cgi_path = "";
+	this->_ch_env = NULL;
+	this->_argv = NULL;
+	this->_env.clear();
 }

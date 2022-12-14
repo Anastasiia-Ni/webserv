@@ -31,8 +31,13 @@ class Response
         void        handleCgi(HttpRequest&);
         void        cutRes(size_t);
         bool        isCgi();
+        void        setCgiOff();
+
+		CgiHandler		_cgi_obj;
+        
 
         std::string removeBoundary(std::string &body, std::string &boundary);
+        std::string     _response_content;
 
     private:
         HttpRequest     _request;
@@ -40,7 +45,6 @@ class Response
         std::string     _target_file;
         std::vector<uint8_t> _body;
         size_t          _body_length;
-        std::string     _response_content;
         std::string     _response_body;
         std::string     _location;
         short           _code;
@@ -49,7 +53,6 @@ class Response
 		int				_cgi_fd[2];
 		size_t			_cgi_response_length;
         bool            _auto_index;
-		// CgiHandler		_cgi_obj;
 
         int     buildBody();
         size_t  file_size();
@@ -67,7 +70,6 @@ class Response
         void    buildErrorBody();
         bool    reqError();
         int     handleCgi(std::string &);
-        int    constructCgiResp();
 
 };
 

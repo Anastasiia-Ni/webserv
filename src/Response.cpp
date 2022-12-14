@@ -193,7 +193,8 @@ int        Response::handleCgi(std::string &location_key)
     }
     if (isAllowedMethod(_request.getMethod(), *_server.getLocationKey(location_key), _code))
         return (1); // проверить еще, после 1 сайт висит
-    CgiHandler obj(path);
+    _cgi_obj.clear();
+    _cgi_obj.setCgiPath(path);
     _cgi = 1;
     if(pipe(_cgi_fd) < 0)
     {
@@ -201,8 +202,8 @@ int        Response::handleCgi(std::string &location_key)
         _code = 500;
         return (1);
     }
-    obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
-    obj.execute(_request, this->_cgi_fd[1], _response_content, this->_code);
+    _cgi_obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
+    _cgi_obj.execute(_request, this->_cgi_fd[1], _response_content, this->_code);
 
     return (0);
 }
@@ -407,26 +408,6 @@ void    Response::buildErrorBody()
         }
 
 }
-int    Response::constructCgiResp()
-{
-    // char buf[4096];
-    // int  recvd = 0;
-    // while(( recvd = read(_cgi_fd[0], buf, 4096)) > 0)
-    // {
-    //     _response_content.append(buf, recvd);
-    //     memset(buf, 0, sizeof(buf));
-    // }
-    // close(_cgi_fd[0]);
-    // // if(recvd == 0)
-    // //     return 0;
-    // if(recvd < 0)
-    // {
-    //     _code = 500;
-    //     return 1;
-    // }
-    return (0);
-        
-}
 void    Response::buildResponse()
 {
 /*  if(checkReqError() || buildBody())
@@ -446,9 +427,10 @@ void    Response::buildResponse()
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
 	if(_cgi)
 	{
-        if(!constructCgiResp())
-            return;
-        buildErrorBody();
+        // if(!constructCgiResp())
+        //     return;
+        // buildErrorBody();
+        return;
     }
     else if(_auto_index)
     {
@@ -467,33 +449,13 @@ void    Response::buildResponse()
 
 /* Returns the entire reponse ( Headers + Body )*/
 std::string     Response::getRes(){
-
-	// if(_cgi)
-	// {
-    // 	char *temp = new(std::nothrow) char[4001];
-    //     if(!temp)
-    //     {
-    // 		std::cerr << "new Failed" << std::endl;
-    //         return (NULL);
-    //     }
-	// 	_cgi_response_length = read(_cgi_fd[0], temp, 4001);
-    //     close(_cgi_fd[0]);
-	// 	return temp;
-	// }
-    // else
-	// {
         return (_response_content);
-	// }
 }
 
 /* Returns the length of entire reponse ( Headers + Body) */
 size_t Response::getLen() const {
-
-	if(_cgi)
-		return _cgi_response_length;
-	return (_response_content.length() + _body_length);
-
-	}
+	return (_response_content.length());
+}
 
 /* Constructs Status line based on status code. */
 void        Response::setStatusLine()
@@ -501,7 +463,6 @@ void        Response::setStatusLine()
     _response_content.append("HTTP/1.1 " + std::to_string(_code) + " ");
     _response_content.append(statusCodeString(_code));
     _response_content.append("\r\n");
-
 }
 
 int    Response::buildBody()
@@ -615,11 +576,6 @@ void   Response::clearResponse()
     _response_body.clear();
     _location.clear();
     _code = 0;
-    // if(_res)
-    // {
-    //     delete [] _res;
-    //     _res = NULL;
-    // }
     _cgi = 0;
     _cgi_response_length = 0;
     _auto_index = 0;
@@ -705,4 +661,9 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
     // std::cout << "NEW NAME: " << filename << std::endl;
     body.clear();
     return (new_body);
+}
+
+void      Response::setCgiOff()
+{
+    _cgi = 0;
 }
