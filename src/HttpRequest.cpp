@@ -28,6 +28,25 @@ HttpRequest::HttpRequest()
 
 HttpRequest::~HttpRequest() {}
 
+bool    checkUriPos(std::string path)
+{
+    std::string tmp(path);
+    char *res = strtok((char*)tmp.c_str(), "/");
+    int pos = 0;
+    while(res != NULL)
+    {
+        std::cout << "res:" << res << "|" << std::endl;
+        if(!strcmp(res, ".."))
+            pos--;
+        else
+            pos++;
+        if(pos < 0)
+            return 1;
+        res = strtok(NULL, "/");
+        // std::cout << path << std::endl;
+    }
+    return 0;
+}
 
 std::map<std::string, std::string> HttpRequest::getHeaders() const
 {
@@ -78,6 +97,11 @@ void    trimStr(std::string &str)
     str.erase(str.find_last_not_of(spaces) + 1); // Trim trailing  spaces
 }
 
+void    toLower(std::string &str)
+{
+    for(int i = 0; i < str.length(); ++i)
+        str[i] = std::tolower(str[i]);
+}
 void    HttpRequest::feed(char *data, size_t size)
 {
     u_int8_t character;
@@ -259,12 +283,12 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Request_Line_Ver:
             {
-                // if (_path.find("/../") != std::string::npos)
-                // {
-                //     _error_code = 400;
-                //     std::cout << "Bad URI (Request_Line_Ver)" << std::endl;
-                //     return;
-                // }
+                if(checkUriPos(_path))
+                {
+                    _error_code = 400;
+                    std::cout << "Request URI ERROR: goes before root !!" << std::endl;
+                    return;
+                }
                 if (character != 'H')
                 {
                     _error_code = 400;
@@ -705,6 +729,7 @@ void    HttpRequest::setMaxBodySize(size_t size)
 void    HttpRequest::setHeader(std::string &name, std::string &value)
 {
     trimStr(value);
+    toLower(name);
     _request_headers[name] = value;
 }
 
@@ -733,16 +758,7 @@ void        HttpRequest::_handle_headers()
 {
     std::stringstream ss;
 
-    if (_request_headers.count("Content-Length"))
-    {
-        _body_flag = true;
-        ss << _request_headers["Content-Length"];
-        ss >> _body_length;
-        // if (_body_length < 0)
-            // std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
-        // std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
-    }
-    else if (_request_headers.count("content-length"))
+    if (_request_headers.count("content-length"))
     {
         _body_flag = true;
         ss << _request_headers["content-length"];
@@ -751,25 +767,25 @@ void        HttpRequest::_handle_headers()
             // std::cout << "ERR_BODY_LENGTH = " << _body_length << std::endl;
         // std::cout << "_BODY_LENGTH = " << _body_length << std::endl;
     }
-    if ( _request_headers.count("Transfer-Encoding"))
+    if ( _request_headers.count("transfer-encoding"))
     {
-        if(_request_headers["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
+        if(_request_headers["transfer-encoding"].find_first_of("chunked") != std::string::npos)
             _chunked_flag = true;
         _body_flag = true;
     }
     
-    if (_request_headers.count("Host"))
+    if (_request_headers.count("host"))
     {
-        size_t pos = _request_headers["Host"].find_first_of(':');
-        _server_name = _request_headers["Host"].substr(0, pos);
+        size_t pos = _request_headers["host"].find_first_of(':');
+        _server_name = _request_headers["host"].substr(0, pos);
         // std::cout << "Target Server Name is :" << _server_name << std::endl;
     }
 
-    if (_request_headers["Content-Type"].find("multipart/form-data") != std::string::npos)
+    if (_request_headers["content-type"].find("multipart/form-data") != std::string::npos)
     {
-        size_t pos = _request_headers["Content-Type"].find("boundary=", 0);
+        size_t pos = _request_headers["content-type"].find("boundary=", 0);
         if (pos != std::string::npos)
-            this->_boundary = _request_headers["Content-Type"].substr(pos + 9, _request_headers["Content-Type"].size());
+            this->_boundary = _request_headers["content-typee"].substr(pos + 9, _request_headers["content-typee"].size());
         this->_multiform_flag = true;
     }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;
@@ -813,9 +829,9 @@ void    HttpRequest::clear()
 **/
 bool        HttpRequest::keepAlive()
 {
-    if (_request_headers.count("Connection"))
+    if (_request_headers.count("connection"))
     {
-        if(_request_headers["Connection"].find("close", 0) != std::string::npos)
+        if(_request_headers["connection"].find("close", 0) != std::string::npos)
             return false;
     }
     return true;
