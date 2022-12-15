@@ -525,7 +525,7 @@ void	ServerConfig::setupServer(void)
 	char tmp[512];
     _server_address.sin_port = htons(_port);
 
-
+	//host:port
     if (bind(_listen_fd, (struct sockaddr *) &_server_address, sizeof(_server_address)) == -1)
     {
         std::cerr << "webserv: bind error" << std::endl;

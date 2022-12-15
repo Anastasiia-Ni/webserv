@@ -95,8 +95,10 @@ static bool    isAllowedMethod(HttpMethod &method, Location &location, short &co
 {
     std::vector<short> methods = location.getMethods();
     if((method == GET && !methods[0]) || (method == POST && !methods[1]) ||
-       (method == DELETE && !methods[2]))
+       (method == DELETE && !methods[2])|| (method == PUT && !methods[3])||
+        (method == HEAD && !methods[4]))
     {
+        std::cout << "METHOD NOT ALLOWED\n" << std::endl;
         code = 405;
         return (1);
     }
@@ -204,7 +206,6 @@ int        Response::handleCgi(std::string &location_key)
     }
     _cgi_obj.initEnv(_request, _server.getLocationKey(location_key)); // + URI
     _cgi_obj.execute(_request, this->_cgi_fd[1], _response_content, this->_code);
-
     return (0);
 }
 
@@ -224,7 +225,7 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
             // std::cout << "URI PATH IS = " << path << " and Location part = " << it->getPath() << std::endl;
                if( it->getPath() == "/" || path.length() == it->getPath().length() || path[it->getPath().length()] == '/')
                {
-                // std::cout << "LOCATION = " << it->getPath() << std::endl;
+                std::cout << "LOCATION = " << it->getPath() << std::endl;
                     if(it->getPath().length() > biggest_match)
                     {
                         biggest_match = it->getPath().length();
@@ -239,7 +240,7 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
 
 int    Response::handleTarget()
 {
-    // std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
+    std::cout << "URI is = |" << _request.getPath()<< "|" << std::endl;
     std::string location_key;
     getLocationMatch(_request.getPath(), _server.getLocations(), location_key);
     // If URI matches with a Location block
@@ -249,7 +250,10 @@ int    Response::handleTarget()
         Location target_location = *_server.getLocationKey(location_key);
 
         if(isAllowedMethod(_request.getMethod(), target_location, _code))
+        {
+            std::cout << "METHOD NOT ALLOWED \n";
             return (1);
+        }
         // Uncomment and fix if we should allow max size for locations
         // if(isAllowedSize(_request.getMethod(), target_location, _code))
         //     return (1);
@@ -263,8 +267,11 @@ int    Response::handleTarget()
 
         if(!target_location.getAlias().empty())
         {
+            std::cout << " ALIAS IS " << target_location.getAlias() << std::endl;
             replaceAlias(target_location, _request, _target_file);
-            _target_file = combinePaths(_server.getRoot(), _target_file, "");
+            // _target_file = combinePaths(_server.getRoot(), _target_file, "");
+            std::cout << " Path after replacing alias is " << _target_file << std::endl;
+
         }
         else
             appendRoot(target_location, _request, _target_file);
@@ -391,7 +398,8 @@ void    Response::buildErrorBody()
             {
                 _location = _server.getErrorPages().at(_code);
                 std::cout << "Error Location is  " << _location << std::endl;
-                _location.insert(_location.begin(), '/');
+                if(_location[0] != '/')
+                    _location.insert(_location.begin(), '/');
                 _code = 302;
             }
 
@@ -422,6 +430,29 @@ void    Response::buildResponse()
     //buildStatusLine
     //buildHeader
     // std::cerr << "HERE" << std::endl;
+    
+
+    // for tester
+    // if(_request.getPath().find(".bla") != std::string::npos)
+    // {
+    //     _code = 200;
+    //     setStatusLine();
+    //     _response_body = "HMM";
+    //     setHeaders();
+    //     _response_content.append(_response_body);
+    //     return;
+    // }
+    // // for tester
+    // if(_request.getPath() == "/directory/Yeah")
+    // {
+    //     _code = 404;
+    //     buildErrorBody()
+    //     setStatusLine();
+    //     _response_body = "HMM";
+    //     setHeaders();
+    //     _response_content.append(_response_body);
+    //     return;
+    // }
     if(reqError() || buildBody())
         buildErrorBody();
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
@@ -442,6 +473,19 @@ void    Response::buildResponse()
         else
             _code = 200;
     }
+    setStatusLine();
+    setHeaders();
+    if(_request.getMethod() != HEAD && (_request.getMethod() == GET || _code != 200))
+        _response_content.append(_response_body);
+    // _response_content.append(_response_body);
+}
+
+void    Response::setErrorResponse(short code)
+{
+    _response_content = "";
+    _code = code;
+    _response_body = "";
+    buildErrorBody();
     setStatusLine();
     setHeaders();
     _response_content.append(_response_body);
@@ -480,21 +524,21 @@ int    Response::buildBody()
     if(_code)
         return (0);
     // std::cout << _target_file << "ERROR " << std::endl;
-    if(_request.getMethod() == GET)
+    if(_request.getMethod() == GET || _request.getMethod() == HEAD)
     {
         if(readFile())
             return (1);
     }
-    else if(_request.getMethod() == POST)
+     else if(_request.getMethod() == POST || _request.getMethod() == PUT)
     {
+        std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << _request.getBody().length() << std::endl;
         std::ofstream file(_target_file.c_str(), std::ios::binary);
         if (file.fail())
         {
-            // std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
+            std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
             _code = 404;
             return (1);
         }
-
 
         if (_request.getMultiformFlag()) 
         {
@@ -519,9 +563,7 @@ int    Response::buildBody()
             return(1);
         }
         else
-        {
             puts( "File successfully deleted" );
-        }
         
     }
     _code = 200;
@@ -563,10 +605,12 @@ void    Response::setRequest(HttpRequest &req)
 {
     _request = req;
 }
+
 void        Response::cutRes(size_t i)
 {
     _response_content = _response_content.substr(i);
 }
+
 void   Response::clearResponse()
 {
     _target_file.clear();
@@ -586,7 +630,7 @@ int      Response::getCode() const
     return (_code);
 }
 
-bool    Response::isCgi()
+int    Response::getCgiState()
 {
     return (_cgi);
 }
@@ -663,7 +707,7 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
     return (new_body);
 }
 
-void      Response::setCgiOff()
+void      Response::setCgiState(int state)
 {
-    _cgi = 0;
+    _cgi = state;
 }

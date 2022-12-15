@@ -238,29 +238,14 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 
 		exit(this->_exit_status);
 	}
-	else if (this->_cgi_pid > 0)
-	{
-		// std::string body = req.getBody();
-		// std::cout << "NO OF BYTES SENT TO CHILD --> " << atoi(this->_env["CONTENT_LENGTH"].c_str()) << std::endl;
-		// int sent_bytes;
-		// // while( (sent_bytes = write(pipe_in[1], body.c_str(), 8192)) > 0 )
-		// // 	body = body.substr(sent_bytes);
-		// write(pipe_in[1], body.c_str(), body.length());
-		// close(pipe_in[1]);
-		// close(pipe_out[1]);
-		// std::cout << "Waiting" << std::endl;
-		
-
-		// // sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
-		// close(pipe_out[0]);
-        // close(pipe_in[0]);
-	}
+	else if (this->_cgi_pid > 0){}
 	else
 	{
         std::cout << "Fork failed" << std::endl; // std::cerr <<
 		error_code = 500;
 	}
 }
+
 
 void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_content) // add fd freom responce
 {				

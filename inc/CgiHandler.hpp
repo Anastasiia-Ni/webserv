@@ -11,10 +11,10 @@ class CgiHandler {
 		char**								_ch_env;
 		char**								_argv;
 		std::string							_cgi_path;
-		pid_t								_cgi_pid;
 		int								_exit_status;
 
 	public:
+		pid_t								_cgi_pid;
 		int	pipe_in[2];
 		int	pipe_out[2];
 		

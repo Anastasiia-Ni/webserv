@@ -204,7 +204,7 @@ void             Client::clearClient()
 //     }
 // }
 
-bool      Client::isCgi()
-{
-    return (_response.isCgi());
-}
+// bool      Client::isCgi()
+// {
+//     return (_response.isCgi());
+// }

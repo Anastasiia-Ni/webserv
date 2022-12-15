@@ -5,6 +5,8 @@ HttpRequest::HttpRequest()
     _method_str[::GET] = "GET";
     _method_str[::POST] = "POST";
     _method_str[::DELETE] = "DELETE";
+    _method_str[::PUT] = "PUT";
+    _method_str[::HEAD] = "HEAD";
     _path = "";
     _query = "";
     _fragment = "";
@@ -18,7 +20,6 @@ HttpRequest::HttpRequest()
     _body_done_flag = false;
     _chunked_flag = false;
     _body_length = 0;
-    _body.clear();
     _storage = "";
     _key_storage = "";
     _multiform_flag = false;
@@ -77,26 +78,6 @@ void    trimStr(std::string &str)
     str.erase(str.find_last_not_of(spaces) + 1); // Trim trailing  spaces
 }
 
-bool    checkUriPos(std::string path)
-{
-    std::string tmp(path);
-    char *res = strtok((char*)tmp.c_str(), "/");
-    int pos = 0;
-    while(res != NULL)
-    {
-        // std::cout << "res:" << res << "|" << std::endl;
-        if(!strcmp(res, ".."))
-            pos--;
-        else
-            pos++;
-        if(pos < 0)
-            return 1;
-        res = strtok(NULL, "/");
-        // std::cout << path << std::endl;
-    }
-    return 0;
-}
-
 void    HttpRequest::feed(char *data, size_t size)
 {
     u_int8_t character;
@@ -112,16 +93,36 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character == 'G')
                     _method = GET;
                 else if (character == 'P')
-                    _method = POST;
+                {
+                    _state = Request_Line_Post_Put;
+                    break;
+                }
                 else if (character == 'D')
                     _method = DELETE;
+                else if (character == 'H')
+                    _method = HEAD;
                 else
                 {
-    
                     _error_code = 501; // Method not implemented (501)
                     std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return;
                 }
+                _state = Request_Line_Method;
+                break;
+            }
+            case Request_Line_Post_Put:
+            {
+                if (character == 'O')
+                    _method = POST;
+                else if(character == 'U')
+                    _method = PUT;
+                else
+                {
+                    _error_code = 501; // Method not implemented (501)
+                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
+                    return;
+                }
+                _method_index++;
                 _state = Request_Line_Method;
                 break;
             }
@@ -131,8 +132,8 @@ void    HttpRequest::feed(char *data, size_t size)
                     _method_index++;
                 else
                 {
-                    _error_code = 501; // Method not implemented
-                    std::cout << "Method Error Request_Line_Method" << std::endl;
+                    _error_code = 501; // Method not implemented (501)
+                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return;
                 }
 
@@ -258,12 +259,12 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Request_Line_Ver:
             {
-                if(checkUriPos(_path))
-                {
-                    _error_code = 400;
-                    std::cout << "Request URI ERROR: goes before root !!" << std::endl;
-                    return;
-                }
+                // if (_path.find("/../") != std::string::npos)
+                // {
+                //     _error_code = 400;
+                //     std::cout << "Bad URI (Request_Line_Ver)" << std::endl;
+                //     return;
+                // }
                 if (character != 'H')
                 {
                     _error_code = 400;
@@ -493,7 +494,7 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (_chunk_length == 0)
                 {
                     _state = Chunked_Length_CR;
-                    std::cout << "Bad Character (77Chunked_Length_Begin)" << std::endl;
+                    // std::cout << "Bad Character (77Chunked_Length_Begin)" << std::endl;
                 }
                 else
                     _state = Chunked_Length;
@@ -501,9 +502,12 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Length:
             {
+                // std::cout << "char is |" << character << "|" << std::endl;
+
                 if(isxdigit(character) != 0)
                 {
                     int temp_len = 0;
+                    std::stringstream().swap(s);
                     s << character;
                     s >> std::hex >> temp_len;
                     _chunk_length *= 16;
@@ -519,6 +523,7 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Length_CR:
             {
+                std::cout << "Chunk End CR" << std::endl;
                 if ( character == '\r')
                     _state = Chunked_Length_LF;
                 else
@@ -526,12 +531,12 @@ void    HttpRequest::feed(char *data, size_t size)
                     _error_code = 400;
                     std::cout << "Bad Character (Chunked_Length_CR)" << std::endl;
                     return;
-
                 }
                 continue;
             }
             case Chunked_Length_LF:
             {
+                std::cout << "Chunk End LF" << std::endl;
                 if ( character == '\n')
                 {
                     if(_chunk_length == 0)
@@ -555,7 +560,7 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Data:
             {
-                std::cout << "Chunk length = " << _chunk_length << std::endl;
+                // std::cout << "Chunk length = " << _chunk_length << std::endl;
 
                 if(_chunk_length == 0)
                     _state = Chunked_Data_CR;
@@ -592,6 +597,8 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_End_CR:
             {
+                std::cout << "Chunk End END CR" << std::endl;
+
                 if (character != '\r')
                 {
                     _error_code = 400;
@@ -604,6 +611,8 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_End_LF:
             {
+                std::cout << "Chunk End END LF" << std::endl;
+
                 if (character != '\n')
                 {
                     _error_code = 400;
@@ -825,4 +834,9 @@ bool    HttpRequest::getMultiformFlag()
 std::string     &HttpRequest::getBoundary()
 {
     return (this->_boundary);
+}
+
+void            HttpRequest::cutReqBody(int bytes)
+{
+    this->_body.erase(_body.begin(), _body.begin() + bytes);
 }

@@ -87,25 +87,26 @@ void    ServerManager::runServers()
             else if(FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
             {
                 std::cout << "I = " << i << std::endl;
-                std::cout << "readRequest()" << std::endl;
+                // std::cout << "readRequest()" << std::endl;
                 readRequest(i);
             }
             else if(FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
 
-                if(_clients_map[i]._response.isCgi() && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_in[1], &write_set_cpy))
+                int state = _clients_map[i]._response.getCgiState();
+                if(state == 1 && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_in[1], &write_set_cpy))
                 {
-                    std::cout << "sendCgiBody()" << std::endl;
+                    // std::cout << "sendCgiBody()" << std::endl;
                     sendCgiBody(i, _clients_map[i]._response._cgi_obj.pipe_in[1]);
                 }
-                else if(_clients_map[i]._response.isCgi() && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_out[0], &recv_set_cpy))
+                else if(state == 1 && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_out[0], &recv_set_cpy))
                 {
-                    std::cout << "readCgiResponse()" << std::endl;
+                    // std::cout << "readCgiResponse()" << std::endl;
                     readCgiResponse(i, _clients_map[i]._response._cgi_obj.pipe_out[0]);
                 }
-                else if((!_clients_map[i]._response.isCgi() && FD_ISSET(i, &write_set_cpy)))
+                else if((state == 0 || state == 2)  && FD_ISSET(i, &write_set_cpy))
                 {
-                    std::cout << "sendReponse()" << std::endl;
+                    // std::cout << "sendReponse()" << std::endl;
                     sendResponse(i);
                 }                   
             }
@@ -212,6 +213,7 @@ void    ServerManager::sendResponse(int &i)
 {
     int bytes_sent;
     std::string response = _clients_map[i].getResponse();
+    // std::cout << "REPONSE IS |" << response << "|" << std::endl;
     // std::cout << "RESPONSE IS = |" << response << std::endl;
     // if(!resp)
     //     send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
@@ -228,7 +230,7 @@ void    ServerManager::sendResponse(int &i)
     else if(bytes_sent == 0 || bytes_sent == response.length())
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
-        if(1 || _clients_map[i].keepAlive() == false || _clients_map[i].requestError() || _clients_map[i].isCgi())
+        if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError() || _clients_map[i]._response.getCgiState())
         {
             std::cout << "Connection Closed !" << std::endl;
             closeConnection(i);
@@ -309,11 +311,10 @@ void    ServerManager::readRequest(int &i)
     {
         assignServer(i);
         _clients_map[i].buildResponse();
-        if(_clients_map[i]._response.isCgi())
+        if(_clients_map[i]._response.getCgiState())
         {
             std::cout << "CGI RESPONSE" << std::endl;
             addToSet(_clients_map[i]._response._cgi_obj.pipe_in[1],  _write_fd_pool);
-            addToSet(_clients_map[i]._response._cgi_obj.pipe_out[0],  _recv_fd_pool);
         }
 
         removeFromSet(i, _recv_fd_pool);
@@ -321,57 +322,115 @@ void    ServerManager::readRequest(int &i)
     }
 }
 
+/*********************************************/
 
 void    ServerManager::sendCgiBody(int &i, int &pipe_in)
 {
-    std::cout << "sendCgiBody" << std::endl;
-
+    int bytes_sent;
+    std::string response = _clients_map[i].getResponse();
     std::string req_body = _clients_map[i]._request.getBody();
-    write(_clients_map[i]._response._cgi_obj.pipe_in[1], req_body.c_str(), req_body.length());
-    std::cout << "BODY SENT !!" << std::endl;
-    // addToSet(_clients_map[i]._response._cgi_obj.pipe_out[0],  _recv_fd_pool);
-    removeFromSet(_clients_map[i]._response._cgi_obj.pipe_in[1], _write_fd_pool);
-    close(_clients_map[i]._response._cgi_obj.pipe_in[1]);
-    close(_clients_map[i]._response._cgi_obj.pipe_out[1]);
-    pipe_in = -1;
-    _clients_map[i]._response._cgi_obj.pipe_out[1] = -1;
+
+    // std::cout << "RESPONSE IS = |" << response << std::endl;
+    // if(!resp)
+    //     send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
+    if(req_body.length() >= 8192)
+        bytes_sent = write(pipe_in, req_body.c_str(), 8192);
+    else
+        bytes_sent = write(pipe_in, req_body.c_str(), req_body.length());
+    
+    if(bytes_sent < 0)
+    {
+        //set ERROR HERE 
+        std::cout << "ERROR SENDING To CGI CHILD :" << strerror(errno) << std::endl;
+        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_in[1], _write_fd_pool);
+        close(_clients_map[i]._response._cgi_obj.pipe_in[1]);
+        close(_clients_map[i]._response._cgi_obj.pipe_out[1]);
+        _clients_map[i]._response.setErrorResponse(500);
+    }
+    else if(bytes_sent == 0 || bytes_sent == req_body.length())
+    {
+        // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
+        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_in[1], _write_fd_pool);
+        addToSet(_clients_map[i]._response._cgi_obj.pipe_out[0],  _recv_fd_pool);
+        close(_clients_map[i]._response._cgi_obj.pipe_in[1]);
+        close(_clients_map[i]._response._cgi_obj.pipe_out[1]);
+    }
+    else
+    {
+        _clients_map[i]._request.cutReqBody(bytes_sent);
+    } 
+    // std::ofstream  file("text_response.txt", std::ios_base::app);
+    // file << resp << std::endl;
 }
 
+
+/*  ********************************** */
 void    ServerManager::readCgiResponse(int &i, int &pipe_out)
 {
-	char	tmp[8192];
-	int 	res;
-	// size_t	pos;
-    std::cout << "readCGI RESPONSE" << std::endl;
-	while( (res = read(pipe_out, tmp, 8192) ) > 0)
-	{
-		std::cout << res << " bytes read succesfully !" << std::endl;
-		_clients_map[i]._response._response_content.append(tmp, res);
-		memset(tmp, 0, sizeof(tmp));
-	}
-	if(res == 0)
-		std::cout << "READ DONE !" << std::endl;
-	else if(res < 0)
-	{
-		std::cout << "Error Reading From CGI Script" << std::endl;
-		// Set Error to 500 here .
-	}
-    if (_clients_map[i]._response._response_content.find("HTTP/1.1") == std::string::npos)
-		_clients_map[i]._response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
-    removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
-    close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
-    close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
-    _clients_map[i]._response._cgi_obj.pipe_in[0] = -1;
-    _clients_map[i]._response._cgi_obj.pipe_out[0] = -1;
-    _clients_map[i]._response.setCgiOff();
+    char    buffer[8192];
+    int     bytes_read = 0;
+    
+    bytes_read = read(_clients_map[i]._response._cgi_obj.pipe_out[0], buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
+    if(bytes_read == 0)
+    {
+        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
+        close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
+        close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
+        _clients_map[i]._response.setCgiState(2);        
+        if (_clients_map[i]._response._response_content.find("HTTP/1.1") == std::string::npos)
+		    _clients_map[i]._response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
+        return;
+    }
+    else if(bytes_read < 0)
+    { 
+        std::cerr << "Error Reading From CGI Script ! " << strerror(errno) << std::endl;
+        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
+        close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
+        close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
+        _clients_map[i]._response.setCgiState(2);        
+        _clients_map[i]._response.setErrorResponse(500);
+        return;
+    }
+    else
+    {
+		std::cout << bytes_read << " bytes read succesfully !" << std::endl;
+		_clients_map[i]._response._response_content.append(buffer, bytes_read);
+		memset(buffer, 0, sizeof(buffer));
+    }
 }
+// {
+// 	char	tmp[8192];
+// 	int 	res;
+// 	// size_t	pos;
+//     std::cout << "readCGI RESPONSE" << std::endl;
+// 	while( (res = read(pipe_out, tmp, 8192) ) > 0)
+// 	{
+// 		std::cout << res << " bytes read succesfully !" << std::endl;
+// 		_clients_map[i]._response._response_content.append(tmp, res);
+// 		memset(tmp, 0, sizeof(tmp));
+// 	}
+// 	if(res == 0)
+// 		std::cout << "READ DONE !" << std::endl;
+// 	else if(res < 0)
+// 	{
+// 		std::cout << "Error Reading From CGI Script" << std::endl;
+// 		// Set Error to 500 here .
+// 	}
+//     if (_clients_map[i]._response._response_content.find("HTTP/1.1") == std::string::npos)
+// 		_clients_map[i]._response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
+//     removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
+//     close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
+//     close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
+//     _clients_map[i]._response._cgi_obj.pipe_in[0] = -1;
+//     _clients_map[i]._response._cgi_obj.pipe_out[0] = -1;
+//     _clients_map[i]._response.setCgiOff();
+// }
 
 void	ServerManager::addToSet(int i, fd_set &set)
 {
     FD_SET(i, &set);
     if(i > _biggest_fd)
         _biggest_fd = i;
-
 }
 
 void	ServerManager::removeFromSet(int i, fd_set &set)
