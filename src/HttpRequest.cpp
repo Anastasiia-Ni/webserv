@@ -516,10 +516,7 @@ void    HttpRequest::feed(char *data, size_t size)
                 s << character;
                 s >> std::hex >> _chunk_length;
                 if (_chunk_length == 0)
-                {
                     _state = Chunked_Length_CR;
-                    // std::cout << "Bad Character (77Chunked_Length_Begin)" << std::endl;
-                }
                 else
                     _state = Chunked_Length;
                 continue;
@@ -654,10 +651,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if(_body.size() == _body_length )
                 {
                     std::cout << "BODY SIZE IS " << _body.size() << std::endl;
-                    // std::cout << "BODY READ DONE !" << std::endl;
-                    // std::cout << "BODY supposed to be " << _body_length << std::endl;
-                    // std::cout << "Actual BODY is " << _body.size() << std::endl;
-
                     _body_done_flag = true;
                     _state = Parsing_Done;
                 }
@@ -676,7 +669,6 @@ void    HttpRequest::feed(char *data, size_t size)
 bool    HttpRequest::parsingCompleted()
 {
     return (_state == Parsing_Done);
-    // return (_fields_done_flag ? (!_body_flag || _body_done_flag) : false);
 }
 
 HttpMethod  &HttpRequest::getMethod()

@@ -511,7 +511,7 @@ void	ServerConfig::setupServer(void)
 {
 	if((_listen_fd = socket(AF_INET, SOCK_STREAM, 0) )  == -1 )
     {
-        std::cerr << " webserv: socket error" << std::endl;
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: socket error %s   Closing ....", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -522,13 +522,11 @@ void	ServerConfig::setupServer(void)
 
     _server_address.sin_family = AF_INET;
     _server_address.sin_addr.s_addr = _host;
-	char tmp[512];
     _server_address.sin_port = htons(_port);
 
-	//host:port
     if (bind(_listen_fd, (struct sockaddr *) &_server_address, sizeof(_server_address)) == -1)
     {
-        std::cerr << "webserv: bind error" << std::endl;
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: bind error %s   Closing ....", strerror(errno));
         exit(EXIT_FAILURE);
     }
 }
