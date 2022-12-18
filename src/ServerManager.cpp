@@ -287,7 +287,7 @@ void    ServerManager::readRequest(int &i)
     int     bytes_read = 0;
     
     bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
-
+    // std::cout << "Request is " << buffer << std::endl;
     if(bytes_read == 0)
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
@@ -312,8 +312,8 @@ void    ServerManager::readRequest(int &i)
         if(_clients_map[i].requestError())
             Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Error In Request..", i);
         else
-            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s", i,
-                _clients_map[i].request.getMethodStr().c_str(), _clients_map[i].request.getPath().c_str());
+            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s with body size = %d", i,
+                _clients_map[i].request.getMethodStr().c_str(), _clients_map[i].request.getPath().c_str(), _clients_map[i].request.getBody().length());
         assignServer(i);
         _clients_map[i].buildResponse();
         

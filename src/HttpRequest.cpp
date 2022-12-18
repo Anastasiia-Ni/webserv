@@ -704,6 +704,7 @@ void    HttpRequest::setHeader(std::string &name, std::string &value)
 {
     trimStr(value);
     toLower(name);
+    std::cout << "Name = " << name << std::endl;
     _request_headers[name] = value;
 }
 
@@ -734,6 +735,7 @@ void        HttpRequest::_handle_headers()
 
     if (_request_headers.count("content-length"))
     {
+        std::cout << "CONTETN -------------------------------------------------------------------------LENGTHGHTHTHTH\n";
         _body_flag = true;
         ss << _request_headers["content-length"];
         ss >> _body_length;
@@ -752,6 +754,7 @@ void        HttpRequest::_handle_headers()
     {
         size_t pos = _request_headers["host"].find_first_of(':');
         _server_name = _request_headers["host"].substr(0, pos);
+
         // std::cout << "Target Server Name is :" << _server_name << std::endl;
     }
 
@@ -759,7 +762,7 @@ void        HttpRequest::_handle_headers()
     {
         size_t pos = _request_headers["content-type"].find("boundary=", 0);
         if (pos != std::string::npos)
-            this->_boundary = _request_headers["content-typee"].substr(pos + 9, _request_headers["content-typee"].size());
+            this->_boundary = _request_headers["content-type"].substr(pos + 9, _request_headers["content-type"].size());
         this->_multiform_flag = true;
     }
     // std::cout << "Chunked Flag = " << _chunked_flag << std::endl;

@@ -151,8 +151,8 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	}
 
 	this->_env["AUTH_TYPE"] = "Basic";
-	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
+	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
+	this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = this->_cgi_path;
@@ -160,12 +160,12 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
     this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
     this->_env["QUERY_STRING"] = decode(req.getQuery());
-    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
-	poz = findStart(req.getHeader("Host"), ":");
-    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
-    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("Host").substr(poz + 1, req.getHeader("Host").size()) : "");
+    this->_env["REMOTE_ADDR"] = req.getHeader("host");
+	poz = findStart(req.getHeader("host"), ":");
+    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("host").substr(0, poz) : "");
+    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
-    this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
+    this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
     this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
 	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";

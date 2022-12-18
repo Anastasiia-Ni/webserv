@@ -38,7 +38,7 @@ void   Response::contentLength()
 
 void   Response::connection()
 {
-    if(request.getHeader("Connection") == "keep-alive")
+    if(request.getHeader("connection") == "keep-alive")
         _response_content.append("Connection: keep-alive\r\n");
 }
 
@@ -532,6 +532,11 @@ int    Response::buildBody()
      else if(request.getMethod() == POST || request.getMethod() == PUT)
     {
         // std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << request.getBody().length() << std::endl;
+        if(fileExists(_target_file) && request.getMethod() == POST)
+        {
+            _code = 204;
+            return (0);
+        }
         std::ofstream file(_target_file.c_str(), std::ios::binary);
         if (file.fail())
         {
