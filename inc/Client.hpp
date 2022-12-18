@@ -49,10 +49,10 @@ class Client
         void                clearClient();
         bool                isCgi();
         Response            _response;
+        HttpRequest         request;
     private:
         int                 _client_socket;
         struct sockaddr_in  _client_address;
-        HttpRequest         _request;
         ServerConfig        _server;
         size_t              _total_bytes_read;
         size_t              bytes_to_send;

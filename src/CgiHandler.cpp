@@ -44,7 +44,12 @@ std::string CgiHandler::decode(std::string &path)
 /* Constructor */
 
 CgiHandler::CgiHandler() {
-    std::cout << "CgiHandler constructor" << std::endl;
+	this->_cgi_pid = -1;
+	this->_exit_status = 0;
+	this->_cgi_path = "";
+	this->_ch_env = NULL;
+	this->_argv = NULL;
+    // std::cout << "CgiHandler constructor" << std::endl;
 }
 
 CgiHandler::CgiHandler(std::string path)
@@ -101,6 +106,7 @@ CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
 	return (*this);
 }
 
+
 /*Set functions */
 void CgiHandler::setCgiPid(pid_t cgi_pid)
 {
@@ -145,8 +151,8 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	}
 
 	this->_env["AUTH_TYPE"] = "Basic";
-	this->_env["CONTENT_LENGTH"] = req.getHeader("Content-Length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("Content-Type");
+	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
+	this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = this->_cgi_path;
@@ -154,12 +160,12 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
     this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
     this->_env["QUERY_STRING"] = decode(req.getQuery());
-    this->_env["REMOTE_ADDR"] = req.getHeader("Host");
-	poz = findStart(req.getHeader("Host"), ":");
-    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("Host").substr(0, poz) : "");
-    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("Host").substr(poz + 1, req.getHeader("Host").size()) : "");
+    this->_env["REMOTE_ADDR"] = req.getHeader("host");
+	poz = findStart(req.getHeader("host"), ":");
+    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("host").substr(0, poz) : "");
+    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
-    this->_env["HTTP_COOKIE"] = req.getHeader("Cookie");
+    this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
     this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
 	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -190,8 +196,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 /* Pipe and execute CGI */
 void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content, short &error_code)
 {
-	int pipe_in[2], pipe_out[2];
-	int out_file;
 
 	if (this->_argv[0] == NULL || this->_argv[1] == NULL)
 	{
@@ -200,13 +204,15 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 	}
 	if (pipe(pipe_in) < 0)
 	{
-		std::cout << "pipe failed" << std::endl; // properly exit
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "pipe failed");
+
 		error_code = 500;
 		return ;
 	}
 	if (pipe(pipe_out) < 0)
 	{
-		std::cout << "pipe failed" << std::endl; // properly exit
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "pipe failed");
+		
 		close(pipe_in[0]);
 		close(pipe_in[1]);
 		error_code = 500;
@@ -234,29 +240,14 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 
 		exit(this->_exit_status);
 	}
-	else if (this->_cgi_pid > 0)
-	{
-		std::string body = req.getBody();
-		std::cout << "NO OF BYTES SENT TO CHILD --> " << atoi(this->_env["CONTENT_LENGTH"].c_str()) << std::endl;
-		int sent_bytes;
-		// while( (sent_bytes = write(pipe_in[1], body.c_str(), 8192)) > 0 )
-		// 	body = body.substr(sent_bytes);
-		write(pipe_in[1], body.c_str(), body.length());
-		close(pipe_in[1]);
-		close(pipe_out[1]);
-		std::cout << "Waiting" << std::endl;
-		
-
-		sendHeaderBody(pipe_out[0], fd, response_content); // add fd from responce
-		close(pipe_out[0]);
-        close(pipe_in[0]);
-	}
+	else if (this->_cgi_pid > 0){}
 	else
 	{
         std::cout << "Fork failed" << std::endl; // std::cerr <<
 		error_code = 500;
 	}
 }
+
 
 void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_content) // add fd freom responce
 {				
@@ -308,7 +299,7 @@ void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_co
 	// 	std::string chunk;
     //     chunk = toString(fromDecToHex(body.length()));
     //     chunk += "\r\n";
-    //     chunk += body;
+	
     //     chunk += "\r\n";
     //     // std::cout << chunk << std::endl;
 	// 	num_ch++; // delete
@@ -404,4 +395,14 @@ std::string CgiHandler::getPathInfo(std::string& path, std::vector<std::string> 
 		return "";
 	end = tmp.find("?");
 	return (end == std::string::npos ? tmp : tmp.substr(0, end));
+}
+
+void		CgiHandler::clear()
+{
+	this->_cgi_pid = -1;
+	this->_exit_status = 0;
+	this->_cgi_path = "";
+	this->_ch_env = NULL;
+	this->_argv = NULL;
+	this->_env.clear();
 }

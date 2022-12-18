@@ -16,6 +16,7 @@
 # include <sstream>
 # include <cctype>
 # include <ctime>
+# include <cstdarg>
 
 /* STL Containers */
 # include <map>
@@ -46,6 +47,13 @@
 # include "Location.hpp"
 # include "CgiHandler.hpp"
 # include "Mime.hpp"
+# include "Logger.hpp"
+
+
+#define CONNECTION_TIMEOUT 60 // Time in seconds before client get kicked out if no data was sent.
+#define TRANSFER_BUFFER 8192 
+#define MAX_URI_LENGTH 4096
+#define MAX_CONTENT_LENGTH 30000000
 
 /* Utils.c */
 std::string statusCodeString(short);

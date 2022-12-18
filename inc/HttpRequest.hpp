@@ -11,12 +11,15 @@ enum HttpMethod
     GET,
     POST,
     DELETE,
+    PUT,
+    HEAD,
     NONE
 };
 
 enum ParsingState
 {
     Request_Line,
+    Request_Line_Post_Put,
     Request_Line_Method,
     Request_Line_First_Space,
     Request_Line_URI_Path_Slash,
@@ -87,7 +90,7 @@ class HttpRequest
         int         errorCode();
         bool        keepAlive();
         std::string getServerName();
-
+        void            cutReqBody(int bytes);
     private:
         std::string     _path;
         std::string     _query;

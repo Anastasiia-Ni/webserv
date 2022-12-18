@@ -19,7 +19,7 @@ Client::Client(const Client &other)
 	{
 		this->_client_socket = other._client_socket;
 		this->_client_address = other._client_address;
-		this->_request = other._request;
+		this->request = other.request;
 		this->_response = other._response;
 		this->_server = other._server;
 		this->_total_bytes_read = other._total_bytes_read;
@@ -36,7 +36,7 @@ Client &Client::operator=(const Client & rhs)
 	{
 		this->_client_socket = rhs._client_socket;
 		this->_client_address = rhs._client_address;
-		this->_request = rhs._request;
+		this->request = rhs.request;
 		this->_response = rhs._response;
 		this->_server = rhs._server;
 		this->_total_bytes_read = rhs._total_bytes_read;
@@ -48,7 +48,7 @@ Client &Client::operator=(const Client & rhs)
 Client::Client(ServerConfig &server)
 {
     setServer(server);
-    _request.setMaxBodySize(_server.getClientMaxBodySize());
+    request.setMaxBodySize(_server.getClientMaxBodySize());
     _last_msg_time = time(NULL);
     _total_bytes_read = 0;
     bytes_to_send = 0;
@@ -79,7 +79,7 @@ int     Client::getSocket()
 
 HttpRequest     &Client::getRequest()
 {
-    return (_request);
+    return (request);
 }
 
 const in_addr_t       &Client::getHost()
@@ -99,7 +99,7 @@ const std::string    &Client::getServerName()
 
 std::string    Client::getReqServerName()
 {
-    return (_request.getServerName());
+    return (request.getServerName());
 }
 
 struct sockaddr_in    Client::getAddress()
@@ -119,32 +119,32 @@ time_t     Client::getLastTime()
 
 void        Client::feedData(char *data, size_t size)
 {
-    _request.feed(data, size);
+    request.feed(data, size);
 }
 
 bool        Client::parsingCompleted()
 {
-    return (_request.parsingCompleted());
+    return (request.parsingCompleted());
 }
 
 short       Client::requestError()
 {
-    return (_request.errorCode());
+    return (request.errorCode());
 }
 
 void        Client::clearRequest()
 {
-    _request.clear();
+    request.clear();
 }
 
 bool        Client::keepAlive()
 {
-    return (_request.keepAlive());
+    return (request.keepAlive());
 }
 
 void        Client::buildResponse()
 {
-    _response.setRequest(_request);
+    _response.setRequest(request);
     _response.buildResponse();
 }
 
@@ -171,7 +171,7 @@ int              Client::getResponseCode()
 
 void             Client::printReq()
 {
-    _request.printMessage();
+    request.printMessage();
 }
 
 void             Client::updateTime()
@@ -182,7 +182,7 @@ void             Client::updateTime()
 void             Client::clearClient()
 {
     _response.clearResponse();
-    _request.clear();
+    request.clear();
     _total_bytes_read = 0;
     bytes_to_send = 0;
     total_bytes_sent = 0;
@@ -204,7 +204,7 @@ void             Client::clearClient()
 //     }
 // }
 
-bool      Client::isCgi()
-{
-    return (_response.isCgi());
-}
+// bool      Client::isCgi()
+// {
+//     return (_response.isCgi());
+// }

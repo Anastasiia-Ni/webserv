@@ -2,7 +2,6 @@
 #include "../inc/ServerManager.hpp"
 
 void sigpipeHandle(int sig) {}
-
 int main(int argc, char **argv) {
 	if (argc == 1 || argc == 2) {
 		try {
@@ -26,7 +25,7 @@ int main(int argc, char **argv) {
 		}
     }
     else {
-		std::cout << "error: wrong arguments" << std::endl;
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Error: wrong arguments");
 		return (1);
 	}
     return (0);
