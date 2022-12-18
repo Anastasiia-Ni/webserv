@@ -3,9 +3,9 @@
 
 std::string Logger::file_name = "logfile.txt";
 LogPrio Logger::prio = ERROR;
-std::map<LogPrio, std::string> Logger::prio_str = { {DEBUG,"[DEBUG]   "}, 
-                                                    {INFO, "[INFO]    "}, 
-                                                    {ERROR, "[ERROR]   "} };
+// std::map<LogPrio, std::string> Logger::prio_str = { {DEBUG,"[DEBUG]   "}, 
+//                                                     {INFO, "[INFO]    "}, 
+//                                                     {ERROR, "[ERROR]   "} };
 
 // void Logger::setFilePath(std::string path)
 // {
@@ -30,7 +30,7 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
             }
             int fd = open(("./logs/" + file_name).c_str(), O_CREAT | O_APPEND | O_RDWR, 0664);
             write(fd, date.c_str(), date.length());
-            write(fd, prio_str[p].c_str(), prio_str[p].length());
+            // write(fd, prio_str[p].c_str(), prio_str[p].length());
             write(fd, "   ", 3);
             write(fd, output, n);
             write(fd, "\n", 1);
@@ -44,7 +44,7 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
                 std::cout << CYAN;
             else if (p == ERROR)
                 std::cout << RED;
-            std::cout << getCurrTime() << prio_str[p] << output << RESET << std::endl;
+            std::cout << getCurrTime()  << output << RESET << std::endl;
         }      
     }
     va_end(args);
