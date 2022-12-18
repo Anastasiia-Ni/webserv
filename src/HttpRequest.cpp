@@ -35,7 +35,6 @@ bool    checkUriPos(std::string path)
     int pos = 0;
     while(res != NULL)
     {
-        std::cout << "res:" << res << "|" << std::endl;
         if(!strcmp(res, ".."))
             pos--;
         else
@@ -43,7 +42,6 @@ bool    checkUriPos(std::string path)
         if(pos < 0)
             return 1;
         res = strtok(NULL, "/");
-        // std::cout << path << std::endl;
     }
     return 0;
 }
@@ -504,14 +502,10 @@ void    HttpRequest::feed(char *data, size_t size)
             {
                 if(isxdigit(character) == 0)
                 {
-                    std::cout << character - '0' << std::endl;
-                    std::cout << "char is |" << character << "|" << std::endl;
                     _error_code = 400;
                     std::cout << "Bad Character (Chunked_Length_Begin)" << std::endl;
                     return;
                 }
-                std::cout << "char is |" << character << "|" << std::endl;
-
                 std::stringstream().swap(s);
                 s << character;
                 s >> std::hex >> _chunk_length;
@@ -523,8 +517,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Length:
             {
-                // std::cout << "char is |" << character << "|" << std::endl;
-
                 if(isxdigit(character) != 0)
                 {
                     int temp_len = 0;
@@ -533,8 +525,6 @@ void    HttpRequest::feed(char *data, size_t size)
                     s >> std::hex >> temp_len;
                     _chunk_length *= 16;
                     _chunk_length += temp_len; // check overflow here
-                    // std::cout << "temp len IN DOING = " << temp_len << std::endl;
-                    // std::cout << "CHUNK LENGTH IN DOING = " << _chunk_length << std::endl;
                 }
                 else if (character == '\r')
                     _state = Chunked_Length_LF;
@@ -544,7 +534,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Length_CR:
             {
-                std::cout << "Chunk End CR" << std::endl;
                 if ( character == '\r')
                     _state = Chunked_Length_LF;
                 else
@@ -557,7 +546,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Length_LF:
             {
-                std::cout << "Chunk End LF" << std::endl;
                 if ( character == '\n')
                 {
                     if(_chunk_length == 0)
@@ -581,8 +569,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Data:
             {
-                // std::cout << "Chunk length = " << _chunk_length << std::endl;
-
                 if(_chunk_length == 0)
                     _state = Chunked_Data_CR;
                 else
@@ -618,8 +604,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_End_CR:
             {
-                std::cout << "Chunk End END CR" << std::endl;
-
                 if (character != '\r')
                 {
                     _error_code = 400;
@@ -632,8 +616,6 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_End_LF:
             {
-                std::cout << "Chunk End END LF" << std::endl;
-
                 if (character != '\n')
                 {
                     _error_code = 400;
@@ -650,7 +632,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _body.push_back(character);
                 if(_body.size() == _body_length )
                 {
-                    std::cout << "BODY SIZE IS " << _body.size() << std::endl;
+                    // std::cout << "BODY SIZE IS " << _body.size() << std::endl;
                     _body_done_flag = true;
                     _state = Parsing_Done;
                 }

@@ -204,13 +204,15 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 	}
 	if (pipe(pipe_in) < 0)
 	{
-		std::cout << "pipe failed" << std::endl; // properly exit
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "pipe failed");
+
 		error_code = 500;
 		return ;
 	}
 	if (pipe(pipe_out) < 0)
 	{
-		std::cout << "pipe failed" << std::endl; // properly exit
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "pipe failed");
+		
 		close(pipe_in[0]);
 		close(pipe_in[1]);
 		error_code = 500;

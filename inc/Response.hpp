@@ -41,7 +41,7 @@ class Response
         std::string     _response_content;
 
     private:
-        HttpRequest     _request;
+        HttpRequest     request;
         ServerConfig    _server;
         std::string     _target_file;
         std::vector<uint8_t> _body;

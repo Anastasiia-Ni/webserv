@@ -81,14 +81,14 @@ void    ServerManager::runServers()
         {
             if(FD_ISSET(i, &recv_set_cpy) && _servers_map.count(i))
             {
-                    std::cout << "I = " << i << std::endl;
-                    std::cout << "acceptNewConnection()" << std::endl;
+                    // std::cout << "I = " << i << std::endl;
+                    // std::cout << "acceptNewConnection()" << std::endl;
                     acceptNewConnection(_servers_map.find(i)->second);
 
             }
             else if(FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
             {
-                std::cout << "I = " << i << std::endl;
+                // std::cout << "I = " << i << std::endl;
                 // std::cout << "readRequest()" << std::endl;
                 readRequest(i);
             }
@@ -142,7 +142,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     long  client_address_size = sizeof(client_address);
     int client_sock;
     Client  new_client(serv);
-
+    char buf[INET_ADDRSTRLEN];
 
     if ( (client_sock = accept(serv.getFd(), (struct sockaddr *)&client_address,
      (socklen_t*)&client_address_size)) == -1)
@@ -150,8 +150,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: accept error %s", strerror(errno));
         return ;
     }
-
-    //Assgin Client to Server here
+    Logger::logMsg(INFO, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
 
     addToSet(client_sock, _recv_fd_pool);
 
@@ -180,16 +179,15 @@ void    ServerManager::setupSelect()
     // adds servers sockets to _recv_fd_pool set
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
-        std::cerr << " LISTEN" << std::endl;
         //Now it calles listen() twice on even if two servers have the same host:port
         if (listen(it->getFd(), 512) == -1)
         {
-            std::cerr << " webserv: listen error: " << strerror(errno) << std::endl;
+            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: listen error: %s   Closing....", strerror(errno));
             exit(EXIT_FAILURE);
         }
         if(fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
         {
-            std::cerr << " webserv: fcntl error: " << strerror(errno) <<std::endl;
+            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fcntl error: %s   Closing....", strerror(errno));
             exit(EXIT_FAILURE);
         }
         addToSet(it->getFd(), _recv_fd_pool);
@@ -218,10 +216,7 @@ void    ServerManager::sendResponse(int &i)
 {
     int bytes_sent;
     std::string response = _clients_map[i].getResponse();
-    // std::cout << "REPONSE IS |" << response << "|" << std::endl;
-    // std::cout << "RESPONSE IS = |" << response << std::endl;
-    // if(!resp)
-    //     send(i, internal_server_error, sizeof(internal_server_error), MSG_NOSIGNAL);
+ 
     if(response.length() >= 8192)
         bytes_sent = write(i, response.c_str(), 8192);
     else
@@ -235,6 +230,8 @@ void    ServerManager::sendResponse(int &i)
     else if(bytes_sent == 0 || bytes_sent == response.length())
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, _clients_map[i]._response.getCode());
+
         if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError() || _clients_map[i]._response.getCgiState())
         {
             std::cout << "Connection Closed !" << std::endl;
@@ -293,13 +290,13 @@ void    ServerManager::readRequest(int &i)
 
     if(bytes_read == 0)
     {
-        std::cerr << "fd= " << i << " - webserv1: Client Closed Connection" << strerror(errno) << std::endl;
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
         closeConnection(i);
         return;
     }
     if(bytes_read < 0)
     { 
-        std::cerr << "fd= " << i << " - webserv1: read error" << strerror(errno) << std::endl;
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
         closeConnection(i);
         return;
     }
@@ -312,13 +309,16 @@ void    ServerManager::readRequest(int &i)
 
     if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
     {
+        if(_clients_map[i].requestError())
+            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Error In Request..", i);
+        else
+            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s", i,
+                _clients_map[i].request.getMethodStr().c_str(), _clients_map[i].request.getPath().c_str());
         assignServer(i);
         _clients_map[i].buildResponse();
+        
         if(_clients_map[i]._response.getCgiState())
-        {
-            std::cout << "CGI RESPONSE" << std::endl;
             addToSet(_clients_map[i]._response._cgi_obj.pipe_in[1],  _write_fd_pool);
-        }
 
         removeFromSet(i, _recv_fd_pool);
         addToSet(i, _write_fd_pool); // move socket i from recive fd_set to write fd_set so response can be sent on next iteration
@@ -331,7 +331,7 @@ void    ServerManager::sendCgiBody(int &i, int &pipe_in)
 {
     int bytes_sent;
     std::string response = _clients_map[i].getResponse();
-    std::string req_body = _clients_map[i]._request.getBody();
+    std::string req_body = _clients_map[i].request.getBody();
 
     if(req_body.length() >= 8192)
         bytes_sent = write(pipe_in, req_body.c_str(), 8192);
@@ -355,7 +355,7 @@ void    ServerManager::sendCgiBody(int &i, int &pipe_in)
     }
     else
     {
-        _clients_map[i]._request.cutReqBody(bytes_sent);
+        _clients_map[i].request.cutReqBody(bytes_sent);
     } 
 }
 
