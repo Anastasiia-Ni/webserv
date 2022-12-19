@@ -1,9 +1,6 @@
 # include "../inc/ServerManager.hpp"
 
 
-ServerManager::ServerManager() {}
-ServerManager::~ServerManager(){}
-
 /**
  * Start all servers on ports specified in the config file
  */
@@ -23,7 +20,7 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
                 serverDub = true;
             }
         }
-        if(!serverDub)
+        if (!serverDub)
             it->setupServer();
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "Server Created -- Host:%s Port:%d", inet_ntop(AF_INET, &it->getHost(), buf, INET_ADDRSTRLEN), it->getPort());
     }
@@ -34,8 +31,10 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
  * - check file descriptors returend from select():
  *      if server fd --> accept new client
  *      if client fd in read_set --> read message from client
- *      if client fd in write_set --> send response to client
- *
+ *      if client fd in write_set:
+ *          1- If it's a CGI response and Body still not sent to CGI child process --> Send request body to CGI child process.
+ *          2- If it's a CGI response and Body was sent to CGI child process --> Read outupt from CGI child process.
+ *          3- If it's a normal response --> Send response to client.
  * - servers and clients sockets will be added to _recv_set_pool initially,
  *   after that, when a request is fully parsed, socket will be moved to _write_set_pool
  */
@@ -45,72 +44,40 @@ void    ServerManager::runServers()
     // after that, when a request is fully parsed, socket will be moved to _write_set_pool
     fd_set recv_set_cpy;
     fd_set write_set_cpy;
+    int select_ret;
 
     _biggest_fd = 0;
-    setupSelect();
+    initializeSets();
 
     struct timeval      timer;
-    while(true)
+    while (true)
     {
         timer.tv_sec = 1;
         timer.tv_usec = 0;
         recv_set_cpy = _recv_fd_pool;
         write_set_cpy = _write_fd_pool;
-        int max_select_fd = _biggest_fd;
-        // std::cout << "Biggest FD is " << _biggest_fd << std::endl;
-        // for(int i = 0; i < _clients_map.size(); ++i)
-        // {
-        //     if(_clients_map[i]._response.isCgi())
-        //     {
-        //         if(_clients_map)
-        //     }
-
-        // }
-        if( select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer) < 0 )
+        
+        if ( (select_ret = select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer)) < 0 )
         {
-            std::cerr << " webserv: select error " << strerror(errno) << std::endl;
+		    Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: select error %s   Closing ....", strerror(errno));
             exit(1);
             continue;
         }
-        // if(_clients_map.empty())
-        //     _biggest_fd = _servers.back().getFd();
-        // else
-        //     _biggest_fd = (--_clients_map.end())->first;
-
         for (int i = 0; i <= _biggest_fd; ++i)
         {
-            if(FD_ISSET(i, &recv_set_cpy) && _servers_map.count(i))
+            if (FD_ISSET(i, &recv_set_cpy) && _servers_map.count(i))
+                acceptNewConnection(_servers_map.find(i)->second);
+            else if (FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
+                readRequest(i, _clients_map[i]);
+            else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
-                    // std::cout << "I = " << i << std::endl;
-                    // std::cout << "acceptNewConnection()" << std::endl;
-                    acceptNewConnection(_servers_map.find(i)->second);
-
-            }
-            else if(FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
-            {
-                // std::cout << "I = " << i << std::endl;
-                // std::cout << "readRequest()" << std::endl;
-                readRequest(i);
-            }
-            else if(FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
-            {
-
-                int state = _clients_map[i]._response.getCgiState();
-                if(state == 1 && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_in[1], &write_set_cpy))
-                {
-                    // std::cout << "sendCgiBody()" << std::endl;
-                    sendCgiBody(i, _clients_map[i]._response._cgi_obj.pipe_in[1]);
-                }
-                else if(state == 1 && FD_ISSET(_clients_map[i]._response._cgi_obj.pipe_out[0], &recv_set_cpy))
-                {
-                    // std::cout << "readCgiResponse()" << std::endl;
-                    readCgiResponse(i, _clients_map[i]._response._cgi_obj.pipe_out[0]);
-                }
-                else if((state == 0 || state == 2)  && FD_ISSET(i, &write_set_cpy))
-                {
-                    // std::cout << "sendReponse()" << std::endl;
-                    sendResponse(i);
-                }                   
+                int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
+                if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
+                    sendCgiBody(i, _clients_map[i], _clients_map[i].response._cgi_obj);
+                else if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_out[0], &recv_set_cpy))
+                    readCgiResponse(i, _clients_map[i], _clients_map[i].response._cgi_obj);
+                else if ((cgi_state == 0 || cgi_state == 2)  && FD_ISSET(i, &write_set_cpy))
+                    sendResponse(i, _clients_map[i]);
             }
                 
         }
@@ -121,14 +88,41 @@ void    ServerManager::runServers()
 /* Checks time passed for clients since last message, If more than CONNECTION_TIMEOUT, close connection */
 void    ServerManager::checkTimeout()
 {
-        for(std::map<int, Client>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
+    for(std::map<int, Client>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
+    {
+        if (time(NULL) - it->second.getLastTime() > CONNECTION_TIMEOUT)
         {
-            if(time(NULL) - it->second.getLastTime() > CONNECTION_TIMEOUT)
-            {
-                closeConnection(it->first);
-                return;
-            }
+            closeConnection(it->first);
+            return;
         }
+    }
+}
+
+/* initialize recv+write fd_sets and add all server listening sockets to _recv_fd_pool. */
+void    ServerManager::initializeSets()
+{
+    FD_ZERO(&_recv_fd_pool);
+    FD_ZERO(&_write_fd_pool);
+
+    // adds servers sockets to _recv_fd_pool set
+    for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+    {
+        //Now it calles listen() twice on even if two servers have the same host:port
+        if (listen(it->getFd(), 512) == -1)
+        {
+            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: listen error: %s   Closing....", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        if (fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
+        {
+            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fcntl error: %s   Closing....", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        addToSet(it->getFd(), _recv_fd_pool);
+        _servers_map.insert(std::make_pair(it->getFd(), *it));
+    }
+    // at this stage _biggest_fd will belong to the last server created.
+    _biggest_fd = _servers.back().getFd();
 }
 
 /**
@@ -154,7 +148,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
 
     addToSet(client_sock, _recv_fd_pool);
 
-    if(fcntl(client_sock, F_SETFL, O_NONBLOCK) < 0)
+    if (fcntl(client_sock, F_SETFL, O_NONBLOCK) < 0)
     {
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fcntl error %s", strerror(errno));
         removeFromSet(client_sock, _recv_fd_pool);
@@ -163,45 +157,18 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     }
 
     new_client.setSocket(client_sock);
-    if(_clients_map.count(client_sock) != 0)
+    if (_clients_map.count(client_sock) != 0)
         _clients_map.erase(client_sock);
     _clients_map.insert(std::make_pair(client_sock, new_client));
 }
 
-/*
-    initialize recv+write fd_sets and add all server listening sockets to _recv_fd_pool.
-*/
-void    ServerManager::setupSelect()
-{
-    FD_ZERO(&_recv_fd_pool);
-    FD_ZERO(&_write_fd_pool);
 
-    // adds servers sockets to _recv_fd_pool set
-    for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
-    {
-        //Now it calles listen() twice on even if two servers have the same host:port
-        if (listen(it->getFd(), 512) == -1)
-        {
-            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: listen error: %s   Closing....", strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-        if(fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
-        {
-            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fcntl error: %s   Closing....", strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-        addToSet(it->getFd(), _recv_fd_pool);
-        _servers_map.insert(std::make_pair(it->getFd(), *it));
-    }
-    // at this stage _biggest_fd will belong to the last server created.
-    _biggest_fd = _servers.back().getFd();
-}
-
-void    ServerManager::closeConnection(int i)
+/* Closes connection from fd i and remove associated client object from _clients_map */
+void    ServerManager::closeConnection(const int i)
 {
-    if(FD_ISSET(i, &_write_fd_pool))
+    if (FD_ISSET(i, &_write_fd_pool))
         removeFromSet(i, _write_fd_pool);
-    if(FD_ISSET(i, &_recv_fd_pool))
+    if (FD_ISSET(i, &_recv_fd_pool))
         removeFromSet(i, _recv_fd_pool);
     close(i);
     _clients_map.erase(i);
@@ -212,27 +179,27 @@ void    ServerManager::closeConnection(int i)
  * If no error was found in request and Connection header value is keep-alive,
  * connection is kept, otherwise connection will be closed.
  */
-void    ServerManager::sendResponse(int &i)
+void    ServerManager::sendResponse(const int &i, Client &c)
 {
     int bytes_sent;
-    std::string response = _clients_map[i].getResponse();
+    std::string response = c.response.getRes();
  
-    if(response.length() >= 8192)
+    if (response.length() >= 8192)
         bytes_sent = write(i, response.c_str(), 8192);
     else
         bytes_sent = write(i, response.c_str(), response.length());
     
-    if(bytes_sent < 0)
+    if (bytes_sent < 0)
     {
         // std::cout << "ERROR SENDING () :" << strerror(errno) << std::endl;
         closeConnection(i);
     }
-    else if(bytes_sent == 0 || bytes_sent == response.length())
+    else if (bytes_sent == 0 || bytes_sent == response.length())
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, _clients_map[i]._response.getCode());
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
 
-        if(_clients_map[i].keepAlive() == false || _clients_map[i].requestError() || _clients_map[i]._response.getCgiState())
+        if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
         {
             std::cout << "Connection Closed !" << std::endl;
             closeConnection(i);
@@ -241,37 +208,34 @@ void    ServerManager::sendResponse(int &i)
         {
             removeFromSet(i, _write_fd_pool);
             addToSet(i, _recv_fd_pool);
-            _clients_map[i].clearClient();
+            c.clearClient();
         }
     }
     else
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
         // std::cout << "Bytes sent are : " << bytes_sent << std::endl;
-        _clients_map[i].updateTime();
-        _clients_map[i]._response.cutRes(bytes_sent);
+        c.updateTime();
+        c.response.cutRes(bytes_sent);
     }
         
     // std::ofstream  file("text_response.txt", std::ios_base::app);
     // file << resp << std::endl;
-    
-
 }
 
-void    ServerManager::assignServer(int &i)
+/* Assigen server_block configuration to a client based on Host Header in request and server_name*/
+void    ServerManager::assignServer(Client &c)
 {
-    
     for (std::vector<ServerConfig>::iterator it = _servers.begin();
         it != _servers.end(); ++it)
     {
-        if(_clients_map[i].getHost() == it->getHost() &&
-           _clients_map[i].getPort() == it->getPort() &&
-           _clients_map[i].getReqServerName() == it->getServerName())
+        if (c.server.getHost() == it->getHost() &&
+            c.server.getPort() == it->getPort() &&
+            c.request.getServerName() == it->getServerName())
         {
-            _clients_map[i].setServer(*it);
+            c.setServer(*it);
             return;
         }
-
     }
 }
 
@@ -281,128 +245,127 @@ void    ServerManager::assignServer(int &i)
  * socket will be moved from _recv_fd_pool to _write_fd_pool
  * and response will be sent on the next iteration of select().
  */
-void    ServerManager::readRequest(int &i)
+void    ServerManager::readRequest(const int &i, Client &c)
 {
-    char    buffer[8192];
+    char    buffer[MESSAGE_BUFFER];
     int     bytes_read = 0;
     
-    bytes_read = read(i, buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
+    bytes_read = read(i, buffer, MESSAGE_BUFFER); // set limit to the total request size to avoid infinite request size.
     // std::cout << "Request is " << buffer << std::endl;
-    if(bytes_read == 0)
+    if (bytes_read == 0)
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
         closeConnection(i);
         return;
     }
-    if(bytes_read < 0)
+    else if (bytes_read < 0)
     { 
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
         closeConnection(i);
         return;
     }
-    else if(bytes_read != 0)
+    else if (bytes_read != 0)
     {
-        _clients_map[i].feedData(buffer, bytes_read);
+        c.request.feed(buffer, bytes_read);
         memset(buffer, 0, sizeof(buffer));
-        _clients_map[i].updateTime();
+        c.updateTime();
     }
 
-    if (_clients_map[i].parsingCompleted() || _clients_map[i].requestError()) // 1 = parsing completed and we can work on the response.
+    if (c.request.parsingCompleted() || c.request.errorCode()) // 1 = parsing completed and we can work on the response.
     {
-        if(_clients_map[i].requestError())
+        if (c.request.errorCode())
             Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Error In Request..", i);
         else
             Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s with body size = %d", i,
-                _clients_map[i].request.getMethodStr().c_str(), _clients_map[i].request.getPath().c_str(), _clients_map[i].request.getBody().length());
-        assignServer(i);
-        _clients_map[i].buildResponse();
+                c.request.getMethodStr().c_str(), c.request.getPath().c_str(), c.request.getBody().length());
+        assignServer(c);
+        c.buildResponse();
         
-        if(_clients_map[i]._response.getCgiState())
-            addToSet(_clients_map[i]._response._cgi_obj.pipe_in[1],  _write_fd_pool);
+        if (c.response.getCgiState())
+            addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
 
         removeFromSet(i, _recv_fd_pool);
-        addToSet(i, _write_fd_pool); // move socket i from recive fd_set to write fd_set so response can be sent on next iteration
+        addToSet(i, _write_fd_pool);
     }
 }
 
-/*********************************************/
-
-void    ServerManager::sendCgiBody(int &i, int &pipe_in)
+/* Send request body to CGI script */
+void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
 {
     int bytes_sent;
-    std::string response = _clients_map[i].getResponse();
-    std::string req_body = _clients_map[i].request.getBody();
+    std::string req_body = c.request.getBody();
 
-    if(req_body.length() >= 8192)
-        bytes_sent = write(pipe_in, req_body.c_str(), 8192);
+    if (req_body.length() >= 8192)
+        bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), 8192);
     else
-        bytes_sent = write(pipe_in, req_body.c_str(), req_body.length());
+        bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), req_body.length());
     
-    if(bytes_sent < 0)
+    if (bytes_sent < 0)
     {
-        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_in[1], _write_fd_pool);
-        close(_clients_map[i]._response._cgi_obj.pipe_in[1]);
-        close(_clients_map[i]._response._cgi_obj.pipe_out[1]);
-        _clients_map[i]._response.setErrorResponse(500);
+        removeFromSet(cgi.pipe_in[1], _write_fd_pool);
+        close(cgi.pipe_in[1]);
+        close(cgi.pipe_out[1]);
+        c.response.setErrorResponse(500);
     }
-    else if(bytes_sent == 0 || bytes_sent == req_body.length())
+    else if (bytes_sent == 0 || bytes_sent == req_body.length())
     {
         // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
-        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_in[1], _write_fd_pool);
-        addToSet(_clients_map[i]._response._cgi_obj.pipe_out[0],  _recv_fd_pool);
-        close(_clients_map[i]._response._cgi_obj.pipe_in[1]);
-        close(_clients_map[i]._response._cgi_obj.pipe_out[1]);
+        removeFromSet(cgi.pipe_in[1], _write_fd_pool);
+        addToSet(cgi.pipe_out[0],  _recv_fd_pool);
+        close(cgi.pipe_in[1]);
+        close(cgi.pipe_out[1]);
     }
     else
     {
-        _clients_map[i].request.cutReqBody(bytes_sent);
+       c.request.cutReqBody(bytes_sent);
     } 
 }
 
-void    ServerManager::readCgiResponse(int &i, int &pipe_out)
+/* Reads outpud produced by the CGI script */
+void    ServerManager::readCgiResponse(const int &i, Client &c, CgiHandler &cgi)
 {
     char    buffer[8192];
     int     bytes_read = 0;
     
-    bytes_read = read(_clients_map[i]._response._cgi_obj.pipe_out[0], buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
-    if(bytes_read == 0)
+    bytes_read = read(cgi.pipe_out[0], buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
+    if (bytes_read == 0)
     {
-        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
-        close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
-        close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
-        _clients_map[i]._response.setCgiState(2);        
-        if (_clients_map[i]._response._response_content.find("HTTP/1.1") == std::string::npos)
-		    _clients_map[i]._response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
+        removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
+        close(cgi.pipe_in[0]);
+        close(cgi.pipe_out[0]);
+        c.response.setCgiState(2);        
+        if (c.response._response_content.find("HTTP/1.1") == std::string::npos)
+		    c.response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
         return;
     }
-    else if(bytes_read < 0)
+    else if (bytes_read < 0)
     { 
         std::cerr << "Error Reading From CGI Script ! " << strerror(errno) << std::endl;
-        removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
-        close(_clients_map[i]._response._cgi_obj.pipe_in[0]);
-        close(_clients_map[i]._response._cgi_obj.pipe_out[0]);
-        _clients_map[i]._response.setCgiState(2);        
-        _clients_map[i]._response.setErrorResponse(500);
+        removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
+        close(cgi.pipe_in[0]);
+        close(cgi.pipe_out[0]);
+        c.response.setCgiState(2);        
+        c.response.setErrorResponse(500);
         return;
     }
     else
     {
 		std::cout << bytes_read << " bytes read succesfully !" << std::endl;
-		_clients_map[i]._response._response_content.append(buffer, bytes_read);
+		c.response._response_content.append(buffer, bytes_read);
 		memset(buffer, 0, sizeof(buffer));
     }
 }
 
-void	ServerManager::addToSet(int i, fd_set &set)
+void	ServerManager::addToSet(const int i, fd_set &set)
 {
     FD_SET(i, &set);
-    if(i > _biggest_fd)
+    if (i > _biggest_fd)
         _biggest_fd = i;
 }
 
-void	ServerManager::removeFromSet(int i, fd_set &set)
+void	ServerManager::removeFromSet(const int i, fd_set &set)
 {
     FD_CLR(i, &set);
-    if(i == _biggest_fd)
+    if (i == _biggest_fd)
         _biggest_fd--;
 }

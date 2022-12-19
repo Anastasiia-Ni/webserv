@@ -27,7 +27,7 @@ class Response
         void        setServer(ServerConfig &);
 
         void        buildResponse();
-        void        clearResponse();
+        void        clear();
         void        handleCgi(HttpRequest&);
         void        cutRes(size_t);
         int         getCgiState();
