@@ -25,8 +25,8 @@ static char internal_server_error[] =
 class ServerManager
 {
     public:                 
-        ServerManager();
-        ~ServerManager();
+        ServerManager() = default;
+        ~ServerManager() = default;
         void    setupServers(std::vector<ServerConfig>);
         void    runServers();
         
@@ -39,16 +39,16 @@ class ServerManager
         int        _biggest_fd;
 
         void acceptNewConnection(ServerConfig &);
-        void setupSelect();
-        void readRequest(int &);
-        void sendResponse(int &);
         void checkTimeout();
-        void closeConnection(int);
-        void assignServer(int &);
-        void sendCgiBody(int &, int &);
-        void readCgiResponse(int &, int &);
-        void addToSet(int , fd_set &);
-        void removeFromSet(int , fd_set &);
+        void initializeSets();
+        void readRequest(const int &, Client &);
+        void sendResponse(const int &, Client &);
+        void sendCgiBody(const int &, Client &, CgiHandler &);
+        void readCgiResponse(const int &, Client &, CgiHandler &);
+        void closeConnection(const int);
+        void assignServer(Client &);
+        void addToSet(const int , fd_set &);
+        void removeFromSet(const int , fd_set &);
 };
 
 

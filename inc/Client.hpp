@@ -19,44 +19,24 @@ class Client
 		    Client &operator=(const Client & rhs);
         ~Client();
 
-        int                 getSocket();
-        struct sockaddr_in  getAddress();
-        HttpRequest         &getRequest();
-        time_t              getLastTime();
-        const std::string &getServerName();
-        const uint16_t &getPort();
-        const in_addr_t &getHost();
-        std::string getReqServerName();
+        const int                 &getSocket() const;
+        const struct sockaddr_in  &getAddress() const;
+        const HttpRequest         &getRequest() const;
+        const time_t              &getLastTime() const;
 
         void                setSocket(int &);
         void                setAddress(sockaddr_in &);
         void                setServer(ServerConfig &);
-        void                feedData(char *, size_t);
-        bool                parsingCompleted();
-        short               requestError();
-        bool                keepAlive();
-        void                clearRequest();
         void                buildResponse();
-        void                printReq();
         void                updateTime();
-        size_t              getPacketSize();
 
-        std::string         getResponse();
-        size_t              getResponseLength();
-        size_t              getTotalBytes();
-        void                clearResponse();
-        int                 getResponseCode();
         void                clearClient();
-        bool                isCgi();
-        Response            _response;
+        Response            response;
         HttpRequest         request;
+        ServerConfig        server;
     private:
         int                 _client_socket;
         struct sockaddr_in  _client_address;
-        ServerConfig        _server;
-        size_t              _total_bytes_read;
-        size_t              bytes_to_send;
-        size_t              total_bytes_sent;
         time_t              _last_msg_time;
 };
 
