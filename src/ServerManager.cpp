@@ -40,8 +40,6 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
  */
 void    ServerManager::runServers()
 {
-    // servers and clients sockets will be added to _recv_set_pool initially,
-    // after that, when a request is fully parsed, socket will be moved to _write_set_pool
     fd_set recv_set_cpy;
     fd_set write_set_cpy;
     int select_ret;
@@ -79,7 +77,6 @@ void    ServerManager::runServers()
                 else if ((cgi_state == 0 || cgi_state == 2)  && FD_ISSET(i, &write_set_cpy))
                     sendResponse(i, _clients_map[i]);
             }
-                
         }
         checkTimeout();
     }
