@@ -22,7 +22,8 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
         }
         if (!serverDub)
             it->setupServer();
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Server Created -- Host:%s Port:%d", inet_ntop(AF_INET, &it->getHost(), buf, INET_ADDRSTRLEN), it->getPort());
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Server Created -- ServerName[%s] Host[%s] Port[%d]",it->getServerName().c_str(),
+                inet_ntop(AF_INET, &it->getHost(), buf, INET_ADDRSTRLEN), it->getPort());
     }
 }
 
@@ -248,7 +249,6 @@ void    ServerManager::readRequest(const int &i, Client &c)
     int     bytes_read = 0;
     
     bytes_read = read(i, buffer, MESSAGE_BUFFER); // set limit to the total request size to avoid infinite request size.
-    // std::cout << "Request is " << buffer << std::endl;
     if (bytes_read == 0)
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);

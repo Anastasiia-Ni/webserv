@@ -135,6 +135,63 @@ const std::string &CgiHandler::getCgiPath() const
 }
 
 /* initialization environment variable */
+void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc)
+{
+	int poz;
+	std::string extension;
+
+	std::vector<std::string> ext_path = it_loc->getCgiPath();
+	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
+	{
+		extension = *it_ext;
+		if (this->_cgi_path.find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
+			break ;
+		else if (this->_cgi_path.find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
+			break ;
+	}
+
+	this->_env["AUTH_TYPE"] = "Basic";
+	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
+	this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
+    this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	poz = findStart(this->_cgi_path, "cgi-bin/");
+	this->_env["SCRIPT_NAME"] = this->_cgi_path;
+    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
+    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
+    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
+    this->_env["QUERY_STRING"] = decode(req.getQuery());
+    this->_env["REMOTE_ADDR"] = req.getHeader("host");
+	poz = findStart(req.getHeader("host"), ":");
+    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("host").substr(0, poz) : "");
+    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
+    this->_env["REQUEST_METHOD"] = req.getMethodStr();
+    this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
+    this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
+	// this->_env["PATH"] = extension; - This thing breaks everything
+    this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    this->_env["REDIRECT_STATUS"] = "200";
+	this->_env["SERVER_SOFTWARE"] = "AMANIX";
+
+	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
+	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
+	for (int i = 0; it != this->_env.end(); it++, i++)
+	{
+		std::string tmp = it->first + "=" + it->second;
+		this->_ch_env[i] = strdup(tmp.c_str());
+	}
+
+	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
+	// 	std::cout << this->_ch_env[i] << std::endl;
+
+	this->_argv = (char **)malloc(sizeof(char *) * 3);
+	this->_argv[0] = strdup(extension.c_str());
+	this->_argv[1] = strdup(this->_cgi_path.c_str());
+	this->_argv[2] = NULL;
+
+	// std::cout << "ARGV0     " << this->_argv[0] << std::endl;
+}
+
+/* initialization environment variable */
 void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
 	int poz;
@@ -189,7 +246,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	this->_argv[2] = NULL;
 
 	// std::cout << "ARGV0     " << this->_argv[0] << std::endl;
-
 }
 
 

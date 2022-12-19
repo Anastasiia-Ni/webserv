@@ -5,7 +5,6 @@
 #include "Client.hpp"
 #include "Response.hpp"
 
-
 static char internal_server_error[] =
 "HTTP/1.1 500 Internal Server Error\r\n"
 "Content-Length = 124\r\n"

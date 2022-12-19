@@ -114,6 +114,9 @@ static bool    checkReturn(Location &loc, short &code, std::string &location)
     {
         code = 301;
         location = loc.getReturn();
+        if(location[0] != '/')
+            location.insert(location.begin(), '/');
+        std::cout << "LOCATION = |" << location << "|"<< std::endl;
         return (1);
     }
     return (0);
@@ -147,6 +150,24 @@ static void      appendRoot(Location &location, HttpRequest &request, std::strin
 {
     target_file = combinePaths(location.getRootLocation(), request.getPath(), "");
     // std::cout << "Target_file after appending root is " << target_file << std::endl;
+}
+
+int        Response::handleCgiTemp(std::string &location_key)
+{
+    std::string path;
+    path = this->request.getPath();
+    _cgi_obj.clear();
+    _cgi_obj.setCgiPath(path);
+    _cgi = 1;
+    if(pipe(_cgi_fd) < 0)
+    {
+        std::cout << "Pipe() fail" << std::endl;
+        _code = 500;
+        return (1);
+    }
+    _cgi_obj.initEnvCgi(request, _server.getLocationKey(location_key)); // + URI
+    _cgi_obj.execute(request, this->_cgi_fd[1], _response_content, this->_code);
+    return (0);
 }
 
 /* check a file for CGI (the extension is supported, the file exists and is executable) and run the CGI */
@@ -274,6 +295,14 @@ int    Response::handleTarget()
         }
         else
             appendRoot(target_location, request, _target_file);
+
+        if(!target_location.getCgiExtension().empty())
+        {
+            Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
+            Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Path are %s", target_location.getCgiPath()[0].c_str());
+             return(handleCgiTemp(location_key));
+
+        }
         // std::cout << "Target file before checking dir is " << _target_file << std::endl;
         if (isDirectory(_target_file))
         {
@@ -444,24 +473,19 @@ void    Response::buildResponse()
     // // for tester
     // if(request.getPath() == "/directory/Yeah")
     // {
-    //     _code = 404;
-    //     buildErrorBody()
-    //     setStatusLine();
-    //     _response_body = "HMM";
-    //     setHeaders();
-    //     _response_content.append(_response_body);
-    //     return;
+        // _code = 404;
+        // buildErrorBody()
+        // setStatusLine();
+        // _response_body = "HMM";
+        // setHeaders();
+        // _response_content.append(_response_body);
+        // return;
     // }
     if(reqError() || buildBody())
         buildErrorBody();
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
 	if(_cgi)
-	{
-        // if(!constructCgiResp())
-        //     return;
-        // buildErrorBody();
         return;
-    }
     else if(_auto_index)
     {
         if(buildHtmlIndex(_target_file, _body, _body_length))
