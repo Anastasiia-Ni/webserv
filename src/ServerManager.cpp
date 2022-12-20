@@ -286,6 +286,8 @@ void    ServerManager::readRequest(const int &i, Client &c)
         {
             handleReqBody(c);
             addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
+            addToSet(c.response._cgi_obj.pipe_out[0],  _recv_fd_pool);
+
         }
 
         removeFromSet(i, _recv_fd_pool);
@@ -314,8 +316,8 @@ void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
     
     if(req_body.length() == 0)
         bytes_sent = 0;
-    else if (req_body.length() >= MESSAGE_BUFFER)
-        bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), MESSAGE_BUFFER);
+    else if (req_body.length() >= 8192)
+        bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), 8192);
     else
         bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), req_body.length());
     
@@ -331,7 +333,7 @@ void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
     {
         Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendCgiBody() Done Sending!");
         removeFromSet(cgi.pipe_in[1], _write_fd_pool);
-        addToSet(cgi.pipe_out[0],  _recv_fd_pool);
+        // addToSet(cgi.pipe_out[0],  _recv_fd_pool);
         close(cgi.pipe_in[1]);
         close(cgi.pipe_out[1]);
     }
@@ -348,15 +350,17 @@ void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
 /* Reads outpud produced by the CGI script */
 void    ServerManager::readCgiResponse(const int &i, Client &c, CgiHandler &cgi)
 {
-    char    buffer[8192];
+    char    buffer[50000];
     int     bytes_read = 0;
     Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
-    sleep(1);
-    bytes_read = read(cgi.pipe_out[0], buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
-    Logger::logMsg(ERROR, FILE_OUTPUT, "Output From CGI is: %s", buffer);
+    // sleep(1);
+    bytes_read = read(cgi.pipe_out[0], buffer, 50000); // set limit to the total request size to avoid infinite request size.
+    // Logger::logMsg(ERROR, FILE_OUTPUT, "Output From CGI is: %s", buffer);
     
     if (bytes_read == 0)
     {
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "readCgiResponse() Done Reading !!");
+        std::cerr << "Error Reading From CGI Script ! " << strerror(errno) << std::endl;
         removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
         close(cgi.pipe_in[0]);
         close(cgi.pipe_out[0]);
