@@ -6,7 +6,7 @@ ServerConfig::ServerConfig()
 	this->_host = 0;
 	this->_server_name = "";
 	this->_root = "";
-	this->_client_max_body_size = 0;
+	this->_client_max_body_size = MAX_CONTENT_LENGTH;
 	this->_index = "";
 	this->_listen_fd = 0;
 	this->_autoindex = false;
@@ -205,6 +205,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 	std::vector<std::string> methods;
 	bool flag_methods = false;
 	bool flag_autoindex = false;
+	bool flag_max_size = false;
 	int valid;
 
 	new_location.setPath(path);
@@ -263,7 +264,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		else if (parametr[i] == "return" && (i + 1) < parametr.size())
 		{
 			if (path == "/cgi-bin")
-				throw ErrorException("Parametr return not allow for CGI");	
+				throw ErrorException("Parametr return not allow for CGI");
 			if (!new_location.getReturn().empty())
 				throw ErrorException("Return of location is duplicated");
 			checkToken(parametr[++i]);
@@ -272,7 +273,7 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		else if (parametr[i] == "alias" && (i + 1) < parametr.size())
 		{
 			if (path == "/cgi-bin")
-				throw ErrorException("Parametr alias not allow for CGI");	
+				throw ErrorException("Parametr alias not allow for CGI");
 			if (!new_location.getAlias().empty())
 				throw ErrorException("Alias of location is duplicated");
 			checkToken(parametr[++i]);
@@ -280,8 +281,6 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		}
 		else if (parametr[i] == "cgi_ext" && (i + 1) < parametr.size())
 		{
-			if (path != "/cgi-bin")
-				throw ErrorException("Parametr cgi_ext allow only for CGI");
 			std::vector<std::string> extension;
 			while (++i < parametr.size())
 			{
@@ -302,8 +301,6 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		}
 		else if (parametr[i] == "cgi_path" && (i + 1) < parametr.size())
 		{
-			if (path != "/cgi-bin")
-				throw ErrorException("Parametr cgi_path allow only for CGI");			
 			std::vector<std::string> path;
 			while (++i < parametr.size())
 			{
@@ -324,11 +321,21 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 			}
 			new_location.setCgiPath(path);
 		}
+		else if (parametr[i] == "client_max_body_size" && (i + 1) < parametr.size())
+		{
+			if (flag_max_size)
+				throw ErrorException("Maxbody_size of location is duplicated");
+			checkToken(parametr[++i]);
+			new_location.setMaxBodySize(parametr[i]);
+			flag_max_size = true;
+		}
 		else if (i < parametr.size())
 			throw ErrorException("Parametr in a location is invalid");
 	}
 	if (new_location.getPath() != "/cgi-bin" && new_location.getIndexLocation().empty())
 		new_location.setIndexLocation(this->_index);
+	if (!flag_max_size)
+		new_location.setMaxBodySize(this->_client_max_body_size);
 	valid = isValidLocation(new_location);
 	if (valid == 1)
 		throw ErrorException("Failed CGI validation");
@@ -354,19 +361,19 @@ bool ServerConfig::isValidHost(std::string host) const
     // int dot_count = 0;
 	// int is_first_num = 1;
     // int num = 0;
-  	
+
 	// if (host.size() > 15 || host.size() < 1)
 	// 	return (false);
 	// if (host == "127.0.0.1" || host == "0.0.0.0")
-	// 	return (true); 
+	// 	return (true);
 	// if (*host.begin() == '.' || *(host.end() - 1) == '.')
 	// 	return (false);
-    // for (size_t i = 0; i < host.size(); i++) 
+    // for (size_t i = 0; i < host.size(); i++)
 	// {
 	// 	if ((host[i] < '0' || host[i] > '9') && host[i] != '.')
     //         return (false);
     //     if ((host[i] < '1' || host[i] > '9') && is_first_num)
-    //         return (false);        
+    //         return (false);
     //     if (host[i] == '.')
 	// 	{
 	// 		if (num > 255)
@@ -433,7 +440,7 @@ int ServerConfig::isValidLocation(Location &location) const
 			{
 				std::string tmp_path = *it_path;
 				if (tmp == ".py" || tmp == "*.py")
-				{		
+				{
 					if (tmp_path.find("python") != std::string::npos)
 						location._ext_path.insert(std::make_pair(".py", tmp_path));
 				}

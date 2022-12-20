@@ -8,6 +8,7 @@ Location::Location()
 	this->_index = "";
 	this->_return = "";
 	this->_alias = "";
+	this->_client_max_body_size = MAX_CONTENT_LENGTH;
 	this->_methods.reserve(5);
 	this->_methods.push_back(1);
 	this->_methods.push_back(0);
@@ -28,6 +29,7 @@ Location::Location(const Location &other)
 	this->_alias = other._alias;
     this->_methods = other._methods;
 	this->_ext_path = other._ext_path;
+	this->_client_max_body_size = other._client_max_body_size;
 }
 
 Location &Location::operator=(const Location &rhs)
@@ -44,6 +46,7 @@ Location &Location::operator=(const Location &rhs)
 		this->_alias = rhs._alias;
 		this->_methods = rhs._methods;
 		this->_ext_path = rhs._ext_path;
+		this->_client_max_body_size = rhs._client_max_body_size;
     }
 	return (*this);
 }
@@ -121,6 +124,26 @@ void Location::setCgiExtension(std::vector<std::string> extension)
 	this->_cgi_ext = extension;
 }
 
+void Location::setMaxBodySize(std::string parametr)
+{
+	unsigned long body_size = 0;
+
+	for (size_t i = 0; i < parametr.length(); i++)
+	{
+		if (parametr[i] < '0' || parametr[i] > '9')
+			throw ServerConfig::ErrorException("Wrong syntax: client_max_body_size");
+	}
+	if (!std::stoi(parametr))
+		throw ServerConfig::ErrorException("Wrong syntax: client_max_body_size");
+	body_size = std::stoi(parametr);
+	this->_client_max_body_size = body_size;
+}
+
+void Location::setMaxBodySize(unsigned long parametr)
+{
+	this->_client_max_body_size = parametr;
+}
+
 /* get functions */
 const std::string &Location::getPath() const
 {
@@ -170,6 +193,11 @@ const std::string &Location::getAlias() const
 const std::map<std::string, std::string> &Location::getExtensionPath() const
 {
 	return (this->_ext_path);
+}
+
+const unsigned long &Location::getMaxBodySize() const
+{
+	return (this->_client_max_body_size);
 }
 
 /* for printing allowed methods*/
