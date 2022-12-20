@@ -27,6 +27,7 @@ Location::Location(const Location &other)
 	this->_return = other._return;
 	this->_alias = other._alias;
     this->_methods = other._methods;
+	this->_ext_path = other._ext_path;
 }
 
 Location &Location::operator=(const Location &rhs)
@@ -42,6 +43,7 @@ Location &Location::operator=(const Location &rhs)
 		this->_return = rhs._return;
 		this->_alias = rhs._alias;
 		this->_methods = rhs._methods;
+		this->_ext_path = rhs._ext_path;
     }
 	return (*this);
 }
@@ -163,6 +165,11 @@ const std::string &Location::getReturn() const
 const std::string &Location::getAlias() const
 {
 	return (this->_alias);
+}
+
+const std::map<std::string, std::string> &Location::getExtensionPath() const
+{
+	return (this->_ext_path);
 }
 
 /* for printing allowed methods*/

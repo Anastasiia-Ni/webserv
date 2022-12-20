@@ -13,7 +13,7 @@ fileitem = form['filename']
 
 # Test if the file was uploaded
 if fileitem.filename:
-   open('/home/vscode/src/Cursus/Amanix/cgi-bin/tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
+   open('/Users/anastasiianifantova/Desktop/ft-server/cgi-bin/tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
    message = 'The file "' + os.path.basename(fileitem.filename) + '" was uploaded successfully'
 else:
    message = 'Uploading Failed'

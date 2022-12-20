@@ -49,7 +49,6 @@
 # include "Mime.hpp"
 # include "Logger.hpp"
 
-
 #define CONNECTION_TIMEOUT 60 // Time in seconds before client get kicked out if no data was sent.
 #define TRANSFER_BUFFER 8192 
 #define MAX_URI_LENGTH 4096

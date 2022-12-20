@@ -365,6 +365,9 @@ void    ServerManager::readCgiResponse(int &i, int &pipe_out)
     int     bytes_read = 0;
     
     bytes_read = read(_clients_map[i]._response._cgi_obj.pipe_out[0], buffer, sizeof(buffer)); // set limit to the total request size to avoid infinite request size.
+    
+    // std::cout << "BODY FROM CGI: " << buffer << std::endl;
+
     if(bytes_read == 0)
     {
         removeFromSet(_clients_map[i]._response._cgi_obj.pipe_out[0], _recv_fd_pool);
