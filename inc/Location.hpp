@@ -17,6 +17,8 @@ class Location
 		std::vector<std::string>	_cgi_ext;
 
 	public:
+		std::map<std::string, std::string> _ext_path;
+		
 		Location();
 		Location(const Location &other);
 		Location &operator=(const Location &rhs);
@@ -41,6 +43,7 @@ class Location
 		const std::string &getAlias() const;
 		const std::vector<std::string> &getCgiPath() const;
 		const std::vector<std::string> &getCgiExtension() const;
+		const std::map<std::string, std::string> &getExtensionPath() const;
 	
 		std::string getPrintMethods() const; // for checking only
 

@@ -704,7 +704,7 @@ void    HttpRequest::setHeader(std::string &name, std::string &value)
 {
     trimStr(value);
     toLower(name);
-    std::cout << "Name = " << name << std::endl;
+    // std::cout << "Name = " << name << std::endl;
     _request_headers[name] = value;
 }
 

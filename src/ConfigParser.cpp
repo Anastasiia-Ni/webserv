@@ -290,7 +290,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			if (!flag_loc)
 				throw  ErrorException("Parametrs after location");
 			else
-				ServerConfig::checkToken(parametrs[++i]);
+				throw  ErrorException("Unsupported directive");
 		}
 	}
 	if (server.getRoot().empty())
