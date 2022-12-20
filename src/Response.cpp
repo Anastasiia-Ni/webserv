@@ -14,7 +14,6 @@ Response::~Response()
 Response::Response(HttpRequest &req): _cgi_response_length(0), request(req), _code(0), _res(NULL)
                                     , _target_file(""), _body_length(0), _cgi(0),  _auto_index(0){}
 
-
 void   Response::contentType()
 {
     // std::cout << "File is = " << _target_file << std::endl;
@@ -33,7 +32,6 @@ void   Response::contentLength()
     _response_content.append("Content-Length: ");
     _response_content.append(ss.str());
     _response_content.append("\r\n");
-
 }
 
 void   Response::connection()
@@ -264,6 +262,7 @@ int    Response::handleTarget()
         // std::cout << "after allwoed\n" ;
         if (checkReturn(target_location, _code, _location))
             return (1);
+
 		if(target_location.getPath().find("cgi-bin") != std::string::npos)
 		{
             return(handleCgi(location_key)); // If CGI will handle the resoponse --> return 0, If Error found Return 1;
@@ -620,7 +619,7 @@ void        Response::cutRes(size_t i)
     _response_content = _response_content.substr(i);
 }
 
-void   Response::clearResponse()
+void   Response::clear()
 {
     _target_file.clear();
     _body.clear();
