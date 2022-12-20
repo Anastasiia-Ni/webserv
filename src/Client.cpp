@@ -85,7 +85,7 @@ const time_t     &Client::getLastTime() const
 
 void        Client::buildResponse()
 {
-    response.setRequest(request);
+    response.setRequest(this->request);
     response.buildResponse();
 }
 

@@ -134,44 +134,65 @@ const std::string &CgiHandler::getCgiPath() const
     return (this->_cgi_path);
 }
 
-/* initialization environment variable */
+/* TESTING */
 void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
 	int poz;
-	std::string extension;
 
-	std::vector<std::string> ext_path = it_loc->getCgiPath();
-	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
+	std::string cgi_exec = ("cgi-bin/" + it_loc->getCgiPath()[0]).c_str();
+	// cgi_exec = "/usr/bin/python3";
+	// this->_cgi_path = "cgi-bin/env.py";
+
+	// this->_cgi_path = "/dkjk";
+	char    *cwd = getcwd(NULL, 0);
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd );
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_EXEC PATH IS %s", cgi_exec.c_str() );
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_SCRIPT PATH IS %s", _cgi_path.c_str() );
+
+
+	// this->_env["AUTH_TYPE"] = "Basic";
+	if(req.getMethod() == POST)
 	{
-		extension = *it_ext;
-		if (this->_cgi_path.find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
-			break ;
-		else if (this->_cgi_path.find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
-			break ;
+		char buf[1024];
+		std::stringstream out;
+		out << req.getBody().length();
+		this->_env["CONTENT_LENGTH"] = out.str();
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());
+		
+		this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
 	}
-
-	this->_env["AUTH_TYPE"] = "Basic";
-	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
-	this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
-    this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	poz = findStart(this->_cgi_path, "cgi-bin/");
-	this->_env["SCRIPT_NAME"] = this->_cgi_path;
-    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
-    this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
-    this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
-    this->_env["QUERY_STRING"] = decode(req.getQuery());
-    this->_env["REMOTE_ADDR"] = req.getHeader("host");
-	poz = findStart(req.getHeader("host"), ":");
-    this->_env["SERVER_NAME"] = (poz > 0 ? req.getHeader("host").substr(0, poz) : "");
-    this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
+	
+    this->_env["GATEWAY_INTERFACE"] = std::string("CGI/1.1");
+	// poz = findStart(this->_cgi_path, "cgi-bin/");
+	this->_env["SCRIPT_NAME"] = cgi_exec;//
+    this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
+    this->_env["PATH_INFO"] = this->_cgi_path;//
+    this->_env["PATH_TRANSLATED"] = this->_cgi_path;//
+    this->_env["REQUEST_URI"] = this->_cgi_path;//
+    // this->_env["QUERY_STRING"] = decode(req.getQuery());
+    // this->_env["REMOTE_ADDR"] = req.getHeader("host");
+	// poz = findStart(req.getHeader("host"), ":");
+    this->_env["SERVER_NAME"] = req.getHeader("host");
+    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
+    this->_env["SERVER_PORT"] ="8002";
+    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
-    this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
-    this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
+    // this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
+    // this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
 	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
 
+	std::map<std::string, std::string> request_headers = req.getHeaders();
+	for(std::map<std::string, std::string>::iterator it = request_headers.begin();
+		it != request_headers.end(); ++it)
+	{
+		std::string name = it->first;
+		std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+		std::string key = "HTTP_" + name;
+		_env[key] = it->second;
+	}
 	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
 	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
 	for (int i = 0; it != this->_env.end(); it++, i++)
@@ -184,7 +205,7 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 	// 	std::cout << this->_ch_env[i] << std::endl;
 
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
-	this->_argv[0] = strdup(extension.c_str());
+	this->_argv[0] = strdup(cgi_exec.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
 
@@ -276,7 +297,6 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 	}
 	this->_cgi_pid = fork();
 	// std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
-
 	if (this->_cgi_pid == 0)
 	{
 		dup2(pipe_in[0], STDIN_FILENO);
@@ -285,10 +305,12 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 		close(pipe_in[1]);
 		close(pipe_out[0]);
 		close(pipe_out[1]);
-	
+		
 		// if(_req.isBody())
 		// 	write(pipe_in[1], _req.getBody(), _reg.getBodyLength());
-
+		int i = -1;
+		while(_ch_env[++i])
+			Logger::logMsg(DEBUG, FILE_OUTPUT, "%s", _ch_env[i]);
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
 		// std::cout << "EXECVE FAILED \n" << std::endl;
 		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);

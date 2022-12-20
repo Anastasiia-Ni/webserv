@@ -155,7 +155,7 @@ static void      appendRoot(Location &location, HttpRequest &request, std::strin
 int        Response::handleCgiTemp(std::string &location_key)
 {
     std::string path;
-    path = this->request.getPath();
+    path = _target_file;
     _cgi_obj.clear();
     _cgi_obj.setCgiPath(path);
     _cgi = 1;
@@ -256,7 +256,6 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
         }
     }
 }
-
 int    Response::handleTarget()
 {
     // std::cout << "URI is = |" << request.getPath()<< "|" << std::endl;
@@ -298,9 +297,14 @@ int    Response::handleTarget()
 
         if(!target_location.getCgiExtension().empty())
         {
-            Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
-            Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Path are %s", target_location.getCgiPath()[0].c_str());
-             return(handleCgiTemp(location_key));
+             
+            if(_target_file.rfind(".bla") != std::string::npos)
+            {   
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "_target_file is %s", _target_file.c_str());
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Path are %s", target_location.getCgiPath()[0].c_str());
+                return(handleCgiTemp(location_key));
+            }
 
         }
         // std::cout << "Target file before checking dir is " << _target_file << std::endl;
@@ -572,7 +576,7 @@ int    Response::buildBody()
         {
             std::string body = request.getBody();
             body = removeBoundary(body, request.getBoundary());
-            file.write(body.c_str(), request.getBody().length());
+            file.write(body.c_str(), body.length());
         }
         else
         {

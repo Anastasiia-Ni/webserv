@@ -79,7 +79,7 @@ class HttpRequest
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
         void        setMaxBodySize(size_t);
-
+        void        setBody(std::string name);
 
         void        feed(char *data, size_t size);
         bool        parsingCompleted();

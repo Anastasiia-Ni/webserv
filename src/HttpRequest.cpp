@@ -703,6 +703,11 @@ std::string     &HttpRequest::getBoundary()
     return (this->_boundary);
 }
 
+void    HttpRequest::setBody(std::string body)
+{
+    _body.clear();
+    _body.insert(_body.begin(), body.begin(), body.end());
+}
 
 void    HttpRequest::setMethod(HttpMethod & method)
 {
@@ -767,7 +772,8 @@ void        HttpRequest::_handle_headers()
         _server_name = _request_headers["host"].substr(0, pos);
     }
 
-    if (_request_headers["content-type"].find("multipart/form-data") != std::string::npos)
+
+    if (_request_headers.count("content-type") && _request_headers["content-type"].find("multipart/form-data") != std::string::npos)
     {
         size_t pos = _request_headers["content-type"].find("boundary=", 0);
         if (pos != std::string::npos)

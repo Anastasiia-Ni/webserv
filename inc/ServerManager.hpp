@@ -41,6 +41,7 @@ class ServerManager
         void checkTimeout();
         void initializeSets();
         void readRequest(const int &, Client &);
+        void handleReqBody(Client &);
         void sendResponse(const int &, Client &);
         void sendCgiBody(const int &, Client &, CgiHandler &);
         void readCgiResponse(const int &, Client &, CgiHandler &);

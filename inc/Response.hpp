@@ -40,8 +40,8 @@ class Response
         std::string removeBoundary(std::string &body, std::string &boundary);
         std::string     _response_content;
 
-    private:
         HttpRequest     request;
+    private:
         ServerConfig    _server;
         std::string     _target_file;
         std::vector<uint8_t> _body;
