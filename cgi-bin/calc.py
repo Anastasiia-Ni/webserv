@@ -15,9 +15,6 @@ print(os.environ["QUERY_STRING"], file=sys.stderr)
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")
 
-# for param in os.environ.keys():
-#     print("<b>%20s</b>: %s<br>" % (param, os.environ[param]))
-
 if not oper or not arg1 or not arg3:
 	print("Parameters are not correct")
 	exit(1)

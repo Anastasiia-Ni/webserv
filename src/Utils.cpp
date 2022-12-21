@@ -1,6 +1,5 @@
 #include "../inc/Webserv.hpp"
 
-
 std::string statusCodeString(short statusCode)
 {
 switch (statusCode)

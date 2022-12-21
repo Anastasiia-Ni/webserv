@@ -31,31 +31,33 @@
 </header>
 
 <div class="sub_div">
-    <!-- <body> -->
     <h1 id="header"></h1>
-    <!-- <p>Messege for checking</p> -->
     <script>
         function setAction(form, name){
-            //form.action = "../cgi-bin/script.php"; //дописать скрипт
             document.cookie = "user=" + name;
         }
         const value = `${document.cookie}`;
         const parts = value.split("=");
-    //    document.getElementById("parts").innerHTML = parts[parts.indexOf("user")]; // delete for checking
         document.getElementById("header").innerHTML = "Welcome " + (parts[parts.indexOf("user") + 1] ? parts[parts.indexOf("user") + 1] : "to webserver");
     </script>
     <br>
-
-
+    <form method="get" onsubmit="return setAction(this, document.getElementById('nameForm').value)">
+        Name: <input id="nameForm" type="text" name="user">
+        <input type="submit" value="OK">
+    </form>
+    <br>
 	<form enctype="multipart/form-data" action = "../cgi-bin/upload.py" method="post" >
         <p>File: <input type="file" name="filename" id="fileid" class="form-control">
             <input type="submit" value="SEND" href="#"></p>
     </form>
-    </title>
 
-    <form method="POST" onsubmit="return setAction(this, document.getElementById('nameForm').value)">
-        Name: <input id="nameForm" type="text" name="user">
-        <input type="submit" value="OK">
+    
+
+    <br>
+    <form action="../cgi-bin/delete.py" method="POST">
+        <input type="hidden" name="_method" value="DELETE" />
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="submit" value="Delete">
     </form>
 
 </div>

@@ -93,8 +93,7 @@ void ServerConfig::setHost(std::string parametr)
 		parametr = "127.0.0.1";
 	if (!isValidHost(parametr))
 		throw ErrorException("Wrong syntax: host");
-	this->_host = inet_addr(parametr.data()); // check with select
-	// if (this->_host != INADDR_NONE);
+	this->_host = inet_addr(parametr.data());
 }
 
 void ServerConfig::setRoot(std::string root)
@@ -198,7 +197,7 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 	}
 }
 
-/* parsing and set location */
+/* parsing and set locations */
 void ServerConfig::setLocation(std::string path, std::vector<std::string> parametr)
 {
 	Location new_location;
@@ -406,12 +405,9 @@ bool ServerConfig::isValidErrorPages()
 	return (true);
 }
 
-/*check some parametrs of location */
+/* check parametrs of location */
 int ServerConfig::isValidLocation(Location &location) const
 {
-	// char dir[1024];
-	// getcwd(dir, 1024);
-
 	if (location.getPath() == "/cgi-bin")
 	{
 		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
@@ -528,6 +524,11 @@ const std::string &ServerConfig::getIndex()
 	return (this->_index);
 }
 
+int   	ServerConfig::getFd() 
+{ 
+	return (this->_listen_fd); 
+}
+
 /* the two functions below can be used later for response */
 const std::string &ServerConfig::getPathErrorPage(short key)
 {
@@ -558,15 +559,15 @@ void ServerConfig::checkToken(std::string &parametr)
 	parametr.erase(pos);
 }
 
-/* check location on a dublicate */
+/* check location for a dublicate */
 bool ServerConfig::checkLocaitons() const
 {
 	if (this->_locations.size() < 2)
 		return (false);
 	std::vector<Location>::const_iterator it1;
 	std::vector<Location>::const_iterator it2;
-	for (it1 = this->_locations.begin(); it1 != _locations.end() - 1; it1++) {
-		for (it2 = it1 + 1; it2 != _locations.end(); it2++) {
+	for (it1 = this->_locations.begin(); it1 != this->_locations.end() - 1; it1++) {
+		for (it2 = it1 + 1; it2 != this->_locations.end(); it2++) {
 			if (it1->getPath() == it2->getPath())
 				return (true);
 		}
@@ -598,5 +599,3 @@ void	ServerConfig::setupServer(void)
         exit(EXIT_FAILURE);
     }
 }
-
-int   	ServerConfig::getFd() { return _listen_fd; }

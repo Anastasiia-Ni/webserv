@@ -42,14 +42,12 @@ std::string CgiHandler::decode(std::string &path)
 }
 
 /* Constructor */
-
 CgiHandler::CgiHandler() {
 	this->_cgi_pid = -1;
 	this->_exit_status = 0;
 	this->_cgi_path = "";
 	this->_ch_env = NULL;
 	this->_argv = NULL;
-    // std::cout << "CgiHandler constructor" << std::endl;
 }
 
 CgiHandler::CgiHandler(std::string path)
@@ -76,10 +74,6 @@ CgiHandler::~CgiHandler() {
 		free(_argv);
 	}
 	this->_env.clear();
-
-   	// std::cout << "CGI DIED" << std::endl; // delete
-//    std::cout << "Exit status was " << WEXITSTATUS(_exit_status) << std::endl;
-
 }
 
 CgiHandler::CgiHandler(const CgiHandler &other)
@@ -105,7 +99,6 @@ CgiHandler &CgiHandler::operator=(const CgiHandler &rhs)
 	}
 	return (*this);
 }
-
 
 /*Set functions */
 void CgiHandler::setCgiPid(pid_t cgi_pid)
@@ -215,8 +208,6 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 	this->_argv[0] = strdup(cgi_exec.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
-
-	// std::cout << "ARGV0     " << this->_argv[0] << std::endl;
 }
 
 
@@ -250,8 +241,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
     this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
     this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
-	this->_env["REQUEST_URI"] = req.getPath() + req.getQuery(); // full path?
-	// this->_env["PATH"] = extension; - This thing breaks everything
+	this->_env["REQUEST_URI"] = req.getPath() + req.getQuery();
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
@@ -264,17 +254,10 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
-		std::cout << this->_ch_env[i] << std::endl;
-
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
-
 	this->_argv[0] = strdup(ext_path.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
-
-	std::cout << "ARGV0: " << this->_argv[0] << std::endl; //delete
-	std::cout << "ARGV1: " << this->_argv[1] << std::endl;
 }
 
 /* Pipe and execute CGI */
@@ -326,7 +309,7 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 	else if (this->_cgi_pid > 0){}
 	else
 	{
-        std::cout << "Fork failed" << std::endl; // std::cerr <<
+        std::cout << "Fork failed" << std::endl;
 		error_code = 500;
 	}
 }
