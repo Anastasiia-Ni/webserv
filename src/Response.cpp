@@ -272,9 +272,10 @@ int    Response::handleTarget()
             std::cout << "METHOD NOT ALLOWED \n";
             return (1);
         }
-        if(request.getBody().length() > target_location.get
+        std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND Loc Max allowed is" << target_location.getMaxBodySize() << std::endl;
+        if(request.getBody().length() > target_location.getMaxBodySize())
         {
-            // std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND BVODY IS " << request.getBody() << std::endl;
+            std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND Loc Max allowed is" << target_location.getMaxBodySize() << std::endl;
             _code = 413;
             return (1);
         }

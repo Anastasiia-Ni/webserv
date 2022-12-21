@@ -207,6 +207,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 	std::vector<std::string> error_codes;
 	int		flag_loc = 1;
 	bool	flag_autoindex = false;
+	bool	flag_max_size = false;
 
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 	if (parametrs.size() < 3)
@@ -262,9 +263,10 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		}
 		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
 		{
-			if (server.getClientMaxBodySize())
+			if (flag_max_size)
 				throw  ErrorException("Client_max_body_size is duplicated");
 			server.setClientMaxBodySize(parametrs[++i]);
+			flag_max_size = true;
 		}
 		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
 		{
@@ -290,7 +292,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 			if (!flag_loc)
 				throw  ErrorException("Parametrs after location");
 			else
-				ServerConfig::checkToken(parametrs[++i]);
+				throw  ErrorException("Unsupported directive");
 		}
 	}
 	if (server.getRoot().empty())
