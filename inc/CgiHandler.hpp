@@ -2,7 +2,6 @@
 #define CGIHANDLER_HPP
 
 #include "Webserv.hpp"
-#include "HttpRequest.hpp"
 
 class HttpRequest;
 class CgiHandler {
@@ -26,7 +25,7 @@ class CgiHandler {
 
 		void initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc);
 		void initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc);
-		void execute(HttpRequest& req, int &fd, std::string &, short &error_code);
+		void execute(short &error_code);
 		void sendHeaderBody(int &pipe_out, int &fd, std::string &);
 		void fixHeader(std::string &header);
 		void clear();
@@ -46,6 +45,5 @@ class CgiHandler {
 		int findStart(const std::string path, const std::string delim);
 		std::string decode(std::string &path);
 };
-
 
 #endif

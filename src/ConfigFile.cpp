@@ -12,7 +12,6 @@ int ConfigFile::getTypePath(std::string const path)
 {
 	struct stat	buffer;
 	int			result;
-
 	result = stat(path.c_str(), &buffer);
 	if (result == 0)
 	{

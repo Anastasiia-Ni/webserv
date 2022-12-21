@@ -26,6 +26,8 @@ HttpRequest::HttpRequest()
     _boundary = "";
 }
 
+HttpRequest::~HttpRequest() {}
+
 bool    checkUriPos(std::string path)
 {
     std::string tmp(path);
@@ -89,7 +91,7 @@ void    trimStr(std::string &str)
 
 void    toLower(std::string &str)
 {
-    for (int i = 0; i < str.length(); ++i)
+    for (size_t i = 0; i < str.length(); ++i)
         str[i] = std::tolower(str[i]);
 }
 void    HttpRequest::feed(char *data, size_t size)
@@ -151,7 +153,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     return;
                 }
 
-                if (_method_index == _method_str[_method].length())
+                if ((size_t) _method_index == _method_str[_method].length())
                     _state = Request_Line_First_Space;
                 break;
             }
@@ -498,7 +500,8 @@ void    HttpRequest::feed(char *data, size_t size)
                     std::cout << "Bad Character (Chunked_Length_Begin)" << std::endl;
                     return;
                 }
-                std::stringstream().swap(s);
+                s.str("");
+                s.clear();
                 s << character;
                 s >> std::hex >> _chunk_length;
                 if (_chunk_length == 0)
@@ -512,7 +515,8 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (isxdigit(character) != 0)
                 {
                     int temp_len = 0;
-                    std::stringstream().swap(s);
+                    s.str("");
+                    s.clear();
                     s << character;
                     s >> std::hex >> temp_len;
                     _chunk_length *= 16;

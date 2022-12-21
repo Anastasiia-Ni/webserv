@@ -57,7 +57,6 @@ void    Client::setAddress(sockaddr_in &addr)
 
 void    Client::setServer(ServerConfig &server)
 {
-    server = server;
     response.setServer(server);
 }
 

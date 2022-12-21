@@ -2,8 +2,19 @@
 
 Mime Response::_mime;
 
-Response::Response(): _cgi_response_length(0), _code(0), _res(NULL), _target_file(""), _body_length(0),
-                      _cgi(0), _auto_index(0){}
+Response::Response()
+{
+    _target_file = "";
+    _body.clear();
+    _body_length = 0;
+    _response_content = "";
+    _response_body = "";
+    _location = "";
+    _code = 0;
+    _cgi = 0;
+    _cgi_response_length = 0;
+    _auto_index = 0;
+}
 
 Response::~Response()
 {
@@ -11,12 +22,21 @@ Response::~Response()
     //     delete [] _res;
 }
 
-Response::Response(HttpRequest &req): _cgi_response_length(0), request(req), _code(0), _res(NULL)
-                                    , _target_file(""), _body_length(0), _cgi(0),  _auto_index(0){}
-
+Response::Response(HttpRequest &req) : request(req)
+{
+    _target_file = "";
+    _body.clear();
+    _body_length = 0;
+    _response_content = "";
+    _response_body = "";
+    _location = "";
+    _code = 0;
+    _cgi = 0;
+    _cgi_response_length = 0;
+    _auto_index = 0;
+}
 void   Response::contentType()
 {
-    // std::cout << "File is = " << _target_file << std::endl;
     _response_content.append("Content-Type: ");
     if(_target_file.rfind(".", std::string::npos) != std::string::npos && _code == 200)
         _response_content.append(_mime.getMimeType(_target_file.substr(_target_file.rfind(".", std::string::npos))) );
@@ -103,11 +123,6 @@ static bool    isAllowedMethod(HttpMethod &method, Location &location, short &co
     return (0);
 }
 
-static bool    isAllowedSize(HttpMethod &method, Location &location, short &code)
-{
-    return (0);
-}
-
 static bool    checkReturn(Location &loc, short &code, std::string &location)
 {
     if(!loc.getReturn().empty())
@@ -125,15 +140,18 @@ static bool    checkReturn(Location &loc, short &code, std::string &location)
 static std::string combinePaths(std::string p1, std::string p2, std::string p3)
 {
     std::string res;
-    if(p1.back() == '/' && (!p2.empty() && p2[0] == '/') )
+    int len1 = p1.length();
+    int len2 = p2.length();
+
+    if(p1[len1 - 1] == '/' && (!p2.empty() && p2[0] == '/') )
         p2.erase(0, 1);
-    if(p1.back() != '/' && (!p2.empty() && p2[0] != '/'))
+    if(p1[len1 - 1] != '/' && (!p2.empty() && p2[0] != '/'))
         p1.insert(p1.end(), '/');
 
-    if(p2.back() == '/' && (!p3.empty() && p3[0] == '/') )
+    if(p2[len2 - 1] == '/' && (!p3.empty() && p3[0] == '/') )
         p3.erase(0, 1);
 
-    if(p2.back() != '/' && (!p3.empty() && p3[0] != '/'))
+    if(p2[len2 - 1] != '/' && (!p3.empty() && p3[0] != '/'))
         p2.insert(p1.end(), '/');
     res = p1 + p2 + p3;
 
@@ -166,7 +184,7 @@ int        Response::handleCgiTemp(std::string &location_key)
         return (1);
     }
     _cgi_obj.initEnvCgi(request, _server.getLocationKey(location_key)); // + URI
-    _cgi_obj.execute(request, this->_cgi_fd[1], _response_content, this->_code);
+    _cgi_obj.execute(this->_code);
     return (0);
 }
 
@@ -224,7 +242,7 @@ int        Response::handleCgi(std::string &location_key)
         return (1);
     }
     _cgi_obj.initEnv(request, _server.getLocationKey(location_key)); // + URI
-    _cgi_obj.execute(request, this->_cgi_fd[1], _response_content, this->_code);
+    _cgi_obj.execute(this->_code);
     return (0);
 }
 
@@ -235,7 +253,7 @@ int        Response::handleCgi(std::string &location_key)
 
 static void    getLocationMatch(std::string &path, std::vector<Location> locations, std::string &location_key)
 {
-    int biggest_match = 0;
+    size_t biggest_match = 0;
 
     for(std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it)
     {
@@ -272,17 +290,12 @@ int    Response::handleTarget()
             std::cout << "METHOD NOT ALLOWED \n";
             return (1);
         }
-        std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND Loc Max allowed is" << target_location.getMaxBodySize() << std::endl;
         if(request.getBody().length() > target_location.getMaxBodySize())
         {
             std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND Loc Max allowed is" << target_location.getMaxBodySize() << std::endl;
             _code = 413;
             return (1);
         }
-        // Uncomment and fix if we should allow max size for locations
-        // if(isAllowedSize(request.getMethod(), target_location, _code))
-        //     return (1);
-        // std::cout << "after allwoed\n" ;
         if (checkReturn(target_location, _code, _location))
             return (1);
 
@@ -297,7 +310,6 @@ int    Response::handleTarget()
             replaceAlias(target_location, request, _target_file);
             // _target_file = combinePaths(_server.getRoot(), _target_file, "");
             std::cout << " Path after replacing alias is " << _target_file << std::endl;
-
         }
         else
             appendRoot(target_location, request, _target_file);
@@ -317,7 +329,7 @@ int    Response::handleTarget()
         // std::cout << "Target file before checking dir is " << _target_file << std::endl;
         if (isDirectory(_target_file))
         {
-            if (_target_file.back() != '/')
+            if (_target_file[_target_file.length() - 1] != '/')
             {
                 _code = 301;
                 _location = request.getPath() + "/";
@@ -350,7 +362,7 @@ int    Response::handleTarget()
                     _location = combinePaths(request.getPath(), target_location.getIndexLocation(), "");
                 else
                     _location = combinePaths(request.getPath(), _server.getIndex(), "");
-                if(_location.back() != '/')
+                if(_location[_location.length() - 1] != '/')
                     _location.insert(_location.end(), '/');
 
                 return (1);
@@ -366,7 +378,7 @@ int    Response::handleTarget()
         _target_file = combinePaths(_server.getRoot(), request.getPath(), "");
         if(isDirectory(_target_file))
         {
-            if (_target_file.back() != '/')
+            if (_target_file[_target_file.length() - 1] != '/')
             {
                 _code = 301;
                 _location = request.getPath() + "/";
@@ -392,7 +404,7 @@ int    Response::handleTarget()
             {
                 _code = 301;
                 _location = combinePaths(request.getPath(), _server.getIndex(), "");
-                if(_location.back() != '/')
+                if(_location[_location.length() - 1] != '/')
                     _location.insert(_location.end(), '/');
                 // std::cout << "Location =  " << _location << std::endl;;
                 return (1);
@@ -495,8 +507,7 @@ void    Response::buildResponse()
     // }
     if(reqError() || buildBody())
         buildErrorBody();
-    // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
-	if(_cgi)
+    if(_cgi)
         return;
     else if(_auto_index)
     {
@@ -539,7 +550,7 @@ size_t Response::getLen() const {
 /* Constructs Status line based on status code. */
 void        Response::setStatusLine()
 {
-    _response_content.append("HTTP/1.1 " + std::to_string(_code) + " ");
+    _response_content.append("HTTP/1.1 " + toString(_code) + " ");
     _response_content.append(statusCodeString(_code));
     _response_content.append("\r\n");
 }
@@ -552,10 +563,10 @@ int    Response::buildBody()
         _code = 413;
         return (1);
     }
-    if (handleTarget())
+    if ( handleTarget() )
         return (1);
-	if(_cgi || _auto_index)
-		return (0);
+    if(_cgi || _auto_index)
+        return (0);
     if(_code)
         return (0);
     // std::cout << _target_file << "ERROR " << std::endl;

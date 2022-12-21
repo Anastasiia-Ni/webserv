@@ -133,9 +133,9 @@ void Location::setMaxBodySize(std::string parametr)
 		if (parametr[i] < '0' || parametr[i] > '9')
 			throw ServerConfig::ErrorException("Wrong syntax: client_max_body_size");
 	}
-	if (!std::stoi(parametr))
+	if (!ft_stoi(parametr))
 		throw ServerConfig::ErrorException("Wrong syntax: client_max_body_size");
-	body_size = std::stoi(parametr);
+	body_size = ft_stoi(parametr);
 	this->_client_max_body_size = body_size;
 }
 

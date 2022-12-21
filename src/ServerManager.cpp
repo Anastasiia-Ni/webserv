@@ -1,5 +1,7 @@
 # include "../inc/ServerManager.hpp"
 
+ServerManager::ServerManager(){}
+ServerManager::~ServerManager(){}
 
 /**
  * Start all servers on ports specified in the config file
@@ -72,9 +74,9 @@ void    ServerManager::runServers()
             {
                 int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
                 if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
-                    sendCgiBody(i, _clients_map[i], _clients_map[i].response._cgi_obj);
+                    sendCgiBody(_clients_map[i], _clients_map[i].response._cgi_obj);
                 else if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_out[0], &recv_set_cpy))
-                    readCgiResponse(i, _clients_map[i], _clients_map[i].response._cgi_obj);
+                    readCgiResponse(_clients_map[i], _clients_map[i].response._cgi_obj);
                 else if ((cgi_state == 0 || cgi_state == 2)  && FD_ISSET(i, &write_set_cpy))
                     sendResponse(i, _clients_map[i]);
             }
@@ -182,7 +184,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
 {
     int bytes_sent;
     std::string response = c.response.getRes();
-    Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendResponse()");
+    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendResponse()");
 
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
@@ -194,14 +196,14 @@ void    ServerManager::sendResponse(const int &i, Client &c)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendResponse() error sending : %s", strerror(errno));
         closeConnection(i);
     }
-    else if (bytes_sent == 0 || bytes_sent == response.length())
+    else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
 
         if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
         {
-            std::cout << "Connection Closed !" << std::endl;
+            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Connection Closed !");
             closeConnection(i);
         }
         else
@@ -213,8 +215,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else
     {
-        // std::cout << "Done SENDING () :" << strerror(errno) << std::endl;
-        // std::cout << "Bytes sent are : " << bytes_sent << std::endl;
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Sent to client. ", bytes_sent);
         c.updateTime();
         c.response.cutRes(bytes_sent);
     }
@@ -249,7 +250,7 @@ void    ServerManager::readRequest(const int &i, Client &c)
 {
     char    buffer[MESSAGE_BUFFER];
     int     bytes_read = 0;
-    Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readRequest()");
+    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readRequest()");
     bytes_read = read(i, buffer, MESSAGE_BUFFER); // set limit to the total request size to avoid infinite request size.
     // Logger::logMsg(ERROR, FILE_OUTPUT, "REQ IS : %s", buffer);
 
@@ -287,7 +288,6 @@ void    ServerManager::readRequest(const int &i, Client &c)
             handleReqBody(c);
             addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
             addToSet(c.response._cgi_obj.pipe_out[0],  _recv_fd_pool);
-
         }
 
         removeFromSet(i, _recv_fd_pool);
@@ -300,7 +300,7 @@ void    ServerManager::handleReqBody(Client &c)
     	if(c.request.getBody().length() == 0)
 		{
 			std::string tmp;
-			std::fstream file(c.response._cgi_obj._cgi_path);
+			std::fstream file;(c.response._cgi_obj._cgi_path.c_str());
 			std::stringstream ss;
 			ss << file.rdbuf();
 			tmp = ss.str();
@@ -309,7 +309,7 @@ void    ServerManager::handleReqBody(Client &c)
 }
 
 /* Send request body to CGI script */
-void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
+void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
 {
     int bytes_sent;
     std::string req_body = c.request.getBody();
@@ -323,15 +323,15 @@ void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
     
     if (bytes_sent < 0)
     {
-        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Error Sending: %s", strerror(errno));
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Error Sending: %s", strerror(errno));
         removeFromSet(cgi.pipe_in[1], _write_fd_pool);
         close(cgi.pipe_in[1]);
         close(cgi.pipe_out[1]);
         c.response.setErrorResponse(500);
     }
-    else if (bytes_sent == 0 || bytes_sent == req_body.length())
+    else if (bytes_sent == 0 || (size_t) bytes_sent == req_body.length())
     {
-        // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendCgiBody() Done Sending!");
+        Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendCgiBody() Done Sending!");
         removeFromSet(cgi.pipe_in[1], _write_fd_pool);
         close(cgi.pipe_in[1]);
         close(cgi.pipe_out[1]);
@@ -342,17 +342,20 @@ void    ServerManager::sendCgiBody(const int &i, Client &c, CgiHandler &cgi)
         c.updateTime();
         c.request.cutReqBody(bytes_sent);
         // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
+        if((c.request.getBody().length() < 75907328 && c.request.getBody().length() > 74907328) || 
+        (c.request.getBody().length() < 55907328 && c.request.getBody().length() > 54907328))
+            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
 
     } 
 }
 
 /* Reads outpud produced by the CGI script */
-void    ServerManager::readCgiResponse(const int &i, Client &c, CgiHandler &cgi)
+void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
 {
     char    buffer[MESSAGE_BUFFER * 2];
     int     bytes_read = 0;
     // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
-    bytes_read = read(cgi.pipe_out[0], buffer, MESSAGE_BUFFER * 2); // set limit to the total request size to avoid infinite request size.
+    bytes_read = read(cgi.pipe_out[0], buffer, MESSAGE_BUFFER* 2); // set limit to the total request size to avoid infinite request size.
     // Logger::logMsg(ERROR, FILE_OUTPUT, "Output From CGI is: %s", buffer);
     
     if (bytes_read == 0)
@@ -367,7 +370,7 @@ void    ServerManager::readCgiResponse(const int &i, Client &c, CgiHandler &cgi)
     }
     else if (bytes_read < 0)
     { 
-        std::cerr << "Error Reading From CGI Script ! " << strerror(errno) << std::endl;
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "readCgiResponse() Error Reading From CGI Script: ", strerror(errno));
         removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
         close(cgi.pipe_in[0]);
         close(cgi.pipe_out[0]);
@@ -378,7 +381,7 @@ void    ServerManager::readCgiResponse(const int &i, Client &c, CgiHandler &cgi)
     else
     {
         c.updateTime();
-		// std::cout << bytes_read << " bytes read succesfully !" << std::endl;
+        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
 		c.response._response_content.append(buffer, bytes_read);
 		memset(buffer, 0, sizeof(buffer));
     }

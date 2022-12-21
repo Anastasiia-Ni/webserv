@@ -1,14 +1,5 @@
 #include "../inc/CgiHandler.hpp"
 
-/* Converetor functions */
-template<typename T>
-std::string toString(const T &arr)
-{
-	std::ostringstream str;
-	str << arr;
-	return str.str();
-}
-
 unsigned int fromHexToDec(const std::string& nb)
 {
 	unsigned int x;
@@ -129,8 +120,6 @@ const std::string &CgiHandler::getCgiPath() const
 
 void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
-	int poz;
-
 	std::string cgi_exec = ("cgi-bin/" + it_loc->getCgiPath()[0]).c_str();
 	// cgi_exec = "/usr/bin/python3";
 	// this->_cgi_path = "cgi-bin/env.py";
@@ -153,7 +142,6 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 	// this->_env["AUTH_TYPE"] = "Basic";
 	if(req.getMethod() == POST)
 	{
-		char buf[1024];
 		std::stringstream out;
 		out << req.getBody().length();
 		this->_env["CONTENT_LENGTH"] = out.str();
@@ -222,7 +210,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 	std::map<std::string, std::string>::iterator it_path = it_loc->_ext_path.find(extension);
     if (it_path == it_loc->_ext_path.end())
         return ;
-	ext_path = it_loc->_ext_path[extension];
+    ext_path = it_loc->_ext_path[extension];
 
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
@@ -230,7 +218,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = this->_cgi_path;
-    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
+    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || (size_t)(poz + 8) > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
     this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
     this->_env["QUERY_STRING"] = decode(req.getQuery());
@@ -261,7 +249,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 }
 
 /* Pipe and execute CGI */
-void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_content, short &error_code)
+void CgiHandler::execute(short &error_code)
 {
 
 	if (this->_argv[0] == NULL || this->_argv[1] == NULL)
@@ -285,6 +273,10 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 		error_code = 500;
 		return ;
 	}
+	fcntl(pipe_in[0], F_SETFL, O_NONBLOCK);
+	fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
+	fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
+	fcntl(pipe_out[1], F_SETFL, O_NONBLOCK);
 	this->_cgi_pid = fork();
 
 	if (this->_cgi_pid == 0)
@@ -410,9 +402,9 @@ void CgiHandler::fixHeader(std::string &header)
 		tmp.append("Transfer-Encoding: chunked\r\n");
     if (header.find("Connection:") == std::string::npos)
         tmp.append("Connection: keep-alive\r\n");
-	if (_env.count("HTTP_COOKIE") && header.find("Cookie") == std::string::npos)
-		tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
-	pos = header.find("\r\n\r\n", 10);
+    if (_env.count("HTTP_COOKIE") && header.find("Cookie") == std::string::npos)
+        tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
+    pos = header.find("\r\n\r\n", 10);
 	if (pos  == std::string::npos)
     {
 		tmp.append("\r\n\r\n");
