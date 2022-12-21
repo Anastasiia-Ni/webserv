@@ -75,7 +75,7 @@ class HttpRequest
         std::string                                 getServerName();
         std::string                                 &getBoundary();
         bool                                        getMultiformFlag();
-
+        int     nothign();
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
         void        setMaxBodySize(size_t);
