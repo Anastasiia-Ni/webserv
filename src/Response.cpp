@@ -194,7 +194,7 @@ int        Response::handleCgi(std::string &location_key)
         return (1);
     }
     exten = path.substr(pos);
-    if (exten != ".py" && exten != ".sh" && exten != ".bla")
+    if (exten != ".py" && exten != ".sh")
     {
         std::cout << "Extension " << exten << " is not supported" << std::endl;
         _code = 501; // 501 Not Implemented seems suitable error code for wrong extenisons
@@ -223,10 +223,6 @@ int        Response::handleCgi(std::string &location_key)
         _code = 500;
         return (1);
     }
-
-    std::cout << "BODY BEFORE |" << request.getBody() << "|" << std::endl; // delete
-
-
     _cgi_obj.initEnv(request, _server.getLocationKey(location_key)); // + URI
     _cgi_obj.execute(request, this->_cgi_fd[1], _response_content, this->_code);
     return (0);
