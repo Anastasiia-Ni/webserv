@@ -1,5 +1,18 @@
 #include "../inc/Webserv.hpp"
 
+int     ft_stoi(std::string str)
+{
+    std::stringstream ss(str);
+
+    for(size_t i = 0; i < str.length() ; ++i)
+    {
+        if(!isdigit(str[i]))
+            throw std::exception();
+    }
+    int res;
+    ss >> res;
+    return res;
+}
 
 std::string statusCodeString(short statusCode)
 {
@@ -114,9 +127,9 @@ switch (statusCode)
 
 std::string getErrorPage(short statusCode)
 {
-    return ("<html>\r\n<head><title>" + std::to_string(statusCode) + " " +
+    return ("<html>\r\n<head><title>" + toString(statusCode) + " " +
              statusCodeString(statusCode) + " </title></head>\r\n" + "<body>\r\n" + 
-            "<center><h1>" + std::to_string(statusCode) + " " + statusCodeString(statusCode) + "</h1></center>\r\n");
+            "<center><h1>" + toString(statusCode) + " " + statusCodeString(statusCode) + "</h1></center>\r\n");
 }
 
 int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &body_len)
@@ -173,7 +186,7 @@ int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &bo
         dirListPage.append("</td>\n");
         dirListPage.append("<td>\n");
         if(!S_ISDIR(file_stat.st_mode))
-            dirListPage.append(std::to_string(file_stat.st_size));
+            dirListPage.append(toString(file_stat.st_size));
         dirListPage.append("</td>\n");
         dirListPage.append("</tr>\n");
     }
@@ -187,3 +200,5 @@ int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &bo
     body_len = body.size();
     return (0);
 }
+
+

@@ -124,7 +124,7 @@ void ServerConfig::setPort(std::string parametr)
 		if (!std::isdigit(parametr[i]))
 			throw ErrorException("Wrong syntax: port");
 	}
-	port = std::stoi((parametr));
+	port = ft_stoi((parametr));
 	if (port < 1 || port > 65636)
 		throw ErrorException("Wrong syntax: port");
 	this->_port = (uint16_t) port;
@@ -140,9 +140,9 @@ void ServerConfig::setClientMaxBodySize(std::string parametr)
 		if (parametr[i] < '0' || parametr[i] > '9')
 			throw ErrorException("Wrong syntax: client_max_body_size");
 	}
-	if (!std::stoi(parametr))
+	if (!ft_stoi(parametr))
 		throw ErrorException("Wrong syntax: client_max_body_size");
-	body_size = std::stoi(parametr);
+	body_size = ft_stoi(parametr);
 	this->_client_max_body_size = body_size;
 }
 
@@ -177,7 +177,7 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 		}
 		if (parametr[i].size() != 3)
 			throw ErrorException("Error code is invalid");
-		short code_error = std::stoi(parametr[i]);
+		short code_error = ft_stoi(parametr[i]);
 		if (statusCodeString(code_error)  == "Undefined" || code_error < 400)
 			throw ErrorException ("Incorrect error code: " + parametr[i]);
 		i++;

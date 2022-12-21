@@ -62,7 +62,7 @@ class HttpRequest
 {
     public:
         HttpRequest();
-        ~HttpRequest() = default;
+        ~HttpRequest();
 
         HttpMethod                                  &getMethod();
         std::string                                 &getPath();

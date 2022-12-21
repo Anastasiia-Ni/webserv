@@ -1,19 +1,19 @@
-                                                           #ifndef SERVERMANAGER_HPP
+#ifndef SERVERMANAGER_HPP
 # define SERVERMANAGER_HPP
 
 #include "Webserv.hpp"
 #include "Client.hpp"
 #include "Response.hpp"
 
-static char internal_server_error[] =
-"HTTP/1.1 500 Internal Server Error\r\n"
-"Content-Length = 124\r\n"
-"Content-Type = text/plain\r\n\r\n"
-"<html>\r\n"
-"<head><title>500 Internal Server Error</title></head>\r\n"
-"<body>\r\n"
-"<center><h1>500 Internal Server Error</h1></center>\r\n"
-;
+// static char internal_server_error[] =
+// "HTTP/1.1 500 Internal Server Error\r\n"
+// "Content-Length = 124\r\n"
+// "Content-Type = text/plain\r\n\r\n"
+// "<html>\r\n"
+// "<head><title>500 Internal Server Error</title></head>\r\n"
+// "<body>\r\n"
+// "<center><h1>500 Internal Server Error</h1></center>\r\n"
+// ;
 
 /**
  * ServerManager
@@ -24,8 +24,8 @@ static char internal_server_error[] =
 class ServerManager
 {
     public:                 
-        ServerManager() = default;
-        ~ServerManager() = default;
+        ServerManager();
+        ~ServerManager();
         void    setupServers(std::vector<ServerConfig>);
         void    runServers();
         
@@ -43,8 +43,8 @@ class ServerManager
         void readRequest(const int &, Client &);
         void handleReqBody(Client &);
         void sendResponse(const int &, Client &);
-        void sendCgiBody(const int &, Client &, CgiHandler &);
-        void readCgiResponse(const int &, Client &, CgiHandler &);
+        void sendCgiBody(Client &, CgiHandler &);
+        void readCgiResponse(Client &, CgiHandler &);
         void closeConnection(const int);
         void assignServer(Client &);
         void addToSet(const int , fd_set &);
