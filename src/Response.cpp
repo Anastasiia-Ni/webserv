@@ -114,6 +114,9 @@ static bool    checkReturn(Location &loc, short &code, std::string &location)
     {
         code = 301;
         location = loc.getReturn();
+        if(location[0] != '/')
+            location.insert(location.begin(), '/');
+        std::cout << "LOCATION = |" << location << "|"<< std::endl;
         return (1);
     }
     return (0);
@@ -147,6 +150,24 @@ static void      appendRoot(Location &location, HttpRequest &request, std::strin
 {
     target_file = combinePaths(location.getRootLocation(), request.getPath(), "");
     // std::cout << "Target_file after appending root is " << target_file << std::endl;
+}
+
+int        Response::handleCgiTemp(std::string &location_key)
+{
+    std::string path;
+    path = _target_file;
+    _cgi_obj.clear();
+    _cgi_obj.setCgiPath(path);
+    _cgi = 1;
+    if(pipe(_cgi_fd) < 0)
+    {
+        std::cout << "Pipe() fail" << std::endl;
+        _code = 500;
+        return (1);
+    }
+    _cgi_obj.initEnvCgi(request, _server.getLocationKey(location_key)); // + URI
+    _cgi_obj.execute(request, this->_cgi_fd[1], _response_content, this->_code);
+    return (0);
 }
 
 /* check a file for CGI (the extension is supported, the file exists and is executable) and run the CGI */
@@ -235,7 +256,6 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
         }
     }
 }
-
 int    Response::handleTarget()
 {
     // std::cout << "URI is = |" << request.getPath()<< "|" << std::endl;
@@ -274,6 +294,19 @@ int    Response::handleTarget()
         }
         else
             appendRoot(target_location, request, _target_file);
+
+        if(!target_location.getCgiExtension().empty())
+        {
+             
+            if(_target_file.rfind(target_location.getCgiExtension()[0]) != std::string::npos)
+            {   
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "_target_file is %s", _target_file.c_str());
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
+                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Path are %s", target_location.getCgiPath()[0].c_str());
+                return(handleCgiTemp(location_key));
+            }
+
+        }
         // std::cout << "Target file before checking dir is " << _target_file << std::endl;
         if (isDirectory(_target_file))
         {
@@ -385,7 +418,8 @@ void    Response::buildErrorBody()
         // if(_code == 301)
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
-        if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty())
+        if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty() ||
+         request.getMethod() == DELETE || request.getMethod() == POST)
         {   
             // std::cout << "USED DEFAULT ERROR PAGE";
             setServerDefaultErrorPages();
@@ -444,24 +478,19 @@ void    Response::buildResponse()
     // // for tester
     // if(request.getPath() == "/directory/Yeah")
     // {
-    //     _code = 404;
-    //     buildErrorBody()
-    //     setStatusLine();
-    //     _response_body = "HMM";
-    //     setHeaders();
-    //     _response_content.append(_response_body);
-    //     return;
+        // _code = 404;
+        // buildErrorBody()
+        // setStatusLine();
+        // _response_body = "HMM";
+        // setHeaders();
+        // _response_content.append(_response_body);
+        // return;
     // }
     if(reqError() || buildBody())
         buildErrorBody();
     // std::cout << "FINISHED 3 function \n ---------------------- " << std::endl;
 	if(_cgi)
-	{
-        // if(!constructCgiResp())
-        //     return;
-        // buildErrorBody();
         return;
-    }
     else if(_auto_index)
     {
         if(buildHtmlIndex(_target_file, _body, _body_length))
@@ -548,7 +577,7 @@ int    Response::buildBody()
         {
             std::string body = request.getBody();
             body = removeBoundary(body, request.getBoundary());
-            file.write(body.c_str(), request.getBody().length());
+            file.write(body.c_str(), body.length());
         }
         else
         {
@@ -560,11 +589,16 @@ int    Response::buildBody()
     }
     else if (request.getMethod() == DELETE)
     {
+        if(!fileExists(_target_file))
+        {
+            _code = 404;
+            return 1;
+        }
         if( remove( _target_file.c_str() ) != 0 )
         {
             perror( "Error deleting file" );
             _code = 500;
-            return(1);
+            return 1;
         }
         else
             puts( "File successfully deleted" );

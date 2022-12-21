@@ -134,6 +134,92 @@ const std::string &CgiHandler::getCgiPath() const
     return (this->_cgi_path);
 }
 
+void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc)
+{
+	int poz;
+
+	std::string cgi_exec = ("cgi-bin/" + it_loc->getCgiPath()[0]).c_str();
+	// cgi_exec = "/usr/bin/python3";
+	// this->_cgi_path = "cgi-bin/env.py";
+
+	// this->_cgi_path = "/dkjk";
+	char    *cwd = getcwd(NULL, 0);
+	if(_cgi_path[0] != '/')
+	{
+		std::string tmp(cwd);
+		tmp.append("/");
+		if(_cgi_path.length() > 0)
+			_cgi_path.insert(0, tmp);
+	}
+
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd);
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_EXEC PATH IS %s", cgi_exec.c_str() );
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_SCRIPT PATH IS %s", _cgi_path.c_str() );
+
+
+	// this->_env["AUTH_TYPE"] = "Basic";
+	if(req.getMethod() == POST)
+	{
+		char buf[1024];
+		std::stringstream out;
+		out << req.getBody().length();
+		this->_env["CONTENT_LENGTH"] = out.str();
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());
+		
+		this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
+	}
+	
+    this->_env["GATEWAY_INTERFACE"] = std::string("CGI/1.1");
+	// poz = findStart(this->_cgi_path, "cgi-bin/");
+	this->_env["SCRIPT_NAME"] = cgi_exec;//
+    this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
+    this->_env["PATH_INFO"] = this->_cgi_path;//
+    this->_env["PATH_TRANSLATED"] = this->_cgi_path;//
+    this->_env["REQUEST_URI"] = this->_cgi_path;//
+    // this->_env["QUERY_STRING"] = decode(req.getQuery());
+    // this->_env["REMOTE_ADDR"] = req.getHeader("host");
+	// poz = findStart(req.getHeader("host"), ":");
+    this->_env["SERVER_NAME"] = req.getHeader("host");
+    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
+    this->_env["SERVER_PORT"] ="8002";
+    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
+    this->_env["REQUEST_METHOD"] = req.getMethodStr();
+    // this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
+    // this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
+	// this->_env["PATH"] = extension; - This thing breaks everything
+    this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    this->_env["REDIRECT_STATUS"] = "200";
+	this->_env["SERVER_SOFTWARE"] = "AMANIX";
+
+	std::map<std::string, std::string> request_headers = req.getHeaders();
+	for(std::map<std::string, std::string>::iterator it = request_headers.begin();
+		it != request_headers.end(); ++it)
+	{
+		std::string name = it->first;
+		std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+		std::string key = "HTTP_" + name;
+		_env[key] = it->second;
+	}
+	this->_ch_env = (char **)calloc(sizeof(char *), this->_env.size() + 1);
+	std::map<std::string, std::string>::const_iterator it = this->_env.begin();
+	for (int i = 0; it != this->_env.end(); it++, i++)
+	{
+		std::string tmp = it->first + "=" + it->second;
+		this->_ch_env[i] = strdup(tmp.c_str());
+	}
+
+	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
+	// 	std::cout << this->_ch_env[i] << std::endl;
+
+	this->_argv = (char **)malloc(sizeof(char *) * 3);
+	this->_argv[0] = strdup(cgi_exec.c_str());
+	this->_argv[1] = strdup(this->_cgi_path.c_str());
+	this->_argv[2] = NULL;
+
+	// std::cout << "ARGV0     " << this->_argv[0] << std::endl;
+}
+
+
 /* initialization environment variable */
 void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {

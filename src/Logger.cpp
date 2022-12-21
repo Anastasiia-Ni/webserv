@@ -39,7 +39,7 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
         else if (m == CONSOLE_OUTPUT)
         {
             if(p == DEBUG)
-                std::cout << WHITE;
+                std::cout << YELLOW;
             else if (p == INFO)
                 std::cout << CYAN;
             else if (p == ERROR)
@@ -55,7 +55,7 @@ std::string Logger::getCurrTime()
     char date[1000];
     time_t now = time(0);
     struct tm tm = *gmtime(&now);
-    strftime(date, sizeof(date), "[%Y-%M-%d  %H:%M:%S]   ", &tm);
+    strftime(date, sizeof(date), "[%Y-%m-%d  %H:%M:%S]   ", &tm);
     return(std::string(date));
 }
 

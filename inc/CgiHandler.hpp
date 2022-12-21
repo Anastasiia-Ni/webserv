@@ -10,10 +10,10 @@ class CgiHandler {
 		std::map<std::string, std::string>	_env;
 		char**								_ch_env;
 		char**								_argv;
-		std::string							_cgi_path;
 		int								_exit_status;
 
 	public:
+		std::string							_cgi_path;
 		pid_t								_cgi_pid;
 		int	pipe_in[2];
 		int	pipe_out[2];
@@ -25,6 +25,7 @@ class CgiHandler {
 		CgiHandler &operator=(CgiHandler const &rhs);
 
 		void initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc);
+		void initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc);
 		void execute(HttpRequest& req, int &fd, std::string &, short &error_code);
 		void sendHeaderBody(int &pipe_out, int &fd, std::string &);
 		void fixHeader(std::string &header);
