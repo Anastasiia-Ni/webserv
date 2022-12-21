@@ -211,7 +211,7 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 /* initialization environment variable */
 void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
-	size_t poz;
+	int poz;
 	std::string extension;
 	std::string ext_path;
 
@@ -227,7 +227,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = this->_cgi_path;
-    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || poz + 8 > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
+    this->_env["SCRIPT_FILENAME"] = ((poz < 0 || (size_t)(poz + 8) > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(poz + 8, this->_cgi_path.size())); // check dif cases after put right parametr from the response
     this->_env["PATH_INFO"] = getPathInfo(req.getPath(), it_loc->getCgiExtension());
     this->_env["PATH_TRANSLATED"] = it_loc->getRootLocation() + (this->_env["PATH_INFO"] == "" ? "/" : this->_env["PATH_INFO"]);
     this->_env["QUERY_STRING"] = decode(req.getQuery());

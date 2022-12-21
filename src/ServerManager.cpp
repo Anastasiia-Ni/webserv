@@ -182,7 +182,7 @@ void    ServerManager::closeConnection(const int i)
  */
 void    ServerManager::sendResponse(const int &i, Client &c)
 {
-    size_t bytes_sent;
+    int bytes_sent;
     std::string response = c.response.getRes();
     // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendResponse()");
 
@@ -196,7 +196,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendResponse() error sending : %s", strerror(errno));
         closeConnection(i);
     }
-    else if (bytes_sent == 0 || bytes_sent == response.length())
+    else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
@@ -311,7 +311,7 @@ void    ServerManager::handleReqBody(Client &c)
 /* Send request body to CGI script */
 void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
 {
-    size_t bytes_sent;
+    int bytes_sent;
     std::string req_body = c.request.getBody();
     
     if(req_body.length() == 0)
@@ -329,7 +329,7 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
         close(cgi.pipe_out[1]);
         c.response.setErrorResponse(500);
     }
-    else if (bytes_sent == 0 || bytes_sent == req_body.length())
+    else if (bytes_sent == 0 || (size_t) bytes_sent == req_body.length())
     {
         Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendCgiBody() Done Sending!");
         removeFromSet(cgi.pipe_in[1], _write_fd_pool);
