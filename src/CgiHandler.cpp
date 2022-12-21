@@ -225,16 +225,13 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 {
 	int poz;
 	std::string extension;
+	std::string ext_path;
 
-	std::vector<std::string> ext_path = it_loc->getCgiPath();
-	for (std::vector<std::string>::iterator it_ext = ext_path.begin(); it_ext != ext_path.end(); it_ext++)
-	{
-		extension = *it_ext;
-		if (this->_cgi_path.find(".py") != std::string::npos && it_ext->find("python") != std::string::npos)
-			break ;
-		else if (this->_cgi_path.find(".sh") != std::string::npos && it_ext->find("bash") != std::string::npos)
-			break ;
-	}
+	extension = this->_cgi_path.substr(this->_cgi_path.find("."));
+	std::map<std::string, std::string>::iterator it_path = it_loc->_ext_path.find(extension);
+    if (it_path == it_loc->_ext_path.end())
+        return ;
+	ext_path = it_loc->_ext_path[extension];
 
 	this->_env["AUTH_TYPE"] = "Basic";
 	this->_env["CONTENT_LENGTH"] = req.getHeader("content-length");
@@ -253,6 +250,7 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
     this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
     this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
+	this->_env["REQUEST_URI"] = req.getPath() + req.getQuery(); // full path?
 	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
@@ -266,11 +264,12 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
 
-	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
-	// 	std::cout << this->_ch_env[i] << std::endl;
+	for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
+		std::cout << this->_ch_env[i] << std::endl;
 
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
-	this->_argv[0] = strdup(extension.c_str());
+
+	this->_argv[0] = strdup(ext_path.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
 	this->_argv[2] = NULL;
 
@@ -303,6 +302,10 @@ void CgiHandler::execute(HttpRequest& req, int &fd, std::string &response_conten
 		error_code = 500;
 		return ;
 	}
+
+	std::string _body = req.getBody();
+	std::cout<< "BODY: |" << _body  << "|" << std::endl; //delete
+	
 	this->_cgi_pid = fork();
 	// std::cout<< "pid: " << this->_cgi_pid << std::endl; //delete
 	if (this->_cgi_pid == 0)

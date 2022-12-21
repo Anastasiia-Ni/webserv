@@ -726,6 +726,13 @@ void    HttpRequest::setMaxBodySize(size_t size)
     _max_body_size = size;
 }
 
+void    HttpRequest::setHeader(std::string &name, std::string &value)
+{
+    trimStr(value);
+    toLower(name);
+    // std::cout << "Name = " << name << std::endl;
+    _request_headers[name] = value;
+}
 
 void        HttpRequest::printMessage()
 {
