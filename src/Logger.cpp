@@ -3,6 +3,8 @@
 
 std::string Logger::file_name = "logfile.txt";
 LogPrio Logger::prio = ERROR;
+Mode Logger::mode = CONSOLE_OUTPUT;
+
 // std::map<LogPrio, std::string> Logger::prio_str = { {DEBUG,"[DEBUG]   "}, 
 //                                                     {INFO, "[INFO]    "}, 
 //                                                     {ERROR, "[ERROR]   "} };

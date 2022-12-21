@@ -354,12 +354,16 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
 {
     char    buffer[MESSAGE_BUFFER * 2];
     int     bytes_read = 0;
-    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
     bytes_read = read(cgi.pipe_out[0], buffer, MESSAGE_BUFFER* 2); // set limit to the total request size to avoid infinite request size.
     // Logger::logMsg(ERROR, FILE_OUTPUT, "Output From CGI is: %s", buffer);
     
+    Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
     if (bytes_read == 0)
     {
+        int status;
+        waitpid(cgi._cgi_pid, &status, 0);
+        if (WEXITSTATUS(status) != 0) 
+            c.response.setErrorResponse(500);
         removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
         close(cgi.pipe_in[0]);
         close(cgi.pipe_out[0]);
@@ -381,7 +385,7 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
     else
     {
         c.updateTime();
-        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
 		c.response._response_content.append(buffer, bytes_read);
 		memset(buffer, 0, sizeof(buffer));
     }

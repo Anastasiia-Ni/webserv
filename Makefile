@@ -8,7 +8,7 @@ HEADERS	= inc/Webserv.hpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-CXX = clang++
+CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -D TESTER
 CXXFLAGS += -g3 
