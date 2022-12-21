@@ -306,7 +306,7 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 	if (server.checkLocaitons())
 		throw  ErrorException("Locaition is duplicated");
 	if (!server.getPort())
-		throw  ErrorException("Port not found"); // check sentense
+		throw  ErrorException("Port not found");
 	server.setErrorPages(error_codes);
 	if (!server.isValidErrorPages())
 		throw ErrorException("Incorrect path for error page or number of error");
