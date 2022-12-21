@@ -23,7 +23,6 @@ class ServerConfig
         int     						_listen_fd;
 
 
-
 	public:
 		ServerConfig();
 		~ServerConfig();

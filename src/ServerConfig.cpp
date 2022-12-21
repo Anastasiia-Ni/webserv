@@ -591,7 +591,6 @@ void	ServerConfig::setupServer(void)
     _server_address.sin_family = AF_INET;
     _server_address.sin_addr.s_addr = _host;
     _server_address.sin_port = htons(_port);
-
     if (bind(_listen_fd, (struct sockaddr *) &_server_address, sizeof(_server_address)) == -1)
     {
 		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: bind error %s   Closing ....", strerror(errno));
