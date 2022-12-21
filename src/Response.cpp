@@ -272,6 +272,12 @@ int    Response::handleTarget()
             std::cout << "METHOD NOT ALLOWED \n";
             return (1);
         }
+        if(request.getBody().length() > target_location.get
+        {
+            // std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND BVODY IS " << request.getBody() << std::endl;
+            _code = 413;
+            return (1);
+        }
         // Uncomment and fix if we should allow max size for locations
         // if(isAllowedSize(request.getMethod(), target_location, _code))
         //     return (1);
