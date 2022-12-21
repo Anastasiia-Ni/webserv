@@ -145,7 +145,15 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 
 	// this->_cgi_path = "/dkjk";
 	char    *cwd = getcwd(NULL, 0);
-	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd );
+	if(_cgi_path[0] != '/')
+	{
+		std::string tmp(cwd);
+		tmp.append("/");
+		if(_cgi_path.length() > 0)
+			_cgi_path.insert(0, tmp);
+	}
+
+	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd);
 	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_EXEC PATH IS %s", cgi_exec.c_str() );
 	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_SCRIPT PATH IS %s", _cgi_path.c_str() );
 

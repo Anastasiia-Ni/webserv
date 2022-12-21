@@ -298,7 +298,7 @@ int    Response::handleTarget()
         if(!target_location.getCgiExtension().empty())
         {
              
-            if(_target_file.rfind(".bla") != std::string::npos)
+            if(_target_file.rfind(target_location.getCgiExtension()[0]) != std::string::npos)
             {   
                 Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "_target_file is %s", _target_file.c_str());
                 Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
@@ -418,7 +418,8 @@ void    Response::buildErrorBody()
         // if(_code == 301)
         //     return;
         // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
-        if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty())
+        if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty() ||
+         request.getMethod() == DELETE || request.getMethod() == POST)
         {   
             // std::cout << "USED DEFAULT ERROR PAGE";
             setServerDefaultErrorPages();
@@ -588,11 +589,16 @@ int    Response::buildBody()
     }
     else if (request.getMethod() == DELETE)
     {
+        if(!fileExists(_target_file))
+        {
+            _code = 404;
+            return 1;
+        }
         if( remove( _target_file.c_str() ) != 0 )
         {
             perror( "Error deleting file" );
             _code = 500;
-            return(1);
+            return 1;
         }
         else
             puts( "File successfully deleted" );
