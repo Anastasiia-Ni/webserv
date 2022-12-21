@@ -3,6 +3,9 @@
 
 #include "Webserv.hpp"
 
+#define MAX_URI_LENGTH 4096
+#define MAX_CONTENT_LENGTH 30000000
+
 enum HttpMethod
 {
     GET,
@@ -62,63 +65,60 @@ class HttpRequest
 {
     public:
         HttpRequest();
-        ~HttpRequest() = default;
+        ~HttpRequest();
 
-        HttpMethod                                  &getMethod();
-        std::string                                 &getPath();
-        std::string                                 &getQuery();
-        std::string                                 &getFragment();
-        std::string                                 getHeader(std::string const &);
-		const std::map<std::string, std::string>    &getHeaders() const;
-		std::string                                 getMethodStr();
-        std::string                                 getBody();
-        std::string                                 getServerName();
-        std::string                                 &getBoundary();
-        bool                                        getMultiformFlag();
+        HttpMethod  &getMethod();
+        std::string &getPath();
+        std::string &getQuery();
+        std::string &getFragment();
+        std::string getHeader(std::string const &);
+		std::map<std::string, std::string> getHeaders() const;
+		std::string getMethodStr();
+        std::string getBody();
+
+        bool    getMultiformFlag();
+        std::string     &getBoundary();
 
         void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
         void        setMaxBodySize(size_t);
-        void        setBody(std::string name);
 
         void        feed(char *data, size_t size);
         bool        parsingCompleted();
         void        printMessage();
         void        clear();
-        short       errorCode();
+        int         errorCode();
         bool        keepAlive();
-        void        cutReqBody(int bytes);
-
+        std::string getServerName();
+        void            cutReqBody(int bytes);
     private:
-        std::string                         _path;
-        std::string                         _query;
-        std::string                         _fragment;
-        std::map<std::string, std::string>  _request_headers;
-        std::vector<u_int8_t>               _body;
-        std::string                         _boundary;
-        HttpMethod                          _method;
-        std::map<u_int8_t, std::string>     _method_str;
-        ParsingState                        _state;
-        size_t                              _max_body_size;
-        size_t                              _body_length;
-        short                               _error_code;
-        size_t                              _chunk_length;
-        std::string                         _storage;
-        std::string                         _key_storage;
-        short                               _method_index;
-        u_int8_t                            _ver_major;
-        u_int8_t                            _ver_minor;
-        std::string                         _server_name;
-        /* flags */
-        bool                                _fields_done_flag;
-        bool                                _body_flag;
-        bool                                _body_done_flag;
-        bool                                _complete_flag;
-        bool                                _chunked_flag;
-        bool                                _multiform_flag;
+        std::string     _path;
+        std::string     _query;
+        std::string     _fragment;
+        std::map<std::string, std::string> _request_headers;
+        std::vector<u_int8_t> _body;
+        HttpMethod _method;
+        std::map<u_int8_t, std::string> _method_str;
+        ParsingState    _state;
+        size_t          _max_body_size;
+        int             _body_length;
+        bool            _fields_done_flag;
+        bool            _body_flag;
+        bool            _body_done_flag;
+        bool            _complete_flag;
+        bool            _chunked_flag;
+        int             _error_code;
+        int             _chunk_length;
+        std::string     _storage;
+        std::string     _key_storage;
+        int             _method_index;
+        u_int8_t        _ver_major;
+        u_int8_t        _ver_minor;
+        std::string     _server_name;
+        void        _handle_headers();
 
-        void            _handle_headers();
-
+        bool            _multiform_flag;
+        std::string     _boundary;
 };
 
 #endif

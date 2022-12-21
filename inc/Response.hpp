@@ -40,8 +40,8 @@ class Response
         std::string removeBoundary(std::string &body, std::string &boundary);
         std::string     _response_content;
 
-        HttpRequest     request;
     private:
+        HttpRequest     request;
         ServerConfig    _server;
         std::string     _target_file;
         std::vector<uint8_t> _body;
@@ -71,7 +71,6 @@ class Response
         void    buildErrorBody();
         bool    reqError();
         int     handleCgi(std::string &);
-        int     handleCgiTemp(std::string &);
 
 };
 
