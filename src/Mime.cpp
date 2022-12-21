@@ -24,7 +24,7 @@ Mime::Mime()
 
 std::string Mime::getMimeType(std::string extension)
 {
-    if(_mime_types.count(extension))
+    if (_mime_types.count(extension))
         return (_mime_types[extension]);
      return (_mime_types["default"]);
 }

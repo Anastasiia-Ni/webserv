@@ -78,7 +78,7 @@ const struct sockaddr_in    &Client::getAddress() const
 
 const time_t     &Client::getLastTime() const
 {
-    return _last_msg_time;
+    return (_last_msg_time);
 }
 
 

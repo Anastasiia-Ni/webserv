@@ -12,6 +12,7 @@ int ConfigFile::getTypePath(std::string const path)
 {
 	struct stat	buffer;
 	int			result;
+	
 	result = stat(path.c_str(), &buffer);
 	if (result == 0)
 	{
@@ -38,7 +39,7 @@ int ConfigFile::isFileExistAndReadable(std::string const path, std::string const
 		return (0);
 	if (getTypePath(path + index) == 1 && checkFile(path + index, 4) == 0)
 		return (0);
-	return -1;
+	return (-1);
 }
 
 /* reading from file to string */

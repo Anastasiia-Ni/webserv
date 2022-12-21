@@ -14,19 +14,21 @@ LogPrio Logger::prio = ERROR;
 
 void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
 {
-    char output[8192];
-    va_list args;
+    char        output[8192];
+    va_list     args;
+    int         n;
+
     va_start(args, msg);
-    int n = vsnprintf(output, 8192, msg, args);
+    n = vsnprintf(output, 8192, msg, args);
     std::string date = getCurrTime();
-    if(Logger::prio >= p)
+    if (Logger::prio >= p)
     {
-        if(m == FILE_OUTPUT)
+        if (m == FILE_OUTPUT)
         {
-            if(mkdir("./logs", 0664) < 0 && errno != EEXIST)
+            if (mkdir("./logs", 0664) < 0 && errno != EEXIST)
             {
                 std::cerr << "mkdir() Error: " << strerror(errno) << std::endl;
-                return;
+                return ;
             }
             int fd = open(("./logs/" + file_name).c_str(), O_CREAT | O_APPEND | O_RDWR, 0664);
             write(fd, date.c_str(), date.length());
@@ -38,7 +40,7 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
         }
         else if (m == CONSOLE_OUTPUT)
         {
-            if(p == DEBUG)
+            if (p == DEBUG)
                 std::cout << YELLOW;
             else if (p == INFO)
                 std::cout << CYAN;
@@ -56,7 +58,7 @@ std::string Logger::getCurrTime()
     time_t now = time(0);
     struct tm tm = *gmtime(&now);
     strftime(date, sizeof(date), "[%Y-%m-%d  %H:%M:%S]   ", &tm);
-    return(std::string(date));
+    return (std::string(date));
 }
 
 void Logger::setPrio(LogPrio p)
