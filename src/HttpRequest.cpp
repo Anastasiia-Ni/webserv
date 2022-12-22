@@ -10,6 +10,7 @@ HttpRequest::HttpRequest()
     _path = "";
     _query = "";
     _fragment = "";
+    _body_str = "";
     _error_code = 0;
     _chunk_length = 0;
     _method = NONE;
@@ -641,6 +642,11 @@ void    HttpRequest::feed(char *data, size_t size)
         }//end of swtich
         _storage += character;
     }
+    if( _state == Parsing_Done)
+    {
+        _body_str.append((char*)_body.data(), _body.size());
+        std::cout << "BODY size = " << _body_str.length() << std::endl;
+    }
 }
 
 bool    HttpRequest::parsingCompleted()
@@ -683,12 +689,13 @@ std::string HttpRequest::getMethodStr()
 	return (_method_str[_method]);
 }
 
-std::string HttpRequest::getBody()
+std::string &HttpRequest::getBody()
 {
-    if (!_body.size())
-        return ("");
-    std::string body((char*)_body.data(), _body.size());
-    return (body);
+    // if (!_body.size())
+    //     return ("");
+    return (_body_str);
+    // std::string body((char*)_body.data(), _body.size());
+    // return (body);
 }
 
 std::string     HttpRequest::getServerName()
@@ -710,6 +717,7 @@ void    HttpRequest::setBody(std::string body)
 {
     _body.clear();
     _body.insert(_body.begin(), body.begin(), body.end());
+    _body_str = body;
 }
 
 void    HttpRequest::setMethod(HttpMethod & method)
@@ -801,6 +809,7 @@ void    HttpRequest::clear()
     _body_length = 0;
     _chunk_length = 0x0;
     _storage.clear();
+    _body_str = "";
     _key_storage.clear();
     _request_headers.clear();
     _server_name.clear();
@@ -828,5 +837,6 @@ bool        HttpRequest::keepAlive()
 
 void            HttpRequest::cutReqBody(int bytes)
 {
-    this->_body.erase(_body.begin(), _body.begin() + bytes);
+    _body_str = _body_str.substr(bytes);
+    // this->_body.erase(_body.begin(), _body.begin() + bytes);
 }

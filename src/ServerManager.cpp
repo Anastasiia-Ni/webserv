@@ -306,7 +306,7 @@ void    ServerManager::handleReqBody(Client &c)
 void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
 {
     int bytes_sent;
-    std::string req_body = c.request.getBody();
+    std::string &req_body = c.request.getBody();
     
     if (req_body.length() == 0)
         bytes_sent = 0;
@@ -332,10 +332,10 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
     }
     else
     {
-        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Sent %d bytes", bytes_sent);
+        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Sent %d bytes", bytes_sent);
         c.updateTime();
-        c.request.cutReqBody(bytes_sent);
-        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
+        req_body = req_body.substr(bytes_sent);
+        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
         // if((c.request.getBody().length() < 75907328 && c.request.getBody().length() > 74907328) || 
         // (c.request.getBody().length() < 55907328 && c.request.getBody().length() > 54907328))
             // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());

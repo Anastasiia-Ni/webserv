@@ -71,7 +71,7 @@ class HttpRequest
         std::string                                 getHeader(std::string const &);
 		const std::map<std::string, std::string>    &getHeaders() const;
 		std::string                                 getMethodStr();
-        std::string                                 getBody();
+        std::string                                 &getBody();
         std::string                                 getServerName();
         std::string                                 &getBoundary();
         bool                                        getMultiformFlag();
