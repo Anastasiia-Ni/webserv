@@ -55,7 +55,7 @@
 #ifdef TESTER
     #define MESSAGE_BUFFER 40000 
 #else
-    #define MESSAGE_BUFFER 8192
+    #define MESSAGE_BUFFER 40000
 #endif
 
 #define MAX_URI_LENGTH 4096

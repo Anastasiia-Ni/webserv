@@ -503,6 +503,7 @@ void    Response::buildResponse()
         return ;
     else if (_auto_index)
     {
+        std::cout << "AUTO index " << std::endl;
         if (buildHtmlIndex(_target_file, _body, _body_length))
         {
             _code = 500;
@@ -510,6 +511,7 @@ void    Response::buildResponse()
         }
         else
             _code = 200;
+        _response_body.insert(_response_body.begin(), _body.begin(), _body.end());
     }
     setStatusLine();
     setHeaders();

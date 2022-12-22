@@ -158,7 +158,7 @@ void ServerConfig::setAutoindex(std::string autoindex)
 	if (autoindex != "on" && autoindex != "off")
 		throw ErrorException("Wrong syntax: autoindex");
 	if (autoindex == "on")
-		this->_index = true;
+		this->_autoindex = true;
 }
 
 /* checks if there is such a default error code. If there is, it overwrites the path to the file,

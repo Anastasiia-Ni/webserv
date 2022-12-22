@@ -109,6 +109,7 @@ class HttpRequest
         u_int8_t                            _ver_major;
         u_int8_t                            _ver_minor;
         std::string                         _server_name;
+        std::string                         _body_str;
         /* flags */
         bool                                _fields_done_flag;
         bool                                _body_flag;

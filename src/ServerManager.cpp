@@ -136,7 +136,6 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     long  client_address_size = sizeof(client_address);
     int client_sock;
     Client  new_client(serv);
-    char buf[INET_ADDRSTRLEN];
 
     if ( (client_sock = accept(serv.getFd(), (struct sockaddr *)&client_address,
      (socklen_t*)&client_address_size)) == -1)
@@ -144,7 +143,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: accept error %s", strerror(errno));
         return ;
     }
-    Logger::logMsg(INFO, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
+    // Logger::logMsg(INFO, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
 
     addToSet(client_sock, _recv_fd_pool);
 
@@ -195,8 +194,8 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
     {
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
+        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
+        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
 
         if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
         {
@@ -212,7 +211,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else
     {
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Sent to client. ", bytes_sent);
+        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Sent to client. ", bytes_sent);
         c.updateTime();
         c.response.cutRes(bytes_sent);
     }
@@ -333,13 +332,13 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
     }
     else
     {
-        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Sent %d bytes", bytes_sent);
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Sent %d bytes", bytes_sent);
         c.updateTime();
         c.request.cutReqBody(bytes_sent);
-        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
-        if((c.request.getBody().length() < 75907328 && c.request.getBody().length() > 74907328) || 
-        (c.request.getBody().length() < 55907328 && c.request.getBody().length() > 54907328))
-            Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
+        Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
+        // if((c.request.getBody().length() < 75907328 && c.request.getBody().length() > 74907328) || 
+        // (c.request.getBody().length() < 55907328 && c.request.getBody().length() > 54907328))
+            // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
 
     } 
 }
