@@ -177,7 +177,6 @@ int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &bo
             continue;
         file_path = dir_name + entityStruct->d_name;
         stat(file_path.c_str() , &file_stat);
-        // std::cout << entityStruct->d_name << std::endl;
         dirListPage.append("<tr>\n");
         dirListPage.append("<td>\n");
         dirListPage.append("<a href=\"");

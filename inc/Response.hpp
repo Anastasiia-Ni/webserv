@@ -12,12 +12,10 @@
 class Response
 {
     public:
-
         static     Mime _mime;
         Response();
         Response(HttpRequest&);
         ~Response();
-
 
         std::string     getRes();
         size_t      getLen() const;
@@ -35,7 +33,6 @@ class Response
         void        setErrorResponse(short code);
 
 		CgiHandler		_cgi_obj;
-        
 
         std::string removeBoundary(std::string &body, std::string &boundary);
         std::string     _response_content;
@@ -72,7 +69,6 @@ class Response
         bool    reqError();
         int     handleCgi(std::string &);
         int     handleCgiTemp(std::string &);
-
 };
 
 #endif // RESPONSE_HPP

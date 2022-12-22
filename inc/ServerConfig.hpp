@@ -11,7 +11,7 @@ class ServerConfig
 {
 	private:
 		uint16_t						_port;
-		in_addr_t						_host; //in_addr_t//from #include <machine/types.h>  base type of internet address
+		in_addr_t						_host;
 		std::string						_server_name;
 		std::string						_root;
 		unsigned long					_client_max_body_size;
@@ -21,8 +21,6 @@ class ServerConfig
 		std::vector<Location> 			_locations;
         struct sockaddr_in 				_server_address;
         int     						_listen_fd;
-
-
 
 	public:
 		ServerConfig();

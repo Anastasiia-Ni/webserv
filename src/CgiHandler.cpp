@@ -89,10 +89,6 @@ const std::string &CgiHandler::getCgiPath() const
 void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
 	std::string cgi_exec = ("cgi-bin/" + it_loc->getCgiPath()[0]).c_str();
-	// cgi_exec = "/usr/bin/python3";
-	// this->_cgi_path = "cgi-bin/env.py";
-
-	// this->_cgi_path = "/dkjk";
 	char    *cwd = getcwd(NULL, 0);
 	if(_cgi_path[0] != '/')
 	{
@@ -101,37 +97,24 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 		if(_cgi_path.length() > 0)
 			_cgi_path.insert(0, tmp);
 	}
-	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd);
-	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_EXEC PATH IS %s", cgi_exec.c_str() );
-	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_SCRIPT PATH IS %s", _cgi_path.c_str() );
-	// this->_env["AUTH_TYPE"] = "Basic";
 	if(req.getMethod() == POST)
 	{
 		std::stringstream out;
 		out << req.getBody().length();
 		this->_env["CONTENT_LENGTH"] = out.str();
-		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());	
+		Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());	
 		this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
 	}
 	
     this->_env["GATEWAY_INTERFACE"] = std::string("CGI/1.1");
-	// poz = findStart(this->_cgi_path, "cgi-bin/");
 	this->_env["SCRIPT_NAME"] = cgi_exec;//
     this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
     this->_env["PATH_INFO"] = this->_cgi_path;//
     this->_env["PATH_TRANSLATED"] = this->_cgi_path;//
     this->_env["REQUEST_URI"] = this->_cgi_path;//
-    // this->_env["QUERY_STRING"] = decode(req.getQuery());
-    // this->_env["REMOTE_ADDR"] = req.getHeader("host");
-	// poz = findStart(req.getHeader("host"), ":");
     this->_env["SERVER_NAME"] = req.getHeader("host");
-    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
     this->_env["SERVER_PORT"] ="8002";
-    // this->_env["SERVER_PORT"] = (poz > 0 ? req.getHeader("host").substr(poz + 1, req.getHeader("host").size()) : "");
     this->_env["REQUEST_METHOD"] = req.getMethodStr();
-    // this->_env["HTTP_COOKIE"] = req.getHeader("cookie");
-    // this->_env["DOCUMENT_ROOT"] = it_loc->getRootLocation();
-	// this->_env["PATH"] = extension; - This thing breaks everything
     this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
     this->_env["REDIRECT_STATUS"] = "200";
 	this->_env["SERVER_SOFTWARE"] = "AMANIX";
@@ -256,119 +239,6 @@ void CgiHandler::execute(short &error_code)
 }
 
 
-void CgiHandler::sendHeaderBody(int &pipe_out, int &fd, std::string &response_content) // add fd freom responce
-{				
-	char	tmp[8192];
-	int 	res;
-	// size_t	pos;
-	while( (res = read(pipe_out, tmp, 8192) ) > 0)
-	{
-		std::cout << res << " bytes read succesfully !" << std::endl;
-		response_content.append(tmp, res);
-		memset(tmp, 0, sizeof(tmp));
-	}
-	if(res == 0)
-		std::cout << "READ DONE !" << std::endl;
-	else if(res < 0)
-	{
-		std::cout << "Error Reading From CGI Script" << std::endl;
-		// Set Error to 500 here .
-	}
-
-	// std::cout << "RESPONSE FROM BINARY IS = " << res << std::endl;
-	// tmp[res] = '\0';
-	// std::string header(tmp);
-	// std::string body;
-
-	// fixHeader(header);
-	// pos = header.find("\r\n\r\n");
-    // if (pos != std::string::npos){
-    //     body = header.substr(pos + 4);
-    //     header.erase(pos + 4);
-    // }
-
-	// write(fd, header.c_str(), header.size());
-
-	// std::cout << "-----------------HEADER-----------------\n"; //delete
-	// std::cout << header << std::endl;
-	// std::cout << "------------------BODY------------------\n";
-	// // std::cout << body << std::endl;
-	// size_t num_ch = 0; //delete
-	
-
-	// while (res > 0)
-	// {
-		
-	// 	// res = read(pipe_out, tmp, 4000);
-	// 	// tmp[res] = '\0';
-	// 	// body.append(tmp);
-		
-	// 	std::string chunk;
-    //     chunk = toString(fromDecToHex(body.length()));
-    //     chunk += "\r\n";
-	
-    //     chunk += "\r\n";
-    //     // std::cout << chunk << std::endl;
-	// 	num_ch++; // delete
-    //     write(fd, chunk.c_str(), chunk.length());
-	// 	// std::cout << "CHUNK" << std::endl; // delete
-    //     if (res <= 0)
-    //         break;
-    //     res = read(pipe_out, tmp, 400);
-    //     tmp[res] = '\0';
-    //     body = toString(tmp);
-	// } 
-
-	// std::cout << "Number of chunks = " << num_ch << std::endl;
-	if (response_content.find("HTTP/1.1") == std::string::npos)
-		response_content.insert(0, "HTTP/1.1 200 OK\r\n");
-	std::cout << "LENGTH OF RESPONSE IS = " << response_content.length() << std::endl;
-	// std::cout << "Response Content IS  " << response_content << std::endl;
-	// write(fd, response_content.c_str(), response_content.length());
-	// std::cout << "LENGTH OF RESPONSE IS = " << response_content.length() << std::endl;
-	// write(fd, "0\r\n\r\n", 5);
-	close(fd);
-	waitpid(this->_cgi_pid, &this->_exit_status, 0);// maybe wait after finish reading from child
-	// if _ext_status is not 0 --> set Error to 500
-	if (this->_exit_status != 0)
-	{
-		response_content.clear();
-		response_content = "HTTP/1.1 500 Server Error\r\nContent-Type: text/plain\r\n\r\n 500 Server Error !!";
-		return ;
-	}
-}
-
-void CgiHandler::fixHeader(std::string &header)
-{
-	std::string	tmp;
-	size_t		pos;
-
-	if (header.find("HTTP/1.1") == std::string::npos)
-		header.insert(0, "HTTP/1.1 200 OK\r\n");
-	if (header.find("Content-Type:") == std::string::npos)
-        tmp.append("Content-type: text/html\r\n");
-	if (header.find("Transfer-Encoding:") == std::string::npos)
-		tmp.append("Transfer-Encoding: chunked\r\n");
-    if (header.find("Connection:") == std::string::npos)
-        tmp.append("Connection: keep-alive\r\n");
-    if (_env.count("HTTP_COOKIE") && header.find("Cookie") == std::string::npos)
-        tmp.append("HTTP_COOKIE: " + setCookie(_env["HTTP_COOKIE"]));
-    pos = header.find("\r\n\r\n", 10);
-	if (pos  == std::string::npos)
-    {
-		tmp.append("\r\n\r\n");
-        pos = header.find("\r\n") + 2;
-    }
-	else
-		tmp.insert(0, "\r\n");
-	header.insert(pos, tmp);
-}
-
-std::string CgiHandler::setCookie(const std::string& str)
-{
-	std::string cook = str;
-	return (cook);
-}
 
 int CgiHandler::findStart(const std::string path, const std::string delim)
 {

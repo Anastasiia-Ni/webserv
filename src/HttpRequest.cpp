@@ -121,7 +121,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _method = HEAD;
                 else
                 {
-                    _error_code = 501; // Method not implemented (501)
+                    _error_code = 501;
                     std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
@@ -136,7 +136,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _method = PUT;
                 else
                 {
-                    _error_code = 501; // Method not implemented (501)
+                    _error_code = 501;
                     std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
@@ -150,7 +150,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     _method_index++;
                 else
                 {
-                    _error_code = 501; // Method not implemented (501)
+                    _error_code = 501;
                     std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
@@ -399,7 +399,7 @@ void    HttpRequest::feed(char *data, size_t size)
             {
                 if (character == '\r')
                     _state = Fields_End;
-                else if (isToken(character))// check here if the character is allowed to be in field name;
+                else if (isToken(character))
                     _state = Field_Name;
                 else
                 {
@@ -424,18 +424,11 @@ void    HttpRequest::feed(char *data, size_t size)
                         else
                         {
                             _state = Message_Body;
-                            // if (_body_length > _max_body_size)
-                            // {
-                            //     _error_code = 400;
-                            //     std::cout << "Body size is bigger than max allowed!" << std::endl;
-                            //     return;
-                            // }
                         }
                     }
                     else
                     {
                         _state = Parsing_Done;
-                        // std::cout << "Query = " << getQuery() << std::endl;
                     }
                     continue ;
                 }
@@ -476,7 +469,6 @@ void    HttpRequest::feed(char *data, size_t size)
                     _state = Field_Value_End;
                     continue ;
                 }
-                // check here if character is allowed in field vlaue;
                 break ;
             }
             case Field_Value_End:
@@ -522,7 +514,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     s << character;
                     s >> std::hex >> temp_len;
                     _chunk_length *= 16;
-                    _chunk_length += temp_len; // check overflow here
+                    _chunk_length += temp_len;
                 }
                 else if (character == '\r')
                     _state = Chunked_Length_LF;
@@ -621,7 +613,7 @@ void    HttpRequest::feed(char *data, size_t size)
                     return ;
                 }
                 _body_done_flag = true;
-                _state = Parsing_Done;//maybe implemnt trailer headers later.
+                _state = Parsing_Done;
                 continue ;
             }
             case Message_Body:
@@ -645,7 +637,6 @@ void    HttpRequest::feed(char *data, size_t size)
     if( _state == Parsing_Done)
     {
         _body_str.append((char*)_body.data(), _body.size());
-        std::cout << "BODY size = " << _body_str.length() << std::endl;
     }
 }
 
@@ -691,11 +682,7 @@ std::string HttpRequest::getMethodStr()
 
 std::string &HttpRequest::getBody()
 {
-    // if (!_body.size())
-    //     return ("");
     return (_body_str);
-    // std::string body((char*)_body.data(), _body.size());
-    // return (body);
 }
 
 std::string     HttpRequest::getServerName()
@@ -765,7 +752,6 @@ void        HttpRequest::_handle_headers()
 
     if (_request_headers.count("content-length"))
     {
-        std::cout << "CONTETN -------------------------------------------------------------------------LENGTHGHTHTHTH\n";
         _body_flag = true;
         ss << _request_headers["content-length"];
         ss >> _body_length;
@@ -838,5 +824,4 @@ bool        HttpRequest::keepAlive()
 void            HttpRequest::cutReqBody(int bytes)
 {
     _body_str = _body_str.substr(bytes);
-    // this->_body.erase(_body.begin(), _body.begin() + bytes);
 }

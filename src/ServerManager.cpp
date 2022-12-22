@@ -136,6 +136,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     long  client_address_size = sizeof(client_address);
     int client_sock;
     Client  new_client(serv);
+    char    buf[INET_ADDRSTRLEN];
 
     if ( (client_sock = accept(serv.getFd(), (struct sockaddr *)&client_address,
      (socklen_t*)&client_address_size)) == -1)
@@ -143,7 +144,7 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: accept error %s", strerror(errno));
         return ;
     }
-    // Logger::logMsg(INFO, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
+    Logger::logMsg(INFO, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
 
     addToSet(client_sock, _recv_fd_pool);
 
@@ -181,7 +182,6 @@ void    ServerManager::sendResponse(const int &i, Client &c)
 {
     int bytes_sent;
     std::string response = c.response.getRes();
-    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendResponse()");
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
     else
@@ -194,8 +194,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
     {
-        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
-        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "Response Sent To %d, status = %d", i, c.response.getCode());
+        Logger::logMsg(INFO, CONSOLE_OUTPUT, "sendResponse() Done sending ");
 
         if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
         {
@@ -211,13 +210,9 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else
     {
-        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Sent to client. ", bytes_sent);
         c.updateTime();
         c.response.cutRes(bytes_sent);
     }
-        
-    // std::ofstream  file("text_response.txt", std::ios_base::app);
-    // file << resp << std::endl;
 }
 
 /* Assigen server_block configuration to a client based on Host Header in request and server_name*/
@@ -246,10 +241,7 @@ void    ServerManager::readRequest(const int &i, Client &c)
 {
     char    buffer[MESSAGE_BUFFER];
     int     bytes_read = 0;
-    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readRequest()");
-    bytes_read = read(i, buffer, MESSAGE_BUFFER); // set limit to the total request size to avoid infinite request size.
-    // Logger::logMsg(ERROR, FILE_OUTPUT, "REQ IS : %s", buffer);
-
+    bytes_read = read(i, buffer, MESSAGE_BUFFER);
     if (bytes_read == 0)
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
@@ -271,11 +263,6 @@ void    ServerManager::readRequest(const int &i, Client &c)
 
     if (c.request.parsingCompleted() || c.request.errorCode()) // 1 = parsing completed and we can work on the response.
     {
-        if (c.request.errorCode())
-            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Error In Request..", i);
-        else
-            Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s with body size = %d", i,
-                c.request.getMethodStr().c_str(), c.request.getPath().c_str(), c.request.getBody().length());
         assignServer(c);
         c.buildResponse();     
         if (c.response.getCgiState())
@@ -332,14 +319,8 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
     }
     else
     {
-        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Sent %d bytes", bytes_sent);
         c.updateTime();
         req_body = req_body.substr(bytes_sent);
-        // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
-        // if((c.request.getBody().length() < 75907328 && c.request.getBody().length() > 74907328) || 
-        // (c.request.getBody().length() < 55907328 && c.request.getBody().length() > 54907328))
-            // Logger::logMsg(ERROR, CONSOLE_OUTPUT, "sendCgiBody() Remaining Body Size = %d bytes", c.request.getBody().length());
-
     } 
 }
 
@@ -375,7 +356,6 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
     else
     {
         c.updateTime();
-        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
 		c.response._response_content.append(buffer, bytes_read);
 		memset(buffer, 0, sizeof(buffer));
     }

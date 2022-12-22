@@ -16,11 +16,7 @@ Response::Response()
     _auto_index = 0;
 }
 
-Response::~Response()
-{
-    // if(_res)
-    //     delete [] _res;
-}
+Response::~Response() {}
 
 Response::Response(HttpRequest &req) : request(req)
 {
@@ -116,7 +112,6 @@ static bool isAllowedMethod(HttpMethod &method, Location &location, short &code)
        (method == DELETE && !methods[2])|| (method == PUT && !methods[3])||
         (method == HEAD && !methods[4]))
     {
-        std::cout << "METHOD NOT ALLOWED\n" << std::endl;
         code = 405;
         return (1);
     }
@@ -131,7 +126,6 @@ static bool    checkReturn(Location &loc, short &code, std::string &location)
         location = loc.getReturn();
         if (location[0] != '/')
             location.insert(location.begin(), '/');
-        std::cout << "LOCATION = |" << location << "|"<< std::endl;
         return (1);
     }
     return (0);
@@ -160,13 +154,11 @@ static std::string combinePaths(std::string p1, std::string p2, std::string p3)
 static void replaceAlias(Location &location, HttpRequest &request, std::string &target_file)
 {
     target_file = combinePaths(location.getAlias(), request.getPath().substr(location.getPath().length()), "");
-    // std::cout << "Target_file after replacing alias is " << target_file << std::endl;
 }
 
 static void appendRoot(Location &location, HttpRequest &request, std::string &target_file)
 {
     target_file = combinePaths(location.getRootLocation(), request.getPath(), "");
-    // std::cout << "Target_file after appending root is " << target_file << std::endl;
 }
 
 int Response::handleCgiTemp(std::string &location_key)
@@ -178,7 +170,6 @@ int Response::handleCgiTemp(std::string &location_key)
     _cgi = 1;
     if (pipe(_cgi_fd) < 0)
     {
-        std::cout << "Pipe() fail" << std::endl;
         _code = 500;
         return (1);
     }
@@ -195,48 +186,42 @@ int        Response::handleCgi(std::string &location_key)
     size_t      pos;
     
     path = this->request.getPath();
-    if (path[0] && path[0] == '/') // возможно еще отрезать весь кусок после расширения
+    if (path[0] && path[0] == '/') 
         path.erase(0, 1);
     if (path == "cgi-bin")
         path += "/" + _server.getLocationKey(location_key)->getIndexLocation();
     else if (path == "cgi-bin/")
         path.append(_server.getLocationKey(location_key)->getIndexLocation());
     
-    // std::cout << "PATH: " << path << std::endl; // delete
     pos = path.find(".");
     if (pos == std::string::npos)
     {
-        std::cout << "Extension is not supported" << std::endl;
-        _code = 501; // 501 Not Implemented seems suitable error code for wrong extenisons
+        _code = 501; 
         return (1);
     }
     exten = path.substr(pos);
     if (exten != ".py" && exten != ".sh")
     {
-        std::cout << "Extension " << exten << " is not supported" << std::endl;
-        _code = 501; // 501 Not Implemented seems suitable error code for wrong extenisons
+        _code = 501; 
         return (1);
     }
     if (ConfigFile::getTypePath(path) != 1) 
     {
-        std::cout << "CGI " << path << " is not exist" << std::endl;
         _code = 404;
         return (1);
     }
     if (ConfigFile::checkFile(path, 1) == -1 || ConfigFile::checkFile(path, 3) == -1)
     {
-        std::cout << "CGI file is not executable or unreadable" << std::endl;
         _code = 403;
         return (1);
     }
     if (isAllowedMethod(request.getMethod(), *_server.getLocationKey(location_key), _code))
-        return (1); // проверить еще, после 1 сайт висит
+        return (1);
     _cgi_obj.clear();
     _cgi_obj.setCgiPath(path);
     _cgi = 1;
     if (pipe(_cgi_fd) < 0)
     {
-        std::cout << "Pipe() fail" << std::endl;
         _code = 500;
         return (1);
     }
@@ -273,8 +258,6 @@ int    Response::handleTarget()
 {
     std::string location_key;
     getLocationMatch(request.getPath(), _server.getLocations(), location_key);
-    // If URI matches with a Location block
-    // std::cout << "METHOD IS " <<  request.getMethod() << " And matched location is |" << location_key << "| and code is " << _code << std::endl;
     if (location_key.length() > 0)
     {
         Location target_location = *_server.getLocationKey(location_key);
@@ -286,7 +269,6 @@ int    Response::handleTarget()
         }
         if (request.getBody().length() > target_location.getMaxBodySize())
         {
-            std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND Loc Max allowed is" << target_location.getMaxBodySize() << std::endl;
             _code = 413;
             return (1);
         }
@@ -295,15 +277,12 @@ int    Response::handleTarget()
 
 		if (target_location.getPath().find("cgi-bin") != std::string::npos)
 		{
-            return (handleCgi(location_key)); // If CGI will handle the resoponse --> return 0, If Error found Return 1;
+            return (handleCgi(location_key));
 		}
 
         if (!target_location.getAlias().empty())
         {
-            std::cout << " ALIAS IS " << target_location.getAlias() << std::endl;
             replaceAlias(target_location, request, _target_file);
-            // _target_file = combinePaths(_server.getRoot(), _target_file, "");
-            std::cout << " Path after replacing alias is " << _target_file << std::endl;
         }
         else
             appendRoot(target_location, request, _target_file);
@@ -313,21 +292,16 @@ int    Response::handleTarget()
              
             if (_target_file.rfind(target_location.getCgiExtension()[0]) != std::string::npos)
             {   
-                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "_target_file is %s", _target_file.c_str());
-                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Extension are %s", target_location.getCgiExtension()[0].c_str());
-                Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Cgi Path are %s", target_location.getCgiPath()[0].c_str());
                 return (handleCgiTemp(location_key));
             }
 
         }
-        // std::cout << "Target file before checking dir is " << _target_file << std::endl;
         if (isDirectory(_target_file))
         {
             if (_target_file[_target_file.length() - 1] != '/')
             {
                 _code = 301;
                 _location = request.getPath() + "/";
-                // std::cout << "LOCATINO IS = " << _location << std::endl;
                 return (1);
             }
             if (!target_location.getIndexLocation().empty())
@@ -364,9 +338,6 @@ int    Response::handleTarget()
     }
     else
     {
-        // if(request.getMethod() == POST || request.getMethod() == DELETE)
-        //     _target_file = combinePaths(_server.getRoot(), "upload" , request.getPath());
-        // else    
         _target_file = combinePaths(_server.getRoot(), request.getPath(), "");
         if (isDirectory(_target_file))
         {
@@ -374,21 +345,11 @@ int    Response::handleTarget()
             {
                 _code = 301;
                 _location = request.getPath() + "/";
-                // std::cout << "LOCATINO IS = " << _location << std::endl;
                 return (1);
             }
             _target_file += _server.getIndex();
             if (!fileExists(_target_file))
             {
-                /* Uncomment when autoindex is enabled outside location blocks
-                if(_server.getAutoindex())
-                {
-                    _target_file.erase(_target_file.find_last_of('/') + 1);
-                    _auto_index = true;
-                    return (0);
-                }
-                */
-                // std::cout << "FORBIDEN !!!!!!!!!!!!!!!\n";
                 _code = 403;
                 return (1);
             }
@@ -398,7 +359,6 @@ int    Response::handleTarget()
                 _location = combinePaths(request.getPath(), _server.getIndex(), "");
                 if(_location[_location.length() - 1] != '/')
                     _location.insert(_location.end(), '/');
-                // std::cout << "Location =  " << _location << std::endl;;
                 return (1);
             }
         }
@@ -419,84 +379,37 @@ bool Response::reqError()
 void Response::setServerDefaultErrorPages()
 {
     _response_body = getErrorPage(_code);
-    // _body.insert(_body.begin(), error_body.begin(), error_body.end());
-    // _body_length = _body.size();
-    // std::cout << "DEFAULLT STRING ERRORS \n";
 }
 
 void Response::buildErrorBody()
 {
-        // if(_code == 301)
-        //     return;
-        // instead check here if error codes contains .css or just plain text. if it contains style then set _code to 302
         if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty() ||
          request.getMethod() == DELETE || request.getMethod() == POST)
         {   
-            // std::cout << "USED DEFAULT ERROR PAGE";
             setServerDefaultErrorPages();
         }
         else
         {
-            // std::cout << "NON_DEFAULT STRING ERRORS \n";
             if(_code >= 400 && _code < 500)
             {
                 _location = _server.getErrorPages().at(_code);
-                // std::cout << "Error Location is  " << _location << std::endl;
                 if(_location[0] != '/')
                     _location.insert(_location.begin(), '/');
                 _code = 302;
             }
 
             _target_file = _server.getRoot() +_server.getErrorPages().at(_code);
-            // std::cout << "Non Default ErrorPath is " << _target_file << std::endl;
             short old_code = _code;
             if(readFile())
             {
                 _code = old_code;
                 _response_body = getErrorPage(_code);
-                // _body.insert(_body.begin(), error_body.begin(), error_body.end());
-                // _body_length = _body.size();
             }
         }
 
 }
 void    Response::buildResponse()
 {
-/*  if(checkReqError() || buildBody())
-        buildErrorBody()
-    setStatusLine()
-    setHeaders();
-
-*/
-    //checkConfig() //
-    //constructTarget() // If there is an error then target file will be error html file, either default or from config.
-    //buildBody()
-    //buildStatusLine
-    //buildHeader
-    // std::cerr << "HERE" << std::endl;
-    
-
-    // for tester
-    // if(request.getPath().find(".bla") != std::string::npos)
-    // {
-    //     _code = 200;
-    //     setStatusLine();
-    //     _response_body = "HMM";
-    //     setHeaders();
-    //     _response_content.append(_response_body);
-    //     return;
-    // }
-    // // for tester
-    // if(request.getPath() == "/directory/Yeah")
-    // {
-        // _code = 404;
-        // buildErrorBody()
-        // setStatusLine();
-        // _response_body = "HMM";
-        // setHeaders();
-        // _response_content.append(_response_body);
-        // return;
-    // }
     if (reqError() || buildBody())
         buildErrorBody();
     if (_cgi)
@@ -517,7 +430,6 @@ void    Response::buildResponse()
     setHeaders();
     if (request.getMethod() != HEAD && (request.getMethod() == GET || _code != 200))
         _response_content.append(_response_body);
-    // _response_content.append(_response_body);
 }
 
 void Response::setErrorResponse(short code)
@@ -555,7 +467,6 @@ int    Response::buildBody()
 {
     if (request.getBody().length() > _server.getClientMaxBodySize())
     {
-        // std::cout << "REQUET BODY SIZE IS " << request.getBody().length() << "AND BVODY IS " << request.getBody() << std::endl;
         _code = 413;
         return (1);
     }
@@ -565,7 +476,6 @@ int    Response::buildBody()
         return (0);
     if (_code)
         return (0);
-    // std::cout << _target_file << "ERROR " << std::endl;
     if (request.getMethod() == GET || request.getMethod() == HEAD)
     {
         if (readFile())
@@ -573,7 +483,6 @@ int    Response::buildBody()
     }
      else if (request.getMethod() == POST || request.getMethod() == PUT)
     {
-        // std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << request.getBody().length() << std::endl;
         if (fileExists(_target_file) && request.getMethod() == POST)
         {
             _code = 204;
@@ -582,7 +491,6 @@ int    Response::buildBody()
         std::ofstream file(_target_file.c_str(), std::ios::binary);
         if (file.fail())
         {
-            std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
             _code = 404;
             return (1);
         }
@@ -595,7 +503,6 @@ int    Response::buildBody()
         }
         else
         {
-            std::cout << "TARGET FILE IS :" << _target_file << " and file size is " << request.getBody().length() << std::endl;
             file.write(request.getBody().c_str(), request.getBody().length());
         }
     }
@@ -608,13 +515,9 @@ int    Response::buildBody()
         }
         if (remove( _target_file.c_str() ) != 0 )
         {
-            perror( "Error deleting file" );
             _code = 500;
             return (1);
         }
-        else
-            puts( "File successfully deleted" );
-        
     }
     _code = 200;
     return (0);
@@ -626,23 +529,16 @@ int Response::readFile()
 
     if (file.fail())
     {
-        // std::cout << "FILE READ FAILED1, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
     std::ostringstream ss;
 	if (!(ss << file.rdbuf()))
     {
-        // std::cout << "FILE READ FAILED2, PATH is: " + _target_file << std::endl;
         _code = 404;
         return (1);
     }
-    // std::cout << "FILE READ Succeed, PATH is: " + _target_file << std::endl;
-
     _response_body = ss.str();
-    // _body.insert(_body.begin(), temp_str.begin(), temp_str.end());
-    // _body_length = _body.size();
-
     return (0);
 }
 
@@ -739,7 +635,6 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
                 }
                 else if (!buffer.compare(("--" + boundary + "--\r")))
                 {
-                    // _target_file = "upload/"+ filename;
                     new_body.erase(new_body.end() - 1);
                     break ;
                 }
@@ -749,10 +644,7 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
 
         }
     }
-    // else
-    //    _error_code = 400; // if download error
-   
-    // std::cout << "NEW NAME: " << filename << std::endl;
+
     body.clear();
     return (new_body);
 }

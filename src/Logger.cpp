@@ -3,14 +3,6 @@
 
 std::string Logger::file_name = "logfile.txt";
 LogPrio Logger::prio = ERROR;
-// std::map<LogPrio, std::string> Logger::prio_str = { {DEBUG,"[DEBUG]   "}, 
-//                                                     {INFO, "[INFO]    "}, 
-//                                                     {ERROR, "[ERROR]   "} };
-
-// void Logger::setFilePath(std::string path)
-// {
-//     file_path = path;
-// }
 
 void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
 {
