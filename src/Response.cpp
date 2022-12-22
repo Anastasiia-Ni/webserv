@@ -184,28 +184,28 @@ int        Response::handleCgi(std::string &location_key)
     std::string path;
     std::string exten;
     size_t      pos;
-    
+
     path = this->request.getPath();
-    if (path[0] && path[0] == '/') 
+    if (path[0] && path[0] == '/')
         path.erase(0, 1);
     if (path == "cgi-bin")
         path += "/" + _server.getLocationKey(location_key)->getIndexLocation();
     else if (path == "cgi-bin/")
         path.append(_server.getLocationKey(location_key)->getIndexLocation());
-    
+
     pos = path.find(".");
     if (pos == std::string::npos)
     {
-        _code = 501; 
+        _code = 501;
         return (1);
     }
     exten = path.substr(pos);
     if (exten != ".py" && exten != ".sh")
     {
-        _code = 501; 
+        _code = 501;
         return (1);
     }
-    if (ConfigFile::getTypePath(path) != 1) 
+    if (ConfigFile::getTypePath(path) != 1)
     {
         _code = 404;
         return (1);
@@ -289,9 +289,9 @@ int    Response::handleTarget()
 
         if (!target_location.getCgiExtension().empty())
         {
-             
+
             if (_target_file.rfind(target_location.getCgiExtension()[0]) != std::string::npos)
-            {   
+            {
                 return (handleCgiTemp(location_key));
             }
 
@@ -372,7 +372,7 @@ bool Response::reqError()
     {
         _code = request.errorCode();
         return (1);
-    }        
+    }
     return (0);
 }
 
@@ -385,7 +385,7 @@ void Response::buildErrorBody()
 {
         if( !_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty() ||
          request.getMethod() == DELETE || request.getMethod() == POST)
-        {   
+        {
             setServerDefaultErrorPages();
         }
         else
@@ -450,7 +450,7 @@ std::string Response::getRes()
 }
 
 /* Returns the length of entire reponse ( Headers + Body) */
-size_t Response::getLen() const 
+size_t Response::getLen() const
 {
 	return (_response_content.length());
 }
@@ -495,7 +495,7 @@ int    Response::buildBody()
             return (1);
         }
 
-        if (request.getMultiformFlag()) 
+        if (request.getMultiformFlag())
         {
             std::string body = request.getBody();
             body = removeBoundary(body, request.getBoundary());
@@ -533,11 +533,7 @@ int Response::readFile()
         return (1);
     }
     std::ostringstream ss;
-	if (!(ss << file.rdbuf()))
-    {
-        _code = 404;
-        return (1);
-    }
+	ss << file.rdbuf();
     _response_body = ss.str();
     return (0);
 }
@@ -625,7 +621,7 @@ std::string Response::removeBoundary(std::string &body, std::string &boundary)
                     is_boundary = false;
                     is_content = true;
                 }
-                
+
             }
             else if (is_content)
             {

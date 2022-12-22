@@ -16,7 +16,7 @@ class CgiHandler {
 	public:
 		int	pipe_in[2];
 		int	pipe_out[2];
-		
+
 		CgiHandler();
 		CgiHandler(std::string path);
 		~CgiHandler();

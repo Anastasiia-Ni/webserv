@@ -102,10 +102,10 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 		std::stringstream out;
 		out << req.getBody().length();
 		this->_env["CONTENT_LENGTH"] = out.str();
-		Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());	
+		Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());
 		this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
 	}
-	
+
     this->_env["GATEWAY_INTERFACE"] = std::string("CGI/1.1");
 	this->_env["SCRIPT_NAME"] = cgi_exec;//
     this->_env["SCRIPT_FILENAME"] = this->_cgi_path;
@@ -208,16 +208,12 @@ void CgiHandler::execute(short &error_code)
 	if (pipe(pipe_out) < 0)
 	{
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "pipe failed");
-		
+
 		close(pipe_in[0]);
 		close(pipe_in[1]);
 		error_code = 500;
 		return ;
 	}
-	fcntl(pipe_in[0], F_SETFL, O_NONBLOCK);
-	fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
-	fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
-	fcntl(pipe_out[1], F_SETFL, O_NONBLOCK);
 	this->_cgi_pid = fork();
 	if (this->_cgi_pid == 0)
 	{

@@ -559,14 +559,11 @@ void    HttpRequest::feed(char *data, size_t size)
             }
             case Chunked_Data:
             {
+				_body.push_back(character);
+				--_chunk_length;
                 if (_chunk_length == 0)
                     _state = Chunked_Data_CR;
-                else
-                {
-                    _body.push_back(character);
-                    --_chunk_length;
-                    continue ;
-                }
+				continue ;
             }
             case Chunked_Data_CR:
             {
