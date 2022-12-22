@@ -1,37 +1,5 @@
 #include "../inc/CgiHandler.hpp"
 
-unsigned int fromHexToDec(const std::string& nb)
-{
-	unsigned int x;
-	std::stringstream ss;
-	ss << nb;
-	ss >> std::hex >> x;
-	return (x);
-}
-
-std::string    fromDecToHex(int num)
-{
-    std::stringstream sstream;
-    sstream << std::hex << num;
-    std::string res = sstream.str();
-    return res;
-}
-
-/* Translation of parameters for QUERY_STRING environment variable */
-std::string CgiHandler::decode(std::string &path)
-{
-	size_t token = path.find("%");
-	while (token != std::string::npos)
-	{
-		if (path.length() < token + 2)
-			break ;
-		char decimal = fromHexToDec(path.substr(token + 1, 2));
-		path.replace(token, 3, toString(decimal));
-		token = path.find("%");
-	}
-	return (path);
-}
-
 /* Constructor */
 CgiHandler::CgiHandler() {
 	this->_cgi_pid = -1;
@@ -133,20 +101,16 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 		if(_cgi_path.length() > 0)
 			_cgi_path.insert(0, tmp);
 	}
-
 	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CWD IS %s", cwd);
 	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_EXEC PATH IS %s", cgi_exec.c_str() );
 	Logger::logMsg(ERROR, CONSOLE_OUTPUT, "CGI_SCRIPT PATH IS %s", _cgi_path.c_str() );
-
-
 	// this->_env["AUTH_TYPE"] = "Basic";
 	if(req.getMethod() == POST)
 	{
 		std::stringstream out;
 		out << req.getBody().length();
 		this->_env["CONTENT_LENGTH"] = out.str();
-		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());
-		
+		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Content-Length Passed to cgi is %s", _env["CONTENT_LENGTH"].c_str());	
 		this->_env["CONTENT_TYPE"] = req.getHeader("content-type");
 	}
 	
@@ -188,10 +152,6 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 		std::string tmp = it->first + "=" + it->second;
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
-
-	// for (int i = 0; this->_ch_env[i]; i++)	//delete PRINT ENV
-	// 	std::cout << this->_ch_env[i] << std::endl;
-
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
 	this->_argv[0] = strdup(cgi_exec.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
@@ -202,7 +162,7 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 /* initialization environment variable */
 void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator it_loc)
 {
-	int poz;
+	int			poz;
 	std::string extension;
 	std::string ext_path;
 
@@ -241,7 +201,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 		std::string tmp = it->first + "=" + it->second;
 		this->_ch_env[i] = strdup(tmp.c_str());
 	}
-
 	this->_argv = (char **)malloc(sizeof(char *) * 3);
 	this->_argv[0] = strdup(ext_path.c_str());
 	this->_argv[1] = strdup(this->_cgi_path.c_str());
@@ -251,7 +210,6 @@ void CgiHandler::initEnv(HttpRequest& req, const std::vector<Location>::iterator
 /* Pipe and execute CGI */
 void CgiHandler::execute(short &error_code)
 {
-
 	if (this->_argv[0] == NULL || this->_argv[1] == NULL)
 	{
 		error_code = 500;
@@ -278,7 +236,6 @@ void CgiHandler::execute(short &error_code)
 	fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
 	fcntl(pipe_out[1], F_SETFL, O_NONBLOCK);
 	this->_cgi_pid = fork();
-
 	if (this->_cgi_pid == 0)
 	{
 		dup2(pipe_in[0], STDIN_FILENO);
@@ -287,15 +244,7 @@ void CgiHandler::execute(short &error_code)
 		close(pipe_in[1]);
 		close(pipe_out[0]);
 		close(pipe_out[1]);
-	
-		// if(_req.isBody())
-		// 	write(pipe_in[1], _req.getBody(), _reg.getBodyLength());
-
 		this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
-		// std::cout << "EXECVE FAILED \n" << std::endl;
-		//this->_exit_status = execve(this->_argv[0], this->_argv, this->_ch_env);
-		// std::cout<< "exit: " << this->_exit_status << strerror(errno) << std::endl; //delete
-
 		exit(this->_exit_status);
 	}
 	else if (this->_cgi_pid > 0){}
@@ -430,6 +379,21 @@ int CgiHandler::findStart(const std::string path, const std::string delim)
 		return (poz);
 	else
 		return (-1);
+}
+
+/* Translation of parameters for QUERY_STRING environment variable */
+std::string CgiHandler::decode(std::string &path)
+{
+	size_t token = path.find("%");
+	while (token != std::string::npos)
+	{
+		if (path.length() < token + 2)
+			break ;
+		char decimal = fromHexToDec(path.substr(token + 1, 2));
+		path.replace(token, 3, toString(decimal));
+		token = path.find("%");
+	}
+	return (path);
 }
 
 /* Isolation PATH_INFO environment variable */

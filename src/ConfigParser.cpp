@@ -117,11 +117,11 @@ void ConfigParser::removeWhiteSpace(std::string &content)
 /* spliting servers on separetly strings in vector */
 void ConfigParser::splitServers(std::string &content)
 {
-	size_t start = 0, end = 1; //, count_server = 0;
+	size_t start = 0;
+	size_t end = 1;
 
 	if (content.find("server", 0) == std::string::npos)
 		throw ErrorException("Server did not find");
-
 	while (start != end && start < content.length())
 	{
 		start = findStartServer(start, content);
@@ -163,8 +163,10 @@ size_t ConfigParser::findStartServer (size_t start, std::string &content)
 /* finding a server end and return the index of } end of server */
 size_t ConfigParser::findEndServer (size_t start, std::string &content)
 {
-	size_t i, scope = 0;
-
+	size_t	i;
+	size_t	scope;
+	
+	scope = 0;
 	for (i = start + 1; content[i]; i++)
 	{
 		if (content[i] == '{')
@@ -183,7 +185,7 @@ size_t ConfigParser::findEndServer (size_t start, std::string &content)
 std::vector<std::string> splitParametrs(std::string line, std::string sep)
 {
 	std::vector<std::string>	str;
-	std::string::size_type start, end;
+	std::string::size_type		start, end;
 
 	start = end = 0;
 	while (1)
@@ -203,8 +205,8 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 /* creating Server from string and fill the value */
 void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
-	std::vector<std::string>parametrs;
-	std::vector<std::string> error_codes;
+	std::vector<std::string>	parametrs;
+	std::vector<std::string>	error_codes;
 	int		flag_loc = 1;
 	bool	flag_autoindex = false;
 	bool	flag_max_size = false;
@@ -302,11 +304,11 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 	if (server.getIndex().empty())
 		server.setIndex("index.html;");
 	if (ConfigFile::isFileExistAndReadable(server.getRoot(), server.getIndex()))
-		throw  ErrorException("Index from config file not found or unreadable");
+		throw ErrorException("Index from config file not found or unreadable");
 	if (server.checkLocaitons())
-		throw  ErrorException("Locaition is duplicated");
+		throw ErrorException("Locaition is duplicated");
 	if (!server.getPort())
-		throw  ErrorException("Port not found");
+		throw ErrorException("Port not found");
 	server.setErrorPages(error_codes);
 	if (!server.isValidErrorPages())
 		throw ErrorException("Incorrect path for error page or number of error");
@@ -346,5 +348,5 @@ void ConfigParser::checkServers()
 
 std::vector<ServerConfig>	ConfigParser::getServers()
 {
-	return (_servers);
+	return (this->_servers);
 }

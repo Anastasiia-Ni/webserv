@@ -22,8 +22,7 @@ enum LogPrio{
 
 enum Mode{
     CONSOLE_OUTPUT,
-    FILE_OUTPUT,
-    NON
+    FILE_OUTPUT
 };
 
 class Logger{
@@ -32,7 +31,6 @@ class Logger{
         static std::string file_name;
         static LogPrio prio;
         static std::map<LogPrio, std::string> prio_str;
-        static Mode mode;
 
         static void         setFilenName(std::string);
         static void         logMsg(LogPrio p, Mode, const char*, ...);

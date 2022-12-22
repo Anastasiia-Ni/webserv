@@ -2,9 +2,12 @@
 #include "../inc/ServerManager.hpp"
 
 void sigpipeHandle(int sig) { if(sig) {}}
-int main(int argc, char **argv) {
+
+int main(int argc, char **argv) 
+{
 	if (argc == 1 || argc == 2) {
-		try {
+		try 
+		{
 			std::string		config;
 			ConfigParser	cluster;
         	ServerManager 	master;
@@ -16,15 +19,15 @@ int main(int argc, char **argv) {
 			cluster.createCluster(config);
 			// cluster.print(); // for checking
 			master.setupServers(cluster.getServers());
-        	master.runServers();
-
+			master.runServers();
 		}
 		catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;
 			return (1);
 		}
     }
-    else {
+    else 
+	{
 		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "Error: wrong arguments");
 		return (1);
 	}

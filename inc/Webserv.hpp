@@ -74,7 +74,8 @@ std::string toString(const T val)
 std::string statusCodeString(short);
 std::string getErrorPage(short);
 int buildHtmlIndex(std::string &, std::vector<uint8_t> &, size_t &);
-int     ft_stoi(std::string str);
+int ft_stoi(std::string str);
+unsigned int fromHexToDec(const std::string& nb);
 
 
 #endif

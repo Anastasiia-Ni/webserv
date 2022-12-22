@@ -11,10 +11,10 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
     _servers = servers;
     char buf[INET_ADDRSTRLEN];
     bool    serverDub;
-    for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+    for (std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
         serverDub = false;
-        for(std::vector<ServerConfig>::iterator it2 = _servers.begin(); it2 != it; ++it2)
+        for (std::vector<ServerConfig>::iterator it2 = _servers.begin(); it2 != it; ++it2)
         {
             if (it2->getHost() == it->getHost() && it2->getPort() == it->getPort())
             {
@@ -43,14 +43,13 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
  */
 void    ServerManager::runServers()
 {
-    fd_set recv_set_cpy;
-    fd_set write_set_cpy;
-    int select_ret;
+    fd_set  recv_set_cpy;
+    fd_set  write_set_cpy;
+    int     select_ret;
 
     _biggest_fd = 0;
     initializeSets();
-
-    struct timeval      timer;
+    struct timeval timer;
     while (true)
     {
         timer.tv_sec = 1;
@@ -62,7 +61,7 @@ void    ServerManager::runServers()
         {
 		    Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: select error %s   Closing ....", strerror(errno));
             exit(1);
-            continue;
+            continue ;
         }
         for (int i = 0; i <= _biggest_fd; ++i)
         {
@@ -94,7 +93,7 @@ void    ServerManager::checkTimeout()
         {
             Logger::logMsg(INFO, CONSOLE_OUTPUT, "Client %d: Timeout Closing Connection..", it->first);
             closeConnection(it->first);
-            return;
+            return ;
         }
     }
 }
@@ -154,9 +153,8 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fcntl error %s", strerror(errno));
         removeFromSet(client_sock, _recv_fd_pool);
         close(client_sock);
-        return;
+        return ;
     }
-
     new_client.setSocket(client_sock);
     if (_clients_map.count(client_sock) != 0)
         _clients_map.erase(client_sock);
@@ -185,7 +183,6 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     int bytes_sent;
     std::string response = c.response.getRes();
     // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "sendResponse()");
-
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
     else
@@ -235,7 +232,7 @@ void    ServerManager::assignServer(Client &c)
             c.request.getServerName() == it->getServerName())
         {
             c.setServer(*it);
-            return;
+            return ;
         }
     }
 }
@@ -258,13 +255,13 @@ void    ServerManager::readRequest(const int &i, Client &c)
     {
         Logger::logMsg(INFO, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
         closeConnection(i);
-        return;
+        return ;
     }
     else if (bytes_read < 0)
     { 
         Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
         closeConnection(i);
-        return;
+        return ;
     }
     else if (bytes_read != 0)
     {
@@ -281,15 +278,13 @@ void    ServerManager::readRequest(const int &i, Client &c)
             Logger::logMsg(INFO, CONSOLE_OUTPUT, "Request From %d Parased --- Method: %s  Path: %s with body size = %d", i,
                 c.request.getMethodStr().c_str(), c.request.getPath().c_str(), c.request.getBody().length());
         assignServer(c);
-        c.buildResponse();
-        
+        c.buildResponse();     
         if (c.response.getCgiState())
         {
             handleReqBody(c);
             addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
             addToSet(c.response._cgi_obj.pipe_out[0],  _recv_fd_pool);
         }
-
         removeFromSet(i, _recv_fd_pool);
         addToSet(i, _write_fd_pool);
     }
@@ -297,10 +292,10 @@ void    ServerManager::readRequest(const int &i, Client &c)
 
 void    ServerManager::handleReqBody(Client &c)
 {
-    	if(c.request.getBody().length() == 0)
+    	if (c.request.getBody().length() == 0)
 		{
 			std::string tmp;
-			std::fstream file;(c.response._cgi_obj._cgi_path.c_str());
+			std::fstream file;(c.response._cgi_obj.getCgiPath().c_str());
 			std::stringstream ss;
 			ss << file.rdbuf();
 			tmp = ss.str();
@@ -314,7 +309,7 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
     int bytes_sent;
     std::string req_body = c.request.getBody();
     
-    if(req_body.length() == 0)
+    if (req_body.length() == 0)
         bytes_sent = 0;
     else if (req_body.length() >= MESSAGE_BUFFER)
         bytes_sent = write(cgi.pipe_in[1], req_body.c_str(), MESSAGE_BUFFER);
@@ -354,23 +349,19 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
 {
     char    buffer[MESSAGE_BUFFER * 2];
     int     bytes_read = 0;
+    // Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
     bytes_read = read(cgi.pipe_out[0], buffer, MESSAGE_BUFFER* 2); // set limit to the total request size to avoid infinite request size.
     // Logger::logMsg(ERROR, FILE_OUTPUT, "Output From CGI is: %s", buffer);
     
-    Logger::logMsg(DEBUG, CONSOLE_OUTPUT, "readCgiResponse()");
     if (bytes_read == 0)
     {
-        int status;
-        waitpid(cgi._cgi_pid, &status, 0);
-        if (WEXITSTATUS(status) != 0) 
-            c.response.setErrorResponse(500);
         removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
         close(cgi.pipe_in[0]);
         close(cgi.pipe_out[0]);
         c.response.setCgiState(2);        
         if (c.response._response_content.find("HTTP/1.1") == std::string::npos)
 		    c.response._response_content.insert(0, "HTTP/1.1 200 OK\r\n");
-        return;
+        return ;
     }
     else if (bytes_read < 0)
     { 
@@ -380,12 +371,12 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
         close(cgi.pipe_out[0]);
         c.response.setCgiState(2);        
         c.response.setErrorResponse(500);
-        return;
+        return ;
     }
     else
     {
         c.updateTime();
-        Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
+        // Logger::logMsg(INFO, CONSOLE_OUTPUT, "%d Bytes Read From Cgi !", bytes_read);
 		c.response._response_content.append(buffer, bytes_read);
 		memset(buffer, 0, sizeof(buffer));
     }

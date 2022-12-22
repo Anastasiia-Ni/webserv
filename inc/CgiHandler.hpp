@@ -9,11 +9,11 @@ class CgiHandler {
 		std::map<std::string, std::string>	_env;
 		char**								_ch_env;
 		char**								_argv;
-		int								_exit_status;
-
-	public:
+		int									_exit_status;
 		std::string							_cgi_path;
 		pid_t								_cgi_pid;
+
+	public:
 		int	pipe_in[2];
 		int	pipe_out[2];
 		

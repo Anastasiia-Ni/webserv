@@ -99,7 +99,6 @@ void ServerConfig::setHost(std::string parametr)
 void ServerConfig::setRoot(std::string root)
 {
 	checkToken(root);
-
 	if (ConfigFile::getTypePath(root) == 2)
 	{
 		this->_root = root;
@@ -115,9 +114,10 @@ void ServerConfig::setRoot(std::string root)
 
 void ServerConfig::setPort(std::string parametr)
 {
-	unsigned int port = 0;
+	unsigned int port;
+	
+	port = 0;
 	checkToken(parametr);
-
 	for (size_t i = 0; i < parametr.length(); i++)
 	{
 		if (!std::isdigit(parametr[i]))
@@ -131,9 +131,10 @@ void ServerConfig::setPort(std::string parametr)
 
 void ServerConfig::setClientMaxBodySize(std::string parametr)
 {
-	unsigned long body_size = 0;
+	unsigned long body_size;
+	
+	body_size = 0;
 	checkToken(parametr);
-
 	for (size_t i = 0; i < parametr.length(); i++)
 	{
 		if (parametr[i] < '0' || parametr[i] > '9')
@@ -164,7 +165,7 @@ void ServerConfig::setAutoindex(std::string autoindex)
 otherwise it creates a new pair: error code - path to the file */
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
-	if(parametr.empty())
+	if (parametr.empty())
 		return;
 	if (parametr.size() % 2 != 0)
 		throw ErrorException ("Error page initialization faled");
@@ -344,8 +345,6 @@ void ServerConfig::setLocation(std::string path, std::vector<std::string> parame
 		throw ErrorException("Failed redirection file in locaition validation");
 	else if (valid == 4)
 		throw ErrorException("Failed alias file in locaition validation");
-	// else if (valid == 5)
-	// 	throw ErrorException("Failed Index from location not found or unreadable");
 	this->_locations.push_back(new_location);
 }
 
@@ -357,37 +356,6 @@ void	ServerConfig::setFd(int fd)
 /* validation of parametrs */
 bool ServerConfig::isValidHost(std::string host) const
 {
-    // int dot_count = 0;
-	// int is_first_num = 1;
-    // int num = 0;
-
-	// if (host.size() > 15 || host.size() < 1)
-	// 	return (false);
-	// if (host == "127.0.0.1" || host == "0.0.0.0")
-	// 	return (true);
-	// if (*host.begin() == '.' || *(host.end() - 1) == '.')
-	// 	return (false);
-    // for (size_t i = 0; i < host.size(); i++)
-	// {
-	// 	if ((host[i] < '0' || host[i] > '9') && host[i] != '.')
-    //         return (false);
-    //     if ((host[i] < '1' || host[i] > '9') && is_first_num)
-    //         return (false);
-    //     if (host[i] == '.')
-	// 	{
-	// 		if (num > 255)
-    //             return (false);
-    //         dot_count++;
-    //         is_first_num = 1;
-    //         num = 0;
-    //         continue ;
-    //     }
-    //     num = num * 10 + host[i] - '0';
-    //     is_first_num = 0;
-    // }
-    // if (dot_count != 3)
-    //     return (false);
-    // return (true);
 	struct sockaddr_in sockaddr;
   	return (inet_pton(AF_INET, host.c_str(), &(sockaddr.sin_addr)) ? true : false);
 }
@@ -416,7 +384,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		{
 			std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
 			if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path, 4) < 0)
-				return 1;
+				return (1);
 		}
 		if (location.getCgiPath().size() != location.getCgiExtension().size())
 			return (1);
@@ -431,7 +399,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		{
 			std::string tmp = *it;
 			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh" && tmp != ".bla" && tmp != "*.bla")
-				return(1);
+				return (1);
 			for (it_path = location.getCgiPath().begin(); it_path != location.getCgiPath().end(); ++it_path)
 			{
 				std::string tmp_path = *it_path;
@@ -575,10 +543,10 @@ bool ServerConfig::checkLocaitons() const
 	return (false);
 }
 
-
+/* socket setup and binding */
 void	ServerConfig::setupServer(void)
 {
-	if((_listen_fd = socket(AF_INET, SOCK_STREAM, 0) )  == -1 )
+	if ((_listen_fd = socket(AF_INET, SOCK_STREAM, 0) )  == -1 )
     {
 		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: socket error %s   Closing ....", strerror(errno));
         exit(EXIT_FAILURE);
@@ -586,13 +554,10 @@ void	ServerConfig::setupServer(void)
 
     int option_value = 1;
     setsockopt(_listen_fd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
-
     memset(&_server_address, 0, sizeof(_server_address));
-
     _server_address.sin_family = AF_INET;
     _server_address.sin_addr.s_addr = _host;
     _server_address.sin_port = htons(_port);
-
     if (bind(_listen_fd, (struct sockaddr *) &_server_address, sizeof(_server_address)) == -1)
     {
 		Logger::logMsg(ERROR, CONSOLE_OUTPUT, "webserv: bind error %s   Closing ....", strerror(errno));
