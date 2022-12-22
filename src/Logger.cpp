@@ -24,7 +24,6 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
             }
             int fd = open(("./logs/" + file_name).c_str(), O_CREAT | O_APPEND | O_RDWR, 0664);
             write(fd, date.c_str(), date.length());
-            // write(fd, prio_str[p].c_str(), prio_str[p].length());
             write(fd, "   ", 3);
             write(fd, output, n);
             write(fd, "\n", 1);
@@ -33,7 +32,7 @@ void    Logger::logMsg(LogPrio p, Mode m, const char* msg, ...)
         else if (m == CONSOLE_OUTPUT)
         {
             if (p == DEBUG)
-                std::cout << YELLOW;
+                std::cout << LIGHTMAGENTA;
             else if (p == INFO)
                 std::cout << CYAN;
             else if (p == ERROR)
