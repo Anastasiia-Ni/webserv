@@ -4,7 +4,7 @@ Develop a server in C++.
 
 ///here paste the screenshot of the log from the terminal
 
-///insert project scheme here
+![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg)
 
 ## About project: 
 
@@ -38,13 +38,15 @@ It written in a scripting language (CGI scripts), but they may include compiled 
 To run CGI using fork().
 
 A model showing how CGI works:
-![](https://github.com/Anastasiia-Ni/.../CGI.jpg)
+
+
+![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/CGI.jpg)
 
 ## Index:
-- contains headers
-- contains the source code of the program
-- CGI scripts
-- Website 
+- [inc](https://github.com/Anastasiia-Ni/webserv/tree/main/inc) contains headers
+- [src](https://github.com/Anastasiia-Ni/webserv/tree/main/src) contains the source code of the program
+- [cgi-bin](https://github.com/Anastasiia-Ni/webserv/tree/main/cgi-bin) CGI scripts
+- [fusion_web](https://github.com/Anastasiia-Ni/webserv/tree/main/fusion_web) Website 
 
 ## Installation:
 ```
@@ -56,7 +58,7 @@ $ make
 ## Usage:
 - `./webserv`    - take default basic configuration files
 
-- `./webserv conf.conf`    - take path to a configuration file
+- `./webserv configs/name.conf`    - take path to a configuration file
 
 ## Resources:
 
@@ -77,6 +79,7 @@ Nginx
 - Interviews with Igor Sysoev
 
 Sockaddr
+- 
 
 CGI
 - RFC 3875 https://datatracker.ietf.org/doc/html/rfc3875
@@ -92,6 +95,6 @@ Cookies
 
 - RFC 6265
 
+Session management
 
-Will delete after submition
-- [Checklist for evaluation](https://github.com/mharriso/school21-checklists/blob/master/ng_5_webserv.pdf)
+- 
