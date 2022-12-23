@@ -2,15 +2,25 @@
 
 Develop a server in C++.
 
-///here paste the screenshot of the log from the terminal
+![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/screen.png)
 
 ![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg)
 
 ## About project: 
 
-/// write about the main idea with listening sockets and so on
+An HTTP server is a software application that listens for incoming requests from clients and responds to them over the Hypertext Transfer Protocol (HTTP). HTTP servers are commonly used to serve web pages and other types of content to clients, such as web browsers.
 
-This project was code for MacOS.
+When a client, such as a web browser, sends an HTTP request to a server, the server processes the request and sends an HTTP response back to the client. The response typically includes a status code indicating the result of the request, as well as any data requested by the client, such as a web page or image file.
+
+HTTP servers can be used to serve a wide range of content, including static files (such as HTML, CSS, and JavaScript files) and dynamic web applications.
+
+In the context of an HTTP server, a listening socket is used to listen for incoming HTTP requests from clients. When a client sends an HTTP request to the server, the server's listening socket accepts the connection and creates a new socket for the client to communicate with the server. The server then processes the request and sends an HTTP response back to the client via the newly created socket.
+
+Listening sockets are commonly used in server-client communication to allow the server to accept incoming connections from multiple clients simultaneously. This allows the server to scale to handle a large number of concurrent connections efficiently.
+
+In summary, an HTTP server uses a listening socket to listen for incoming HTTP requests from clients, and to create new sockets for communication with the clients. The HTTP server then processes the requests and sends responses back to the clients via the new sockets.
+
+This project was code for MacOS and for Google Chrome browser.
 
 The program is working with a configuration file default or pass by the argument.
 You can setup the port, the host, the allowed methods and some other basic paramaters for a webserver.
