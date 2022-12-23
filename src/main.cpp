@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
 			signal(SIGPIPE, sigpipeHandle);
 			/* configuration file as argument or default path */
-			config = (argc == 1 ? "default.conf" : argv[1]);
+			config = (argc == 1 ? "configs/default.conf" : argv[1]);
 			cluster.createCluster(config);
 			// cluster.print(); // for checking
 			master.setupServers(cluster.getServers());

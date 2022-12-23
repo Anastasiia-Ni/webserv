@@ -59,9 +59,6 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 /* init error page by default */
 void ServerConfig::initErrorPages(void)
 {
-	char dir[1024];
-	getcwd(dir, 1024);
-	std::string root = dir;
 	_error_pages[301] = "";
 	_error_pages[302] = "";
 	_error_pages[400] = "";
@@ -380,9 +377,17 @@ int ServerConfig::isValidLocation(Location &location) const
 	{
 		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
 			return (1);
+
+
 		if (ConfigFile::checkFile(location.getIndexLocation(), 4) < 0)
 		{
 			std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
+			if (ConfigFile::getTypePath(path) != 1)
+			{				
+				std::string root = getcwd(NULL, 0);
+				location.setRootLocation(root);
+				path = root + location.getPath() + "/" + location.getIndexLocation();
+			}
 			if (path.empty() || ConfigFile::getTypePath(path) != 1 || ConfigFile::checkFile(path, 4) < 0)
 				return (1);
 		}
@@ -398,7 +403,7 @@ int ServerConfig::isValidLocation(Location &location) const
 		for (it = location.getCgiExtension().begin(); it != location.getCgiExtension().end(); ++it)
 		{
 			std::string tmp = *it;
-			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh" && tmp != ".bla" && tmp != "*.bla")
+			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh")
 				return (1);
 			for (it_path = location.getCgiPath().begin(); it_path != location.getCgiPath().end(); ++it_path)
 			{
@@ -412,11 +417,6 @@ int ServerConfig::isValidLocation(Location &location) const
 				{
 					if (tmp_path.find("bash") != std::string::npos)
 						location._ext_path[".sh"] = tmp_path;
-				}
-				else if (tmp == ".bla" || tmp == "*.bla")
-				{
-					if (tmp_path.find("cgi_tester") != std::string::npos)
-						location._ext_path[".bla"] = tmp_path;
 				}
 			}
 		}
