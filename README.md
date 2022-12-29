@@ -101,10 +101,10 @@ Boundary
 
 - https://www.youtube.com/watch?v=_j5spdsJdV8&t=562s
 
-Cookies
+Cookies & Session management
 
-- RFC 6265
-
-Session management
-
-- 
+- [RFC 6265](https://www.rfc-editor.org/rfc/rfc6265)
+- [https://www.valentinog.com/blog/cookies/#what-are-cookies-in-web-development](https://www.valentinog.com/blog/cookies/#what-are-cookies-in-web-development)
+- [https://pymotw.com/3/http.cookies/](https://pymotw.com/3/http.cookies/)
+- [https://code.activestate.com/recipes/325484/](https://code.activestate.com/recipes/325484/)
+- [https://stackoverflow.com/questions/33318927/python-cgi-persistence-with-session-keys](https://stackoverflow.com/questions/33318927/python-cgi-persistence-with-session-keys)
