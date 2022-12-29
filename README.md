@@ -89,7 +89,8 @@ Nginx
 
 Sockaddr
 
-- 
+- [https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html](https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html)
+- [https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind](https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind)
 
 CGI
 - RFC 3875 https://datatracker.ietf.org/doc/html/rfc3875
