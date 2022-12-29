@@ -2,11 +2,11 @@
 
 Develop a server in C++.
 
-![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/screen.png)
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/screen.png" width=55% height=55%>
 
-![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg)
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg" width=55% height=55%>
 
-## About project: 
+## About the project: 
 
 An HTTP server is a software application that listens for incoming requests from clients and responds to them over the Hypertext Transfer Protocol (HTTP). HTTP servers are commonly used to serve web pages and other types of content to clients, such as web browsers.
 
@@ -49,8 +49,7 @@ To run CGI using fork().
 
 A model showing how CGI works:
 
-
-![](https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/CGI.jpg)
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/CGI.jpg" width=35% height=35%>
 
 ## Index:
 - [inc](https://github.com/Anastasiia-Ni/webserv/tree/main/inc) contains headers
@@ -89,6 +88,7 @@ Nginx
 - Interviews with Igor Sysoev
 
 Sockaddr
+
 - 
 
 CGI
