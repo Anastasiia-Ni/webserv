@@ -2,9 +2,7 @@
 
 Develop a server in C++.
 
-<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/screen.png" width=55% height=55%>
-
-<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg" width=55% height=55%>
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/HTTP_protocol.jpg" width=75% height=75%>
 
 ## About the project: 
 
@@ -49,7 +47,7 @@ To run CGI using fork().
 
 A model showing how CGI works:
 
-<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/CGI.jpg" width=35% height=35%>
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/CGI.jpg" width=55% height=55%>
 
 ## Index:
 - [inc](https://github.com/Anastasiia-Ni/webserv/tree/main/inc) contains headers
@@ -68,6 +66,8 @@ $ make
 - `./webserv`    - take default basic configuration files
 
 - `./webserv configs/name.conf`    - take path to a configuration file
+
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/screen.png" width=65% height=65%>
 
 ## Resources:
 
