@@ -114,7 +114,7 @@ Before writing your webserver, I would recommend reading [this](https://medium.c
 
 The I/O Multiplexing process in our web server is summarized in the flowchart below.
 
-<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/Multiplexing_process.png" width=80% height=80%>
+<img src="https://github.com/Anastasiia-Ni/webserv/blob/main/for_RM/Multiplexing_process.png" width=100% height=100%>
 
 ### Request Parser
 
