@@ -78,7 +78,8 @@ void    Response::date()
     _response_content.append("\r\n");
 
 }
-// uri ecnoding
+
+/* URI ecnoding */
 void    Response::setHeaders()
 {
     contentType();

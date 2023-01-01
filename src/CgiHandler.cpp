@@ -121,7 +121,7 @@ void CgiHandler::initEnvCgi(HttpRequest& req, const std::vector<Location>::itera
 
 	std::map<std::string, std::string> request_headers = req.getHeaders();
 	for(std::map<std::string, std::string>::iterator it = request_headers.begin();
-		it != request_headers.end(); ++it)
+	it != request_headers.end(); ++it)
 	{
 		std::string name = it->first;
 		std::transform(name.begin(), name.end(), name.begin(), ::toupper);
@@ -233,8 +233,6 @@ void CgiHandler::execute(short &error_code)
 		error_code = 500;
 	}
 }
-
-
 
 int CgiHandler::findStart(const std::string path, const std::string delim)
 {
