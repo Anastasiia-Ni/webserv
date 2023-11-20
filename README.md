@@ -185,7 +185,7 @@ A model showing how CGI works:
 
 ## Installation:
 ```
-$ git clone git@github.com:Anastasiia-Ni/
+$ git clone git@github.com:Anastasiia-Ni/webserv.git
 $ cd webserv
 $ make
 ```
